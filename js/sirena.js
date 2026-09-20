@@ -50,7 +50,6 @@ const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
 const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
 const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
 const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
-const LAYOUTS = [['dagre', 'layoutDagre'], ['elk', 'layoutElk']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
@@ -100,7 +99,6 @@ const el = {
   sizeSelect: $('size-select'),
   colorSelect: $('color-select'),
   curveSelect: $('curve-select'),
-  layoutSelect: $('layout-select'),
   coloresPropios: $('colores-propios'),
   colorFill: $('color-fill'),
   colorBorder: $('color-border'),
@@ -210,7 +208,6 @@ function buildAppearanceSelects() {
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve));
-  fillSelect(el.layoutSelect, LAYOUTS, localStorage.getItem(STORE.layout));
   fillSelect(el.directionSelect, DIRECTIONS, null, 'TD');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
@@ -235,7 +232,6 @@ function updateAppearanceVisibility() {
   const esFlujo = tipo === 'flowchart';
   const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(tipo);
   $('ajuste-curve').hidden = !esFlujo;
-  $('ajuste-layout').hidden = !esFlujo;
   $('ajuste-spacing').hidden = !esFlujo;
   $('ajuste-direction').hidden = !conDireccion;
   $('ajuste-numbering').hidden = tipo !== 'sequence';
@@ -500,9 +496,14 @@ function fitToWindow() {
   const box = el.canvas.getBoundingClientRect();
   const port = el.viewport.getBoundingClientRect();
   if (!box.width || !box.height) return;
-  // El ajuste amplía los diagramas pequeños además de reducir los grandes,
-  // hasta el doble de su tamaño, para que no se queden diminutos en el lienzo.
-  const scale = Math.min(port.width / box.width, port.height / box.height, 2.5);
+  // El ajuste amplía los diagramas pequeños además de reducir los grandes. Si el
+  // diagrama es mucho más alargado que el panel, encajarlo entero lo dejaría
+  // ilegible, así que se ajusta por su lado corto y se recorre desplazándolo.
+  const encaje = Math.min(port.width / box.width, port.height / box.height);
+  const relleno = Math.max(port.width / box.width, port.height / box.height);
+  const scale = encaje < relleno * 0.5
+    ? Math.min(relleno, 1)
+    : Math.min(encaje, 2.5);
   view.scale = scale > 0 ? scale : 1;
   view.x = Math.max(0, (port.width - box.width * view.scale) / 2);
   view.y = Math.max(0, (port.height - box.height * view.scale) / 2);
@@ -590,7 +591,6 @@ function appearanceConfig() {
   const config = {};
   const variables = {};
   if (el.lookSelect.value && el.lookSelect.value !== 'classic') config.look = el.lookSelect.value;
-  if (el.layoutSelect.value && el.layoutSelect.value !== 'dagre') config.layout = el.layoutSelect.value;
   if (el.sizeSelect.value && el.sizeSelect.value !== '16') variables.fontSize = el.sizeSelect.value + 'px';
   const color = colorVariables(el.colorSelect.value);
   if (color) {
@@ -676,7 +676,6 @@ function readAppearance() {
   }
   const variables = config.themeVariables || {};
   el.lookSelect.value = config.look || 'classic';
-  el.layoutSelect.value = config.layout || 'dagre';
   el.curveSelect.value = (config.flowchart && config.flowchart.curve) || 'basis';
   el.spacingSelect.value = String((config.flowchart && config.flowchart.nodeSpacing) || 50);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
@@ -1046,8 +1045,7 @@ async function loadFromHash() {
     const theme = params.get('t');
     if (theme && MERMAID_THEMES.includes(theme)) el.themeSelect.value = theme;
     const desdeEnlace = [[el.lookSelect, 'l', LOOKS], [el.sizeSelect, 's', SIZES],
-                         [el.colorSelect, 'c', COLORS], [el.curveSelect, 'cv', CURVES],
-                         [el.layoutSelect, 'ly', LAYOUTS]];
+                         [el.colorSelect, 'c', COLORS], [el.curveSelect, 'cv', CURVES]];
     desdeEnlace.forEach(([select, clave, opciones]) => {
       const valor = params.get(clave);
       if (valor !== null && opciones.some((opcion) => opcion[0] === valor)) select.value = valor;
@@ -1238,7 +1236,7 @@ function setupToolbar() {
   el.appearanceMenu.addEventListener('click', (event) => event.stopPropagation());
 
   [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size], [el.colorSelect, STORE.color],
-   [el.curveSelect, STORE.curve], [el.layoutSelect, STORE.layout]].forEach(([select, clave]) => {
+   [el.curveSelect, STORE.curve]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
       localStorage.setItem(clave, select.value);
       if (select === el.colorSelect && select.value === 'custom') {

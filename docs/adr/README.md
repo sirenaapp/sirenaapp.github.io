@@ -14,6 +14,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [6](0006-ayuda-y-accesibilidad.md) | La ayuda de sintaxis y los textos accesibles viven dentro de la página | aceptado |
 | [7](0007-ajustes-del-dibujo.md) | El aspecto del dibujo se ajusta con la configuración, sin tocar el código | sustituido por el 8 |
 | [8](0008-ajustes-escritos-en-el-codigo.md) | Los ajustes del dibujo se escriben en el código del diagrama | aceptado |
+| [9](0009-ajuste-de-la-vista.md) | Un diagrama muy alargado se ajusta por su lado corto | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

@@ -43,6 +43,11 @@ tiene efecto, y se actualiza al cambiar el código aunque el menú esté abierto
 - **Escribir la cabecera solo al guardar o al compartir.** Descartada porque
   seguiría sin verse mientras se trabaja.
 
+El motor de distribución elk se probó y se retiró del menú: en Mermaid 12.0.0 no
+cambia el dibujo, ni configurado como `layout: elk` ni escribiendo
+`flowchart-elk`. Medido sobre dos diagramas distintos, el resultado es idéntico
+al de dagre, así que era un control que no hacía nada.
+
 ## Consecuencias
 
 El código del diagrama gana una primera línea que no escribió el usuario. A
