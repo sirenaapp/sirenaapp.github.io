@@ -12,7 +12,10 @@ de la propia dirección.
 - Escribir el diagrama como texto y verlo dibujado al momento.
 - Elegir entre 18 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
-- Cambiar el aspecto del diagrama entre los cinco temas de Mermaid.
+- Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de
+  aspecto, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
+  color principal y, en los diagramas de flujo, la forma de las líneas y la
+  distribución. Todo eso viaja dentro del enlace compartido.
 - Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
   como imagen.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y

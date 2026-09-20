@@ -8,6 +8,11 @@ const STORE = {
   lang: 'sirena.lang',
   dark: 'sirena.dark',
   theme: 'sirena.theme',
+  look: 'sirena.look',
+  size: 'sirena.size',
+  color: 'sirena.color',
+  curve: 'sirena.curve',
+  layout: 'sirena.layout',
   width: 'sirena.editorWidth'
 };
 
@@ -40,6 +45,20 @@ const DEFAULT_CODE = {
 };
 
 const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
+
+// Ajustes del dibujo: cada uno es un valor de configuración de Mermaid.
+const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
+const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
+const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
+const LAYOUTS = [['dagre', 'layoutDagre'], ['elk', 'layoutElk']];
+const COLORS = [
+  ['', 'colorDefault', null],
+  ['blue', 'colorBlue', { primaryColor: '#d0ebff', primaryBorderColor: '#1971c2', lineColor: '#1971c2' }],
+  ['green', 'colorGreen', { primaryColor: '#d3f9d8', primaryBorderColor: '#2f9e44', lineColor: '#2f9e44' }],
+  ['orange', 'colorOrange', { primaryColor: '#ffe8cc', primaryBorderColor: '#e8590c', lineColor: '#e8590c' }],
+  ['purple', 'colorPurple', { primaryColor: '#e5dbff', primaryBorderColor: '#6741d9', lineColor: '#6741d9' }],
+  ['gray', 'colorGray', { primaryColor: '#e9ecef', primaryBorderColor: '#495057', lineColor: '#495057' }]
+];
 const THEME_KEYS = {
   default: 'themeDefault',
   neutral: 'themeNeutral',
@@ -71,7 +90,13 @@ const el = {
   a11yTitle: $('a11y-title'),
   a11yDescr: $('a11y-descr'),
   syntaxBox: $('syntax-box'),
-  downloadMenu: $('download-menu')
+  downloadMenu: $('download-menu'),
+  appearanceMenu: $('appearance-menu'),
+  lookSelect: $('look-select'),
+  sizeSelect: $('size-select'),
+  colorSelect: $('color-select'),
+  curveSelect: $('curve-select'),
+  layoutSelect: $('layout-select')
 };
 
 let lang = 'es';
@@ -119,6 +144,7 @@ function applyLang(code) {
 
   buildExampleSelect();
   buildThemeSelect();
+  buildAppearanceSelects();
   buildLangMenu();
   updateStatus();
 }
@@ -155,6 +181,31 @@ function buildExampleSelect() {
     });
     select.appendChild(optgroup);
   });
+}
+
+function fillSelect(select, opciones, guardado, predeterminado) {
+  const porDefecto = predeterminado !== undefined ? predeterminado : opciones[0][0];
+  const actual = select.value || guardado || porDefecto;
+  select.innerHTML = '';
+  opciones.forEach(([valor, clave]) => select.appendChild(new Option(t(clave), valor)));
+  select.value = opciones.some(([v]) => v === actual) ? actual : porDefecto;
+}
+
+function buildAppearanceSelects() {
+  fillSelect(el.lookSelect, LOOKS, localStorage.getItem(STORE.look));
+  fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
+  fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
+  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve));
+  fillSelect(el.layoutSelect, LAYOUTS, localStorage.getItem(STORE.layout));
+}
+
+// La forma de las líneas y la distribución solo tienen sentido en los
+// diagramas de flujo, así que fuera de ellos no se muestran.
+function updateAppearanceVisibility() {
+  const esFlujo = /^\s*(flowchart|graph)\b/m.test(el.editor.value);
+  $('ajuste-curve').hidden = !esFlujo;
+  $('ajuste-layout').hidden = !esFlujo;
+  document.querySelector('.ajuste-nota').hidden = esFlujo;
 }
 
 function buildThemeSelect() {
@@ -244,15 +295,23 @@ function updateStatus(extra) {
 /* --- Dibujo del diagrama --- */
 
 function initMermaid() {
+  const color = COLORS.find(([valor]) => valor === el.colorSelect.value);
+  const variables = Object.assign(
+    { fontSize: (el.sizeSelect.value || '16') + 'px' },
+    color && color[2] ? color[2] : {}
+  );
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    theme: el.themeSelect.value || defaultMermaidTheme(),
+    theme: color && color[2] ? 'base' : (el.themeSelect.value || defaultMermaidTheme()),
+    look: el.lookSelect.value || 'classic',
+    layout: el.layoutSelect.value || 'dagre',
+    themeVariables: variables,
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
     htmlLabels: false,
-    flowchart: { useMaxWidth: false, htmlLabels: false },
+    flowchart: { useMaxWidth: false, htmlLabels: false, curve: el.curveSelect.value || 'basis' },
     sequence: { useMaxWidth: false },
     gantt: { useMaxWidth: false },
     er: { useMaxWidth: false },
@@ -421,6 +480,7 @@ function setupPan() {
 
   el.viewport.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
+    event.preventDefault();
     dragging = true;
     startX = event.clientX - view.x;
     startY = event.clientY - view.y;
@@ -444,6 +504,9 @@ function setupPan() {
 
   el.viewport.addEventListener('pointerup', end);
   el.viewport.addEventListener('pointercancel', end);
+
+  // Firefox y Chromium arrancan su propio arrastre de imagen sobre el SVG.
+  el.viewport.addEventListener('dragstart', (event) => event.preventDefault());
 
   el.viewport.addEventListener('wheel', (event) => {
     if (!event.ctrlKey && Math.abs(event.deltaY) < 2) return;
@@ -739,6 +802,15 @@ async function buildLink(extra) {
   const params = new URLSearchParams();
   params.set(deflated ? 'z' : 'd', toBase64Url(raw));
   params.set('t', el.themeSelect.value);
+  // Los ajustes del dibujo viajan con el enlace: así quien lo abre, o la página
+  // donde se incrusta, ve el diagrama tal como se dejó.
+  const ajustes = { l: el.lookSelect.value, s: el.sizeSelect.value, c: el.colorSelect.value,
+                    cv: el.curveSelect.value, ly: el.layoutSelect.value };
+  Object.entries(ajustes).forEach(([clave, valor]) => {
+    if (valor && valor !== 'classic' && valor !== '16' && valor !== 'basis' && valor !== 'dagre') {
+      params.set(clave, valor);
+    }
+  });
   if (extra) Object.entries(extra).forEach(([key, value]) => params.set(key, value));
   return location.origin + location.pathname + '#' + params.toString();
 }
@@ -785,6 +857,13 @@ async function loadFromHash() {
     el.editor.value = code;
     const theme = params.get('t');
     if (theme && MERMAID_THEMES.includes(theme)) el.themeSelect.value = theme;
+    const desdeEnlace = [[el.lookSelect, 'l', LOOKS], [el.sizeSelect, 's', SIZES],
+                         [el.colorSelect, 'c', COLORS], [el.curveSelect, 'cv', CURVES],
+                         [el.layoutSelect, 'ly', LAYOUTS]];
+    desdeEnlace.forEach(([select, clave, opciones]) => {
+      const valor = params.get(clave);
+      if (valor !== null && opciones.some((opcion) => opcion[0] === valor)) select.value = valor;
+    });
     if (params.get('v') === '1') enableViewer(params);
     return true;
   } catch (_) {
@@ -918,6 +997,7 @@ function setupToolbar() {
   document.addEventListener('click', () => {
     el.langMenu.hidden = true;
     el.downloadMenu.hidden = true;
+    el.appearanceMenu.hidden = true;
   });
 
   $('btn-a11y').addEventListener('click', () => {
@@ -952,6 +1032,25 @@ function setupToolbar() {
     if (!found) return;
     el.editor.value = exampleCode(found);
     render();
+  });
+
+  $('btn-appearance').addEventListener('click', (event) => {
+    event.stopPropagation();
+    updateAppearanceVisibility();
+    el.appearanceMenu.hidden = !el.appearanceMenu.hidden;
+    el.downloadMenu.hidden = true;
+    el.langMenu.hidden = true;
+  });
+
+  el.appearanceMenu.addEventListener('click', (event) => event.stopPropagation());
+
+  [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size], [el.colorSelect, STORE.color],
+   [el.curveSelect, STORE.curve], [el.layoutSelect, STORE.layout]].forEach(([select, clave]) => {
+    select.addEventListener('change', () => {
+      localStorage.setItem(clave, select.value);
+      initMermaid();
+      render();
+    });
   });
 
   el.themeSelect.addEventListener('change', () => {
@@ -1019,6 +1118,7 @@ async function start() {
   const savedTheme = localStorage.getItem(STORE.theme);
   el.themeSelect.value = savedTheme && MERMAID_THEMES.includes(savedTheme) ? savedTheme : defaultMermaidTheme();
 
+  buildAppearanceSelects();
   setupToolbar();
   setupSplitter();
   setupPan();
