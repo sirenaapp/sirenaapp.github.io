@@ -47,7 +47,7 @@ Solo se ofrecen los ajustes que cambian el dibujo de verdad, medidos uno a uno
 sobre el mismo diagrama. `flowchart.padding` y `wrappingWidth` no tuvieron
 efecto en Mermaid 12.0.0 y quedaron fuera. La forma de las líneas y la
 separación tampoco lo tenían, pero porque dependen del motor de distribución:
-se explica y se resuelve en el [ADR 12](0012-motor-dagre-por-defecto-y-lineas-curvas.md).
+se explica y se resuelve en el [ADR 12](0012-motor-de-distribucion-escrito-en-la-cabecera.md).
 
 ## Consecuencias
 

@@ -87,7 +87,7 @@ window.SIRENA_LANG.en = {
   curveBasis: 'Curved',
   curveLinear: 'Straight',
   curveStep: 'Stepped',
-  curveElk: 'Right-angled',
+  curveElk: 'Right-angled (elk)',
   spacing: 'Spacing',
   spacingS: 'Compact',
   spacingM: 'Normal',

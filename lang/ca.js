@@ -87,7 +87,7 @@ window.SIRENA_LANG.ca = {
   curveBasis: 'Corbes',
   curveLinear: 'Rectes',
   curveStep: 'Esglaonades',
-  curveElk: 'En angle recte',
+  curveElk: 'En angle recte (elk)',
   spacing: 'Separació',
   spacingS: 'Compacta',
   spacingM: 'Normal',

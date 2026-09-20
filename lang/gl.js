@@ -87,7 +87,7 @@ window.SIRENA_LANG.gl = {
   curveBasis: 'Curvas',
   curveLinear: 'Rectas',
   curveStep: 'Escalonadas',
-  curveElk: 'En ángulo recto',
+  curveElk: 'En ángulo recto (elk)',
   spacing: 'Separación',
   spacingS: 'Compacta',
   spacingM: 'Normal',

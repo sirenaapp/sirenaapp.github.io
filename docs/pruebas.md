@@ -29,7 +29,7 @@ lanzar a mano desde la pestaña Actions del repositorio.
 
 Mermaid 12 cambió el motor de distribución por defecto de `dagre` a `elk`, que
 no atiende a la forma de las líneas (`flowchart.curve`) ni a la separación
-(`nodeSpacing`, `rankSpacing`). Sirena arranca con `dagre` y escribe el motor en
-la cabecera cuando hace falta; la tabla con lo medido está en
-[docs/adr/0012](adr/0012-motor-dagre-por-defecto-y-lineas-curvas.md). Al
+(`nodeSpacing`, `rankSpacing`). Sirena mantiene `elk`, pasa a `dagre` al elegir otra forma de línea y escribe
+siempre el motor en la cabecera; la tabla con lo medido está en
+[docs/adr/0012](adr/0012-motor-de-distribucion-escrito-en-la-cabecera.md). Al
 actualizar Mermaid conviene repetir esas medidas.

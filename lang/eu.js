@@ -87,7 +87,7 @@ window.SIRENA_LANG.eu = {
   curveBasis: 'Kurbatuak',
   curveLinear: 'Zuzenak',
   curveStep: 'Mailakatuak',
-  curveElk: 'Angelu zuzenean',
+  curveElk: 'Angelu zuzenean (elk)',
   spacing: 'Tartea',
   spacingS: 'Trinkoa',
   spacingM: 'Normala',

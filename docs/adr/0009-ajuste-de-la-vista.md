@@ -35,7 +35,7 @@ diagrama de flujo de veinte pasos (476 × 1949 con el trazado normal):
 | Trazado | Tamaño | Resultado |
 |---|---|---|
 | por defecto | 476 × 1949 | columna estrecha y muy alta |
-| elk | 476 × 1949 | igual, porque en Mermaid 12 ya es el motor por defecto ([ADR 12](0012-motor-dagre-por-defecto-y-lineas-curvas.md)) |
+| elk | 476 × 1949 | igual, porque en Mermaid 12 ya es el motor por defecto ([ADR 12](0012-motor-de-distribucion-escrito-en-la-cabecera.md)) |
 | elk.mrtree | 558 × 1490 | algo menos alto, rótulos de flecha descolocados |
 | elk.stress | 911 × 631 | compacto, pero los pasos se solapan |
 | elk.rectpacking | 728 × 464 | entra entero, pero el orden se pierde |

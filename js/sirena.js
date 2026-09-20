@@ -52,9 +52,9 @@ const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
 const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
 const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
 // Las líneas y la separación solo las atiende el motor dagre. Mermaid 12 usa elk
-// por defecto, que las ignora y traza en ángulo recto. Sirena arranca con dagre
-// (líneas curvas) y, al elegir otra cosa, escribe el motor en la cabecera.
-const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep'], ['elk', 'curveElk']];
+// por defecto, que las ignora y traza en ángulo recto. Sirena lo respeta y, en
+// los diagramas de flujo, escribe siempre el motor en la cabecera (ADR 12).
+const CURVES = [['elk', 'curveElk'], ['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
@@ -414,7 +414,7 @@ function buildAppearanceSelects() {
   fillSelect(el.lookSelect, LOOKS, localStorage.getItem(STORE.look));
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
-  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'basis');
+  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'elk');
   fillSelect(el.directionSelect, DIRECTIONS, null, 'TD');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
@@ -540,8 +540,6 @@ function initMermaid() {
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    // Mermaid 12 trae elk por defecto; con dagre las líneas salen curvas (ADR 8).
-    layout: 'dagre',
     theme: el.themeSelect.value || defaultMermaidTheme(),
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
@@ -856,7 +854,7 @@ function appearanceConfig() {
   const esFlujo = diagramKind() === 'flowchart';
   if (esFlujo && curva === 'elk') {
     config.layout = 'elk';
-  } else if (esFlujo && (curva !== 'basis' || separacion !== '50')) {
+  } else if (esFlujo) {
     config.layout = 'dagre';
     if (curva !== 'basis') flowchart.curve = curva;
     if (separacion !== '50') {
@@ -940,7 +938,7 @@ function readAppearance() {
   const variables = config.themeVariables || {};
   el.lookSelect.value = config.look || 'classic';
   const flujo = config.flowchart || {};
-  el.curveSelect.value = config.layout === 'elk' ? 'elk' : (flujo.curve || 'basis');
+  el.curveSelect.value = config.layout === 'dagre' ? (flujo.curve || 'basis') : 'elk';
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
