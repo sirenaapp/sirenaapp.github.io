@@ -1277,6 +1277,76 @@ async function downloadAs(formato) {
   if (canvas) canvas.toBlob((blob) => blob && download(blob, nombre + '.png'), 'image/png');
 }
 
+/* --- Impresión, que es también la forma de guardar en PDF --- */
+
+// La hoja va siempre con fondo blanco, aunque se esté trabajando en modo
+// oscuro, y el dibujo se ajusta a lo que cabe en ella. La orientación sale de
+// la forma del diagrama, para que uno ancho no se imprima diminuto en vertical.
+function printablePage() {
+  const data = svgForExport();
+  if (!data) return null;
+  const acc = readAccessibility();
+  const titulo = acc.titulo || diagramName();
+  const pie = acc.titulo || acc.descr
+    ? `\n  <figcaption>${escapeHtml(acc.titulo)}${acc.descr ? `<p>${escapeHtml(acc.descr)}</p>` : ''}</figcaption>`
+    : '';
+  const orientacion = data.width > data.height ? 'landscape' : 'portrait';
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8">
+<title>${escapeHtml(titulo)}</title>
+<style>
+  @page { size: A4 ${orientacion}; margin: 12mm; }
+  html, body { height: 100%; }
+  body { margin: 0; background: #fff; color: #17262b;
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  figure { display: flex; flex-direction: column; gap: 10px; height: 100%; margin: 0; }
+  /* El dibujo ocupa lo que le deja el pie y se amplía hasta llenar la hoja: es
+     vectorial, así que no pierde calidad al agrandarse. */
+  .lienzo { flex: 1 1 auto; min-height: 0; display: flex; }
+  .lienzo svg { width: 100%; height: 100%; }
+  figcaption { flex: none; text-align: center; color: #5c7078; font-size: 12px; }
+  figcaption p { margin: 4px 0 0; }
+</style>
+</head>
+<body>
+<figure role="img" aria-label="${escapeHtml(titulo)}">
+  <div class="lienzo">${data.markup}</div>${pie}
+</figure>
+</body>
+</html>`;
+}
+
+// Se imprime desde un marco aparte y no desde la propia página, de modo que no
+// haya que esconder con reglas de impresión la barra, el editor y el pie.
+async function printDiagram() {
+  const pagina = printablePage();
+  if (!pagina) {
+    toast(t('printEmpty'));
+    return;
+  }
+  const marco = document.createElement('iframe');
+  marco.setAttribute('aria-hidden', 'true');
+  marco.setAttribute('tabindex', '-1');
+  marco.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;';
+  document.body.appendChild(marco);
+  try {
+    await new Promise((listo) => {
+      marco.addEventListener('load', listo, { once: true });
+      marco.srcdoc = pagina;
+    });
+    try { await marco.contentDocument.fonts.ready; } catch (_) { /* sin esperar */ }
+    marco.contentWindow.focus();
+    marco.contentWindow.print();
+  } finally {
+    // El diálogo de impresión detiene el guion hasta que se cierra, pero no en
+    // todos los navegadores: se deja un margen antes de retirar el marco.
+    setTimeout(() => marco.remove(), 3000);
+    el.editor.focus({ preventScroll: true });
+  }
+}
+
 async function copyText(text, message) {
   try {
     await navigator.clipboard.writeText(text);
@@ -1503,6 +1573,8 @@ function setupToolbar() {
       downloadAs(boton.dataset.formato);
     });
   });
+
+  $('btn-print').addEventListener('click', () => printDiagram());
 
   $('btn-copy-code').addEventListener('click', () => copyText(el.editor.value, t('copied')));
 

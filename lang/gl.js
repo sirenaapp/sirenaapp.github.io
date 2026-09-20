@@ -30,6 +30,8 @@ window.SIRENA_LANG.gl = {
   syntaxInsert: 'Ao premer un fragmento, insírese no editor.',
   syntaxUnknown: 'Para este tipo de diagrama, a sintaxe está na referencia de Mermaid.',
   downloads: 'Descargar o diagrama',
+  print: 'Imprimir ou gardar en PDF',
+  printEmpty: 'Non hai ningún diagrama que imprimir.',
   dlPng: 'Imaxe PNG',
   dlPngD: 'Para inserir nun documento ou nunha presentación',
   dlSvg: 'Imaxe SVG',

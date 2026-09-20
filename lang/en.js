@@ -30,6 +30,8 @@ window.SIRENA_LANG.en = {
   syntaxInsert: 'Clicking a snippet inserts it into the editor.',
   syntaxUnknown: 'For this diagram type, the syntax is in the Mermaid reference.',
   downloads: 'Download the diagram',
+  print: 'Print or save as PDF',
+  printEmpty: 'There is no diagram to print.',
   dlPng: 'PNG image',
   dlPngD: 'To insert into a document or a presentation',
   dlSvg: 'SVG image',

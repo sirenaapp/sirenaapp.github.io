@@ -30,6 +30,8 @@ window.SIRENA_LANG.eu = {
   syntaxInsert: 'Zati bat sakatzean, editorean txertatzen da.',
   syntaxUnknown: 'Diagrama mota honetarako, sintaxia Mermaid-en erreferentzian dago.',
   downloads: 'Deskargatu diagrama',
+  print: 'Inprimatu edo PDF gisa gorde',
+  printEmpty: 'Ez dago inprimatzeko diagramarik.',
   dlPng: 'PNG irudia',
   dlPngD: 'Dokumentu batean edo aurkezpen batean txertatzeko',
   dlSvg: 'SVG irudia',

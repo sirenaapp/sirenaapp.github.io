@@ -3,9 +3,11 @@
 Editor libre de diagramas [Mermaid](https://mermaid.js.org/) que funciona por
 completo en el navegador: **<https://sirenaapp.github.io>**
 
-No hay cuenta, ni servidor, ni límite de diagramas. El código que se escribe no
-sale del equipo, y el enlace para compartir lleva el diagrama comprimido dentro
-de la propia dirección.
+No hay cuenta, ni servidor, ni límite de diagramas: se pueden hacer todos los
+que se quiera. Solo la biblioteca del navegador tiene un máximo de diagramas
+guardados, que se elige entre 10 y 100. El código que se escribe no sale del
+equipo, y el enlace para compartir lleva el diagrama comprimido dentro de la
+propia dirección.
 
 ## Qué permite hacer
 
@@ -22,6 +24,8 @@ de la propia dirección.
   igual en cualquier editor de Mermaid.
 - Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
   como imagen.
+- Imprimir el diagrama o guardarlo en PDF, en una hoja A4 que toma la
+  orientación de la forma del diagrama.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla.
 - Consultar la sintaxis del tipo de diagrama que se está escribiendo, en la

@@ -30,6 +30,8 @@ window.SIRENA_LANG.ca = {
   syntaxInsert: "En prémer un fragment, s'insereix a l'editor.",
   syntaxUnknown: 'Per a aquest tipus de diagrama, la sintaxi és a la referència de Mermaid.',
   downloads: 'Baixar el diagrama',
+  print: 'Imprimir o desar en PDF',
+  printEmpty: 'No hi ha cap diagrama per imprimir.',
   dlPng: 'Imatge PNG',
   dlPngD: 'Per inserir en un document o una presentació',
   dlSvg: 'Imatge SVG',
