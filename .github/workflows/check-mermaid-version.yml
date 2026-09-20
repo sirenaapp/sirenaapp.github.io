@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: '0 6 * * 1'   # cada lunes a las 6:00 UTC
   workflow_dispatch:
+    inputs:
+      version_simulada:
+        description: 'Versión ficticia para probar el aviso (dejar vacío para consultar npm)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -21,7 +26,8 @@ jobs:
         id: versiones
         run: |
           instalada="$(cat vendor/mermaid/VERSION)"
-          ultima="$(npm view mermaid version)"
+          ultima="${{ github.event.inputs.version_simulada }}"
+          [ -n "$ultima" ] || ultima="$(npm view mermaid version)"
           echo "instalada=$instalada" >> "$GITHUB_OUTPUT"
           echo "ultima=$ultima" >> "$GITHUB_OUTPUT"
           if [ "$instalada" = "$ultima" ]; then
@@ -45,20 +51,5 @@ jobs:
             echo "La incidencia ya estaba abierta."
             exit 0
           fi
-          gh issue create --title "$titulo" --label mermaid --body "$(cat <<CUERPO
-Mermaid ha publicado la versión **$ULTIMA**. Sirena sigue con la **$INSTALADA**.
-
-Para actualizarla:
-
-\`\`\`bash
-scripts/actualizar-mermaid.sh
-\`\`\`
-
-Después conviene comprobar lo que indica [docs/pruebas.md](../blob/main/docs/pruebas.md):
-que los 18 ejemplos se dibujan y se exportan a PNG en Chromium y en Firefox, y que
-el enlace compartido sigue restaurando el código. En un salto de versión mayor,
-revisar además si ha cambiado la sintaxis de algún tipo de diagrama.
-
-Aviso automático de [.github/workflows/check-mermaid-version.yml](../blob/main/.github/workflows/check-mermaid-version.yml).
-CUERPO
-)"
+          cuerpo="$(INSTALADA="$INSTALADA" ULTIMA="$ULTIMA" envsubst '$INSTALADA $ULTIMA' < .github/aviso-mermaid.md)"
+          gh issue create --title "$titulo" --label mermaid --body "$cuerpo"
