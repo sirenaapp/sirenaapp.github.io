@@ -30,6 +30,12 @@ dibujo: relleno, borde, líneas y texto, que son las variables `primaryColor`,
 relleno, los otros tres se recalculan solos mientras no se hayan tocado a mano;
 en cuanto se elige uno, ese se respeta.
 
+No todos los ajustes son configuración: la dirección del diagrama y el mostrar
+los valores de un diagrama de sectores son parte de su sintaxis, así que se
+escriben en el cuerpo (`flowchart LR`, una línea `direction LR`, `pie showData`)
+y no en la cabecera. Cada control aparece solo en los tipos de diagrama donde
+tiene efecto, y se actualiza al cambiar el código aunque el menú esté abierto.
+
 ## Alternativas descartadas
 
 - **Mantener la configuración solo en la aplicación (ADR 7).** Descartada: el

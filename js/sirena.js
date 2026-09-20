@@ -51,6 +51,9 @@ const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'l
 const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
 const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
 const LAYOUTS = [['dagre', 'layoutDagre'], ['elk', 'layoutElk']];
+const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
+const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
+const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
 const COLORS = [
   ['', 'colorDefault', null],
   ['blue', 'colorBlue', { primaryColor: '#d0ebff', primaryBorderColor: '#1971c2', lineColor: '#1971c2' }],
@@ -102,7 +105,11 @@ const el = {
   colorFill: $('color-fill'),
   colorBorder: $('color-border'),
   colorLine: $('color-line'),
-  colorText: $('color-text')
+  colorText: $('color-text'),
+  directionSelect: $('direction-select'),
+  spacingSelect: $('spacing-select'),
+  numberingSelect: $('numbering-select'),
+  showDataSelect: $('showdata-select')
 };
 
 let lang = 'es';
@@ -204,15 +211,38 @@ function buildAppearanceSelects() {
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve));
   fillSelect(el.layoutSelect, LAYOUTS, localStorage.getItem(STORE.layout));
+  fillSelect(el.directionSelect, DIRECTIONS, null, 'TD');
+  fillSelect(el.spacingSelect, SPACINGS, null, '50');
+  fillSelect(el.numberingSelect, YESNO, null, 'no');
+  fillSelect(el.showDataSelect, YESNO, null, 'no');
 }
 
 // La forma de las líneas y la distribución solo tienen sentido en los
 // diagramas de flujo, así que fuera de ellos no se muestran.
+function diagramKind() {
+  const code = el.editor.value.replace(INIT_RE, '');
+  if (/^\s*(flowchart|graph)\b/m.test(code)) return 'flowchart';
+  if (/^\s*stateDiagram(-v2)?\b/m.test(code)) return 'state';
+  if (/^\s*classDiagram\b/m.test(code)) return 'class';
+  if (/^\s*erDiagram\b/m.test(code)) return 'er';
+  if (/^\s*sequenceDiagram\b/m.test(code)) return 'sequence';
+  if (/^\s*pie\b/m.test(code)) return 'pie';
+  return 'otro';
+}
+
 function updateAppearanceVisibility() {
-  const esFlujo = /^\s*(flowchart|graph)\b/m.test(el.editor.value);
+  const tipo = diagramKind();
+  const esFlujo = tipo === 'flowchart';
+  const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(tipo);
   $('ajuste-curve').hidden = !esFlujo;
   $('ajuste-layout').hidden = !esFlujo;
+  $('ajuste-spacing').hidden = !esFlujo;
+  $('ajuste-direction').hidden = !conDireccion;
+  $('ajuste-numbering').hidden = tipo !== 'sequence';
+  $('ajuste-showdata').hidden = tipo !== 'pie';
   $('nota-flujo').hidden = esFlujo;
+  readDirection();
+  readShowData();
 }
 
 function buildThemeSelect() {
@@ -568,8 +598,62 @@ function appearanceConfig() {
     config.theme = 'base';
   }
   if (Object.keys(variables).length) config.themeVariables = variables;
-  if (el.curveSelect.value && el.curveSelect.value !== 'basis') config.flowchart = { curve: el.curveSelect.value };
+  const flowchart = {};
+  if (el.curveSelect.value && el.curveSelect.value !== 'basis') flowchart.curve = el.curveSelect.value;
+  if (el.spacingSelect.value && el.spacingSelect.value !== '50') {
+    flowchart.nodeSpacing = Number(el.spacingSelect.value);
+    flowchart.rankSpacing = Number(el.spacingSelect.value);
+  }
+  if (Object.keys(flowchart).length) config.flowchart = flowchart;
+  if (el.numberingSelect.value === 'yes') config.sequence = { showSequenceNumbers: true };
   return config;
+}
+
+// La dirección vive en el cuerpo del diagrama: en la primera línea de los de
+// flujo (flowchart TD) y en una línea «direction» en los demás que la admiten.
+function writeDirection() {
+  const tipo = diagramKind();
+  const valor = el.directionSelect.value || 'TD';
+  const cabecera = INIT_RE.exec(el.editor.value);
+  const inicio = cabecera ? cabecera[0] : '';
+  let cuerpo = el.editor.value.slice(inicio.length);
+
+  if (tipo === 'flowchart') {
+    cuerpo = cuerpo.replace(/^(\s*)(flowchart|graph)\b[ \t]*(TB|TD|BT|LR|RL)?/m, `$1$2 ${valor}`);
+  } else if (['state', 'class', 'er'].includes(tipo)) {
+    const conDireccion = /^[ \t]*direction[ \t]+(TB|TD|BT|LR|RL)[ \t]*$/m;
+    if (conDireccion.test(cuerpo)) {
+      cuerpo = cuerpo.replace(conDireccion, (linea) => linea.replace(/(TB|TD|BT|LR|RL)/, valor));
+    } else if (valor !== 'TD') {
+      const lineas = cuerpo.split('\n');
+      const primera = lineas.findIndex((linea) => linea.trim());
+      const sangria = (lineas[primera + 1] || '    ').match(/^[ \t]*/)[0] || '    ';
+      lineas.splice(primera + 1, 0, `${sangria}direction ${valor}`);
+      cuerpo = lineas.join('\n');
+    }
+  }
+  el.editor.value = inicio + cuerpo;
+}
+
+// Lee del código la dirección que ya tenga, para colocar el selector.
+function readDirection() {
+  const cuerpo = el.editor.value.replace(INIT_RE, '');
+  const flujo = /^\s*(?:flowchart|graph)\b[ \t]*(TB|TD|BT|LR|RL)\b/m.exec(cuerpo);
+  const suelta = /^[ \t]*direction[ \t]+(TB|TD|BT|LR|RL)[ \t]*$/m.exec(cuerpo);
+  const valor = (flujo && flujo[1]) || (suelta && suelta[1]) || 'TD';
+  el.directionSelect.value = valor === 'TB' ? 'TD' : valor;
+}
+
+// «Mostrar los valores» es una palabra del propio diagrama de sectores.
+function writeShowData() {
+  if (diagramKind() !== 'pie') return;
+  const quiere = el.showDataSelect.value === 'yes';
+  el.editor.value = el.editor.value.replace(/^([ \t]*pie)([ \t]+showData)?/m,
+    (coincidencia, inicio) => inicio + (quiere ? ' showData' : ''));
+}
+
+function readShowData() {
+  el.showDataSelect.value = /^[ \t]*pie[ \t]+showData\b/m.test(el.editor.value) ? 'yes' : 'no';
 }
 
 // Escribe (o quita) la cabecera de configuración al principio del código.
@@ -594,6 +678,10 @@ function readAppearance() {
   el.lookSelect.value = config.look || 'classic';
   el.layoutSelect.value = config.layout || 'dagre';
   el.curveSelect.value = (config.flowchart && config.flowchart.curve) || 'basis';
+  el.spacingSelect.value = String((config.flowchart && config.flowchart.nodeSpacing) || 50);
+  el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
+  readDirection();
+  readShowData();
   el.sizeSelect.value = variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16';
 
   const primario = variables.primaryColor || '';
@@ -1162,6 +1250,20 @@ function setupToolbar() {
     });
   });
 
+  el.directionSelect.addEventListener('change', () => {
+    writeDirection();
+    render();
+  });
+
+  el.showDataSelect.addEventListener('change', () => {
+    writeShowData();
+    render();
+  });
+
+  [el.spacingSelect, el.numberingSelect].forEach((select) => {
+    select.addEventListener('change', () => writeAppearance());
+  });
+
   el.colorFill.addEventListener('input', () => {
     deriveColors();
     writeAppearance();
@@ -1212,6 +1314,7 @@ function setupToolbar() {
       el.a11yModal.hidden = true;
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
+      el.appearanceMenu.hidden = true;
     }
   });
 }
@@ -1250,7 +1353,13 @@ async function start() {
   }
 
   initMermaid();
-  el.editor.addEventListener('input', () => { updateStatus(); renderGutter(); readAppearance(); scheduleRender(); });
+  el.editor.addEventListener('input', () => {
+    updateStatus();
+    renderGutter();
+    readAppearance();
+    if (!el.appearanceMenu.hidden) updateAppearanceVisibility();
+    scheduleRender();
+  });
   el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });
   el.errorBox.addEventListener('click', () => { if (errorLine) goToLine(errorLine); });
 
