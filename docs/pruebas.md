@@ -27,10 +27,9 @@ lanzar a mano desde la pestaña Actions del repositorio.
 
 ## Ajustes que dependen de la versión de Mermaid
 
-Varios ajustes de configuración no tienen efecto en Mermaid 12.0.0, y por eso no
-están en el menú de aspecto: el motor `elk`, la forma de las líneas
-(`flowchart.curve`) y la separación entre elementos (`nodeSpacing`,
-`rankSpacing`). La tabla con lo medido está en
-[docs/adr/0008](adr/0008-ajustes-escritos-en-el-codigo.md). Al actualizar
-Mermaid conviene volver a medirlos: si vuelven a funcionar, merece la pena
-recuperarlos.
+Mermaid 12 cambió el motor de distribución por defecto de `dagre` a `elk`, que
+no atiende a la forma de las líneas (`flowchart.curve`) ni a la separación
+(`nodeSpacing`, `rankSpacing`). Sirena arranca con `dagre` y escribe el motor en
+la cabecera cuando hace falta; la tabla con lo medido está en
+[docs/adr/0012](adr/0012-motor-dagre-por-defecto-y-lineas-curvas.md). Al
+actualizar Mermaid conviene repetir esas medidas.

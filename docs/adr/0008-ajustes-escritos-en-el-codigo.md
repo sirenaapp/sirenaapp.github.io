@@ -43,22 +43,11 @@ tiene efecto, y se actualiza al cambiar el código aunque el menú esté abierto
 - **Escribir la cabecera solo al guardar o al compartir.** Descartada porque
   seguiría sin verse mientras se trabaja.
 
-Solo se ofrecen los ajustes que en Mermaid 12.0.0 cambian el dibujo de verdad.
-Se midieron uno a uno sobre el mismo diagrama y varios quedaron fuera:
-
-| Ajuste | Efecto medido |
-|---|---|
-| `look` (clásico, a mano alzada, moderno) | **sí** |
-| `themeVariables.fontSize` y los colores | **sí** |
-| `flowchart.diagramPadding` | **sí** |
-| `layout: elk` y el tipo `flowchart-elk` | ninguno |
-| `flowchart.curve` (curvas, rectas, escalonadas) | ninguno |
-| `flowchart.nodeSpacing` y `rankSpacing` | ninguno |
-| `flowchart.padding` y `wrappingWidth` | ninguno |
-
-Los que no hacen nada se retiraron del menú en lugar de dejarlos puestos: un
-control que no cambia nada engaña a quien lo usa. Conviene volver a medirlos
-cuando Mermaid publique una versión nueva, por si vuelven a funcionar.
+Solo se ofrecen los ajustes que cambian el dibujo de verdad, medidos uno a uno
+sobre el mismo diagrama. `flowchart.padding` y `wrappingWidth` no tuvieron
+efecto en Mermaid 12.0.0 y quedaron fuera. La forma de las líneas y la
+separación tampoco lo tenían, pero porque dependen del motor de distribución:
+se explica y se resuelve en el [ADR 12](0012-motor-dagre-por-defecto-y-lineas-curvas.md).
 
 ## Consecuencias
 
