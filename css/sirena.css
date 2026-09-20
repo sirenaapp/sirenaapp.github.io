@@ -387,3 +387,42 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 
 /* Los elementos ocultos mandan sobre display: flex */
 [hidden] { display: none !important; }
+
+/* --- Modo visor: solo el diagrama, para incrustar en otra página --- */
+
+body.viewer { background: var(--surface); }
+body.viewer .topbar,
+body.viewer .tabs,
+body.viewer .footer,
+body.viewer .splitter,
+body.viewer .pane-editor { display: none !important; }
+
+body.viewer .workspace { padding: 0; }
+
+body.viewer .pane-preview {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.viewer .preview-viewport { background-image: none; }
+
+/* En un marco estrecho se aplican las reglas de pantalla pequeña, que ocultan
+   uno de los dos paneles. En el modo visor el diagrama debe verse siempre. */
+body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
+
+.viewer-link {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 11px;
+  text-decoration: none;
+  opacity: .55;
+}
+
+.viewer-link:hover { opacity: 1; color: var(--accent); }

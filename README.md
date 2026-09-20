@@ -16,8 +16,33 @@ de la propia dirección.
 - Descargar el resultado en SVG o en PNG, o copiarlo como imagen.
 - Abrir y guardar archivos `.mmd`.
 - Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio.
+- Incrustar el diagrama en un blog o en un material de eXeLearning, con el botón
+  que copia el código listo para pegar.
 - Trabajar en castellano, catalán, gallego, euskera o inglés.
 - Usarlo en móvil y tableta, con tema claro u oscuro.
+
+## Incrustar un diagrama en otra página
+
+El botón de incrustar copia un código como este, que se pega en el HTML del
+material. El diagrama viaja dentro de la dirección, así que la página incrustada
+tampoco depende de ningún servidor:
+
+```html
+<iframe src="https://sirenaapp.github.io/#z=…&v=1" title="Diagrama" loading="lazy"
+        style="width:100%;height:420px;border:1px solid #d3dde0;border-radius:8px"></iframe>
+<script>
+addEventListener('message', function (e) {
+  if (!e.data || e.data.sirena !== 'altura') return;
+  document.querySelectorAll('iframe').forEach(function (marco) {
+    if (marco.contentWindow === e.source) marco.style.height = e.data.altura + 'px';
+  });
+});
+</script>
+```
+
+El parámetro `v=1` deja la página con el diagrama solo, sin editor ni barra de
+herramientas, y con un enlace discreto para abrirlo y editarlo. El guion es
+opcional: sirve para que el marco se ajuste solo al alto del diagrama.
 
 ## Cómo funciona por dentro
 

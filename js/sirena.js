@@ -42,7 +42,8 @@ const el = {
   fileInput: $('file-input'),
   splitter: $('splitter'),
   workspace: $('workspace'),
-  helpModal: $('help-modal')
+  helpModal: $('help-modal'),
+  viewerLink: $('viewer-link')
 };
 
 let lang = 'es';
@@ -50,6 +51,7 @@ let strings = window.SIRENA_LANG.es;
 let renderTimer = null;
 let renderToken = 0;
 let currentSvg = '';
+let viewer = false;
 const view = { scale: 1, x: 0, y: 0 };
 
 /* --- Idioma --- */
@@ -216,6 +218,7 @@ async function render() {
     hideEmpty();
     hideError();
     fitToWindow();
+    reportHeight();
   } catch (error) {
     if (token !== renderToken) return;
     showError(error);
@@ -485,13 +488,44 @@ function fromBase64Url(text) {
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
 }
 
-async function shareLink() {
+async function buildLink(extra) {
   const { raw, deflated } = await compress(el.editor.value);
   const params = new URLSearchParams();
   params.set(deflated ? 'z' : 'd', toBase64Url(raw));
   params.set('t', el.themeSelect.value);
-  const url = location.origin + location.pathname + '#' + params.toString();
-  await copyText(url, t('linkCopied'));
+  if (extra) Object.entries(extra).forEach(([key, value]) => params.set(key, value));
+  return location.origin + location.pathname + '#' + params.toString();
+}
+
+async function shareLink() {
+  await copyText(await buildLink(), t('linkCopied'));
+}
+
+// Código listo para pegar en un blog o en un material de eXeLearning. El
+// diagrama viaja dentro de la dirección y el guion ajusta la altura del marco.
+async function embedCode() {
+  const url = await buildLink({ v: '1' });
+  const codigo = `<iframe src="${url}" title="${t('diagram')}" loading="lazy"
+        style="width:100%;height:420px;border:1px solid #d3dde0;border-radius:8px"></iframe>
+<script>
+addEventListener('message', function (e) {
+  if (!e.data || e.data.sirena !== 'altura') return;
+  document.querySelectorAll('iframe').forEach(function (marco) {
+    if (marco.contentWindow === e.source) marco.style.height = e.data.altura + 'px';
+  });
+});
+<\/script>`;
+  await copyText(codigo, t('embedCopied'));
+}
+
+// En el modo visor, la página dice a la de fuera cuánto mide el diagrama para
+// que el marco crezca solo y no queden barras de desplazamiento.
+function reportHeight() {
+  if (!viewer || window.parent === window) return;
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return;
+  const alto = (svg.viewBox.baseVal.height || svg.getBoundingClientRect().height) + 80;
+  window.parent.postMessage({ sirena: 'altura', altura: Math.round(Math.min(2400, Math.max(160, alto))) }, '*');
 }
 
 async function loadFromHash() {
@@ -505,11 +539,23 @@ async function loadFromHash() {
     el.editor.value = code;
     const theme = params.get('t');
     if (theme && MERMAID_THEMES.includes(theme)) el.themeSelect.value = theme;
+    if (params.get('v') === '1') enableViewer(params);
     return true;
   } catch (_) {
     toast(t('restoreWarning'));
     return false;
   }
+}
+
+// Modo visor: la página se queda solo con el diagrama, para incrustarla.
+function enableViewer(params) {
+  viewer = true;
+  document.body.classList.add('viewer');
+  document.body.dataset.pane = 'preview';
+  const limpio = new URLSearchParams(params.toString());
+  limpio.delete('v');
+  el.viewerLink.href = location.origin + location.pathname + '#' + limpio.toString();
+  el.viewerLink.hidden = false;
 }
 
 /* --- Divisor de paneles --- */
@@ -609,6 +655,7 @@ function setupToolbar() {
   });
 
   $('btn-share').addEventListener('click', shareLink);
+  $('btn-embed').addEventListener('click', embedCode);
 
   $('btn-dark').addEventListener('click', () => {
     const dark = !isDark();
@@ -709,6 +756,15 @@ async function start() {
 
   initMermaid();
   el.editor.addEventListener('input', () => { updateStatus(); scheduleRender(); });
+
+  // Si llega un enlace nuevo sin recargar la página (se pega en la barra de
+  // direcciones, por ejemplo), se carga igualmente el diagrama que trae.
+  window.addEventListener('hashchange', async () => {
+    if (await loadFromHash()) {
+      initMermaid();
+      render();
+    }
+  });
   window.addEventListener('resize', () => scheduleRender(250));
   document.body.dataset.pane = 'editor';
 

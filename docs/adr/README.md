@@ -10,6 +10,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [2](0002-compartir-por-enlace.md) | El diagrama compartido viaja dentro del enlace | aceptado |
 | [3](0003-etiquetas-sin-html.md) | Los rótulos se dibujan como texto SVG, no como HTML | aceptado |
 | [4](0004-aviso-de-version-nueva.md) | El aviso de versión nueva llega por incidencia y por Telegram | aceptado |
+| [5](0005-modo-visor-para-incrustar.md) | El diagrama se incrusta con la propia página en modo visor | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca
