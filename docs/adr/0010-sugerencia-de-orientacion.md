@@ -1,6 +1,6 @@
 # 10. La página propone la dirección en lugar de maquillar el resultado
 
-Fecha: 2026-09-20 · Estado: aceptado
+Fecha: 2026-09-20 · Estado: descartado el 20-09-2026, tras probarlo
 
 ## Contexto
 
@@ -30,8 +30,14 @@ ver para ese diagrama.
 - **Cambiar de motor de trazado.** Descartada por lo medido en el
   [ADR 9](0009-ajuste-de-la-vista.md): reordena los pasos.
 
-## Consecuencias
+## Por qué se descartó
 
-En diagramas largos aparece un aviso que antes no estaba. A cambio, el arreglo
-queda en el propio diagrama y viaja con él, en lugar de depender de cómo lo
-mire esta página.
+Al usarlo se vio que no arregla nada: el mismo diagrama en horizontal queda
+igual de desproporcionado, solo que tumbado, y sigue sin leerse de un vistazo.
+El aviso, por tanto, solo molestaba. Se retiró el mismo día.
+
+Queda escrito para que no se vuelva a intentar: en un diagrama de flujo largo,
+ni el motor de trazado (ver [ADR 9](0009-ajuste-de-la-vista.md)) ni la dirección
+resuelven el problema. Lo único que hay hasta ahora es el ajuste de la vista, y
+lo que de verdad lo arreglaría es partir el diagrama en varios más pequeños,
+que es decisión de quien lo escribe.

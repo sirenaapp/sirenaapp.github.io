@@ -107,10 +107,8 @@ const el = {
   directionSelect: $('direction-select'),
   spacingSelect: $('spacing-select'),
   numberingSelect: $('numbering-select'),
-  showDataSelect: $('showdata-select'),
-  sugerencia: $('sugerencia'),
-  sugerenciaTexto: $('sugerencia-texto'),
-  sugerenciaAplicar: $('sugerencia-aplicar')
+  showDataSelect: $('showdata-select')
+
 };
 
 let lang = 'es';
@@ -121,8 +119,6 @@ let currentSvg = '';
 let viewer = false;
 let errorLine = 0;
 const coloresTocados = new Set();
-let sugerenciaRechazada = '';
-let sugerenciaBloqueada = false;
 const view = { scale: 1, x: 0, y: 0 };
 
 /* --- Idioma --- */
@@ -388,7 +384,6 @@ async function renderOnce() {
     hideEmpty();
     hideError();
     fitToWindow();
-    updateSuggestion();
     reportHeight();
   } catch (error) {
     if (token !== renderToken) return;
@@ -459,32 +454,6 @@ function showEmpty() {
 function hideEmpty() {
   const box = $('preview-empty');
   if (box) box.remove();
-}
-
-// Mermaid coloca los pasos según la dirección que pida el código. Cuando el
-// resultado sale desproporcionado, la página no lo maquilla: propone cambiar la
-// dirección, que es lo que de verdad reparte el diagrama, y lo hace en el código
-// con la sintaxis de siempre para que siga valiendo en cualquier editor.
-function updateSuggestion() {
-  const svg = el.canvas.querySelector('svg');
-  el.sugerencia.hidden = true;
-  if (!svg || viewer || sugerenciaBloqueada || diagramKind() !== 'flowchart') return;
-
-  const caja = svg.viewBox.baseVal;
-  if (!caja || !caja.width || !caja.height) return;
-  const proporcion = caja.height / caja.width;
-  const actual = el.directionSelect.value;
-  const vertical = actual === 'TD' || actual === 'BT';
-
-  let destino = null;
-  if (vertical && proporcion > 2.2) destino = 'LR';
-  else if (!vertical && proporcion < 0.35) destino = 'TD';
-  if (!destino || sugerenciaRechazada === destino) return;
-
-  el.sugerenciaTexto.textContent = destino === 'LR' ? t('suggestH') : t('suggestV');
-  el.sugerenciaAplicar.textContent = destino === 'LR' ? t('suggestHDo') : t('suggestVDo');
-  el.sugerenciaAplicar.dataset.destino = destino;
-  el.sugerencia.hidden = false;
 }
 
 /* --- Zoom y desplazamiento --- */
@@ -1280,23 +1249,7 @@ function setupToolbar() {
     });
   });
 
-  el.sugerenciaAplicar.addEventListener('click', () => {
-    el.directionSelect.value = el.sugerenciaAplicar.dataset.destino;
-    // Tras aceptar, no se vuelve a proponer nada hasta que se toque el código:
-    // así no se propone deshacer lo que se acaba de hacer.
-    sugerenciaBloqueada = true;
-    writeDirection();
-    el.sugerencia.hidden = true;
-    render();
-  });
-
-  $('sugerencia-cerrar').addEventListener('click', () => {
-    sugerenciaRechazada = el.sugerenciaAplicar.dataset.destino || '';
-    el.sugerencia.hidden = true;
-  });
-
   el.directionSelect.addEventListener('change', () => {
-    sugerenciaBloqueada = true;
     writeDirection();
     render();
   });
@@ -1400,8 +1353,6 @@ async function start() {
 
   initMermaid();
   el.editor.addEventListener('input', () => {
-    sugerenciaBloqueada = false;
-    sugerenciaRechazada = '';
     updateStatus();
     renderGutter();
     readAppearance();
