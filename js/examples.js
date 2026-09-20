@@ -65,8 +65,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Algoritmo de la amistad', ca: "Algorisme de l'amistat", gl: 'Algoritmo da amizade', eu: 'Adiskidetasunaren algoritmoa', en: 'Friendship algorithm' },
         code: {
           es: `flowchart TD
-    accTitle: Algoritmo de la amistad
-    accDescr: Pasos para hacer un amigo, con un contador que impide quedarse dando vueltas al proponer actividades.
+    accTitle: Algoritmo de la amistad, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: Diagrama con el que Sheldon Cooper hace amigos en la serie The Big Bang Theory, con el contador de intentos que le añadió Howard Wolowitz para salir del bucle de las actividades.
     A([Inicio]) --> B[Elegir a la persona]
     B --> C[Averiguar sus intereses]
     C --> D{¿Hay algún interés común?}
@@ -86,8 +86,8 @@ window.SIRENA_EXAMPLES = [
     N -- Sí --> O[Repetir la actividad]
     O --> P([Amistad establecida])`,
           ca: `flowchart TD
-    accTitle: Algorisme de l'amistat
-    accDescr: Passos per fer un amic, amb un comptador que impedeix quedar-se donant voltes en proposar activitats.
+    accTitle: Algorisme de l'amistat, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: Diagrama amb què Sheldon Cooper fa amics a la sèrie The Big Bang Theory, amb el comptador d'intents que hi va afegir Howard Wolowitz per sortir del bucle de les activitats.
     A([Inici]) --> B[Triar la persona]
     B --> C[Esbrinar els seus interessos]
     C --> D{Hi ha algun interès comú?}
@@ -107,8 +107,8 @@ window.SIRENA_EXAMPLES = [
     N -- Sí --> O[Repetir l'activitat]
     O --> P([Amistat establerta])`,
           gl: `flowchart TD
-    accTitle: Algoritmo da amizade
-    accDescr: Pasos para facer un amigo, cun contador que impide quedar dando voltas ao propoñer actividades.
+    accTitle: Algoritmo da amizade, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: Diagrama co que Sheldon Cooper fai amigos na serie The Big Bang Theory, co contador de intentos que lle engadiu Howard Wolowitz para saír do bucle das actividades.
     A([Inicio]) --> B[Escoller a persoa]
     B --> C[Averiguar os seus intereses]
     C --> D{Hai algún interese común?}
@@ -128,8 +128,8 @@ window.SIRENA_EXAMPLES = [
     N -- Si --> O[Repetir a actividade]
     O --> P([Amizade establecida])`,
           eu: `flowchart TD
-    accTitle: Adiskidetasunaren algoritmoa
-    accDescr: Lagun bat egiteko urratsak, jarduerak proposatzean bueltaka ez geratzeko kontagailu batekin.
+    accTitle: Adiskidetasunaren algoritmoa, Sheldon Cooperrena (The Big Bang Theory)
+    accDescr: Sheldon Cooperrek The Big Bang Theory telesailean lagunak egiteko erabiltzen duen diagrama, Howard Wolowitzek jardueren bukletik ateratzeko gehitu zion saiakera-kontagailuarekin.
     A([Hasiera]) --> B[Pertsona aukeratu]
     B --> C[Bere interesak jakin]
     C --> D{Interes komunik dago?}
@@ -149,8 +149,8 @@ window.SIRENA_EXAMPLES = [
     N -- Bai --> O[Jarduera errepikatu]
     O --> P([Adiskidetasuna sortuta])`,
           en: `flowchart TD
-    accTitle: Friendship algorithm
-    accDescr: Steps to make a friend, with a counter that stops the loop when activities are turned down.
+    accTitle: Friendship algorithm, by Sheldon Cooper (The Big Bang Theory)
+    accDescr: The diagram Sheldon Cooper uses to make friends in the series The Big Bang Theory, with the attempt counter Howard Wolowitz added to break out of the activity loop.
     A([Start]) --> B[Choose the person]
     B --> C[Find out their interests]
     C --> D{Any shared interest?}
