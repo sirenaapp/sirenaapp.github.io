@@ -22,7 +22,7 @@ window.SIRENA_LANG.en = {
   fullscreen: 'Fullscreen',
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
-  zoomReset: 'Fit to window',
+  zoomReset: 'Back to 100 %',
   help: 'Help',
   editorLabel: 'Diagram code',
   copied: 'Copied',

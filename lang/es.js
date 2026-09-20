@@ -22,7 +22,7 @@ window.SIRENA_LANG.es = {
   fullscreen: 'Pantalla completa',
   zoomIn: 'Acercar',
   zoomOut: 'Alejar',
-  zoomReset: 'Ajustar a la ventana',
+  zoomReset: 'Volver al 100 %',
   help: 'Ayuda',
   editorLabel: 'Código del diagrama',
   copied: 'Copiado',

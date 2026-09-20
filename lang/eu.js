@@ -22,7 +22,7 @@ window.SIRENA_LANG.eu = {
   fullscreen: 'Pantaila osoa',
   zoomIn: 'Handitu',
   zoomOut: 'Txikitu',
-  zoomReset: 'Doitu leihora',
+  zoomReset: 'Itzuli %100era',
   help: 'Laguntza',
   editorLabel: 'Diagramaren kodea',
   copied: 'Kopiatuta',

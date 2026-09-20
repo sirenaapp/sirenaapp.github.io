@@ -28,7 +28,6 @@
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8"/></symbol>
   <symbol id="i-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M11 8v6M8 11h6M20 20l-3.6-3.6"/></symbol>
   <symbol id="i-zoom-out" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M8 11h6M20 20l-3.6-3.6"/></symbol>
-  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></symbol>
   <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H4a1 1 0 0 0-1 1v4M16 3h4a1 1 0 0 1 1 1v4M8 21H4a1 1 0 0 1-1-1v-4M16 21h4a1 1 0 0 0 1-1v-4"/></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.7-.8 1.2v.6"/><circle cx="12" cy="17" r=".8" stroke="none" fill="currentColor"/></symbol>
   <symbol id="i-lang" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15 0 18M12 3c-2.5 2.7-2.5 15 0 18"/></symbol>
@@ -83,9 +82,8 @@
   <section class="pane pane-preview" id="pane-preview">
     <div class="preview-tools">
       <button type="button" id="btn-zoom-out" class="tb" data-i18n-title="zoomOut"><svg><use href="#i-zoom-out"></use></svg></button>
-      <span class="zoom-value" id="zoom-value">100 %</span>
+      <button type="button" class="zoom-value" id="zoom-value" data-i18n-title="zoomReset">100 %</button>
       <button type="button" id="btn-zoom-in" class="tb" data-i18n-title="zoomIn"><svg><use href="#i-zoom-in"></use></svg></button>
-      <button type="button" id="btn-fit" class="tb" data-i18n-title="zoomReset"><svg><use href="#i-fit"></use></svg></button>
       <button type="button" id="btn-full" class="tb" data-i18n-title="fullscreen"><svg><use href="#i-full"></use></svg></button>
     </div>
     <div class="preview-viewport" id="viewport">

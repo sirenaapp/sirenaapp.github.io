@@ -235,7 +235,22 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
   background: var(--surface-2);
 }
 
-.zoom-value { min-width: 56px; text-align: center; font-size: 12px; color: var(--text-soft); }
+.zoom-value {
+  min-width: 62px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.zoom-value:hover { background: var(--accent-soft); border-color: var(--border); color: var(--text); }
+.zoom-value:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .preview-tools .btn-full { margin-left: auto; }
 
 .preview-viewport {

@@ -274,6 +274,18 @@ function zoomBy(factor, center) {
   applyView();
 }
 
+// El porcentaje funciona como botón: devuelve el diagrama a su tamaño real.
+function resetZoom() {
+  const box = el.canvas.getBoundingClientRect();
+  const port = el.viewport.getBoundingClientRect();
+  const width = box.width / (view.scale || 1);
+  const height = box.height / (view.scale || 1);
+  view.scale = 1;
+  view.x = Math.max(0, (port.width - width) / 2);
+  view.y = Math.max(0, (port.height - height) / 2);
+  applyView();
+}
+
 function fitToWindow() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;
@@ -642,7 +654,7 @@ function setupToolbar() {
 
   $('btn-zoom-in').addEventListener('click', () => zoomBy(1.2));
   $('btn-zoom-out').addEventListener('click', () => zoomBy(1 / 1.2));
-  $('btn-fit').addEventListener('click', fitToWindow);
+  el.zoomValue.addEventListener('click', resetZoom);
 
   const fullButton = $('btn-full');
   fullButton.classList.add('btn-full');

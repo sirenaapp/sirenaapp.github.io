@@ -32,6 +32,9 @@ scripts/actualizar-mermaid.sh          # última versión publicada
 scripts/actualizar-mermaid.sh 12.0.0   # una versión concreta
 ```
 
+Una acción programada avisa cada lunes, abriendo una incidencia, cuando Mermaid
+publica una versión nueva.
+
 Las decisiones técnicas que condicionan el proyecto están en [docs/adr](docs/adr).
 
 ## Licencias

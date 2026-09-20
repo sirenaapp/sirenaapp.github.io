@@ -1,0 +1,64 @@
+# Comprueba cada semana si Mermaid ha publicado una versión nueva y, si la hay,
+# abre una incidencia con los pasos para actualizar la copia de vendor/mermaid.
+name: Comprobar la versión de Mermaid
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # cada lunes a las 6:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comparar la versión instalada con la última publicada
+        id: versiones
+        run: |
+          instalada="$(cat vendor/mermaid/VERSION)"
+          ultima="$(npm view mermaid version)"
+          echo "instalada=$instalada" >> "$GITHUB_OUTPUT"
+          echo "ultima=$ultima" >> "$GITHUB_OUTPUT"
+          if [ "$instalada" = "$ultima" ]; then
+            echo "Mermaid está al día ($instalada)."
+            echo "hay_novedad=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "Hay versión nueva: $instalada → $ultima"
+            echo "hay_novedad=sí" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Abrir la incidencia si no existe ya
+        if: steps.versiones.outputs.hay_novedad == 'sí'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INSTALADA: ${{ steps.versiones.outputs.instalada }}
+          ULTIMA: ${{ steps.versiones.outputs.ultima }}
+        run: |
+          titulo="Mermaid $ULTIMA disponible (Sirena lleva $INSTALADA)"
+          if gh issue list --state open --search "$titulo in:title" --json title \
+             | grep -qF "$titulo"; then
+            echo "La incidencia ya estaba abierta."
+            exit 0
+          fi
+          gh issue create --title "$titulo" --label mermaid --body "$(cat <<CUERPO
+Mermaid ha publicado la versión **$ULTIMA**. Sirena sigue con la **$INSTALADA**.
+
+Para actualizarla:
+
+\`\`\`bash
+scripts/actualizar-mermaid.sh
+\`\`\`
+
+Después conviene comprobar lo que indica [docs/pruebas.md](../blob/main/docs/pruebas.md):
+que los 18 ejemplos se dibujan y se exportan a PNG en Chromium y en Firefox, y que
+el enlace compartido sigue restaurando el código. En un salto de versión mayor,
+revisar además si ha cambiado la sintaxis de algún tipo de diagrama.
+
+Aviso automático de [.github/workflows/check-mermaid-version.yml](../blob/main/.github/workflows/check-mermaid-version.yml).
+CUERPO
+)"

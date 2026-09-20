@@ -22,7 +22,7 @@ window.SIRENA_LANG.gl = {
   fullscreen: 'Pantalla completa',
   zoomIn: 'Achegar',
   zoomOut: 'Afastar',
-  zoomReset: 'Axustar á xanela',
+  zoomReset: 'Volver ao 100 %',
   help: 'Axuda',
   editorLabel: 'Código do diagrama',
   copied: 'Copiado',

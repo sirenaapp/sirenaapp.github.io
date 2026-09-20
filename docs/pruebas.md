@@ -17,3 +17,10 @@ comprobar, con un script de pasos, estas tres cosas:
    sustituyen por texto SVG, porque si no el navegador impide convertir el
    dibujo en imagen.
 3. Que el enlace compartido restaura el código tal cual, con acentos y eñes.
+
+## Aviso de versión nueva de Mermaid
+
+Cada lunes, la acción `.github/workflows/check-mermaid-version.yml` compara
+`vendor/mermaid/VERSION` con la última versión publicada en npm y, si son
+distintas, abre una incidencia con los pasos de actualización. También se puede
+lanzar a mano desde la pestaña Actions del repositorio.
