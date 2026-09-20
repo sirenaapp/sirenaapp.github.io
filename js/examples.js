@@ -66,20 +66,20 @@ window.SIRENA_EXAMPLES = [
         code: {
           es: `flowchart TD
     accTitle: Algoritmo de la amistad, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: Diagrama con el que Sheldon Cooper hace amigos en la serie The Big Bang Theory, con el contador de intentos que le añadió Howard Wolowitz para salir del bucle de las actividades.
+    accDescr: Diagrama con el que Sheldon Cooper hace amigos en la serie The Big Bang Theory, con el arreglo de Howard Wolowitz: un contador de intentos y una salida que se queda con la actividad menos desagradable.
     A([Inicio]) --> B[Elegir a la persona]
     B --> C[Averiguar sus intereses]
-    C --> D{¿Hay algún interés común?}
-    D -- No --> E[Preguntar por otro interés]
-    E --> D
-    D -- Sí --> F[/Intentos = 0/]
-    F --> G[Proponer una actividad sobre ese interés]
-    G --> H{¿Acepta la invitación?}
-    H -- No --> I[/Intentos = Intentos + 1/]
+    C --> F[/Intentos = 0/]
+    F --> D{¿Hay algún interés común?}
+    D -- No --> I[/Intentos = Intentos + 1/]
     I --> J{¿Intentos menor que 3?}
-    J -- Sí --> K[Proponer otra actividad]
-    K --> H
-    J -- No --> L([Abandonar el intento])
+    J -- Sí --> E[Preguntar por otro interés]
+    E --> D
+    J -- No --> L[Quedarse con la actividad menos desagradable]
+    L --> G
+    D -- Sí --> G[Proponer compartir esa actividad]
+    G --> H{¿Acepta la invitación?}
+    H -- No --> I
     H -- Sí --> M[Compartir la actividad]
     M --> N{¿Ha resultado agradable?}
     N -- No --> B
@@ -87,20 +87,20 @@ window.SIRENA_EXAMPLES = [
     O --> P([Amistad establecida])`,
           ca: `flowchart TD
     accTitle: Algorisme de l'amistat, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: Diagrama amb què Sheldon Cooper fa amics a la sèrie The Big Bang Theory, amb el comptador d'intents que hi va afegir Howard Wolowitz per sortir del bucle de les activitats.
+    accDescr: Diagrama amb què Sheldon Cooper fa amics a la sèrie The Big Bang Theory, amb l'arranjament de Howard Wolowitz: un comptador d'intents i una sortida que es queda amb l'activitat menys desagradable.
     A([Inici]) --> B[Triar la persona]
     B --> C[Esbrinar els seus interessos]
-    C --> D{Hi ha algun interès comú?}
-    D -- No --> E[Preguntar per un altre interès]
-    E --> D
-    D -- Sí --> F[/Intents = 0/]
-    F --> G[Proposar una activitat sobre aquest interès]
-    G --> H{Accepta la invitació?}
-    H -- No --> I[/Intents = Intents + 1/]
+    C --> F[/Intents = 0/]
+    F --> D{Hi ha algun interès comú?}
+    D -- No --> I[/Intents = Intents + 1/]
     I --> J{Intents menor que 3?}
-    J -- Sí --> K[Proposar una altra activitat]
-    K --> H
-    J -- No --> L([Abandonar l'intent])
+    J -- Sí --> E[Preguntar per un altre interès]
+    E --> D
+    J -- No --> L[Quedar-se amb l'activitat menys desagradable]
+    L --> G
+    D -- Sí --> G[Proposar compartir aquesta activitat]
+    G --> H{Accepta la invitació?}
+    H -- No --> I
     H -- Sí --> M[Compartir l'activitat]
     M --> N{Ha resultat agradable?}
     N -- No --> B
@@ -108,20 +108,20 @@ window.SIRENA_EXAMPLES = [
     O --> P([Amistat establerta])`,
           gl: `flowchart TD
     accTitle: Algoritmo da amizade, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: Diagrama co que Sheldon Cooper fai amigos na serie The Big Bang Theory, co contador de intentos que lle engadiu Howard Wolowitz para saír do bucle das actividades.
+    accDescr: Diagrama co que Sheldon Cooper fai amigos na serie The Big Bang Theory, co arranxo de Howard Wolowitz: un contador de intentos e unha saída que queda coa actividade menos desagradable.
     A([Inicio]) --> B[Escoller a persoa]
     B --> C[Averiguar os seus intereses]
-    C --> D{Hai algún interese común?}
-    D -- Non --> E[Preguntar por outro interese]
-    E --> D
-    D -- Si --> F[/Intentos = 0/]
-    F --> G[Propoñer unha actividade sobre ese interese]
-    G --> H{Acepta a invitación?}
-    H -- Non --> I[/Intentos = Intentos + 1/]
+    C --> F[/Intentos = 0/]
+    F --> D{Hai algún interese común?}
+    D -- Non --> I[/Intentos = Intentos + 1/]
     I --> J{Intentos menor que 3?}
-    J -- Si --> K[Propoñer outra actividade]
-    K --> H
-    J -- Non --> L([Abandonar o intento])
+    J -- Si --> E[Preguntar por outro interese]
+    E --> D
+    J -- Non --> L[Quedar coa actividade menos desagradable]
+    L --> G
+    D -- Si --> G[Propoñer compartir esa actividade]
+    G --> H{Acepta a invitación?}
+    H -- Non --> I
     H -- Si --> M[Compartir a actividade]
     M --> N{Resultou agradable?}
     N -- Non --> B
@@ -129,20 +129,20 @@ window.SIRENA_EXAMPLES = [
     O --> P([Amizade establecida])`,
           eu: `flowchart TD
     accTitle: Adiskidetasunaren algoritmoa, Sheldon Cooperrena (The Big Bang Theory)
-    accDescr: Sheldon Cooperrek The Big Bang Theory telesailean lagunak egiteko erabiltzen duen diagrama, Howard Wolowitzek jardueren bukletik ateratzeko gehitu zion saiakera-kontagailuarekin.
+    accDescr: Sheldon Cooperrek The Big Bang Theory telesailean lagunak egiteko erabiltzen duen diagrama, Howard Wolowitzen konponketarekin: saiakera-kontagailu bat eta jarduerarik desatseginena aukeratzen duen irteera bat.
     A([Hasiera]) --> B[Pertsona aukeratu]
     B --> C[Bere interesak jakin]
-    C --> D{Interes komunik dago?}
-    D -- Ez --> E[Beste interes batez galdetu]
-    E --> D
-    D -- Bai --> F[/Saiakerak = 0/]
-    F --> G[Interes horri buruzko jarduera bat proposatu]
-    G --> H{Gonbidapena onartzen du?}
-    H -- Ez --> I[/Saiakerak = Saiakerak + 1/]
+    C --> F[/Saiakerak = 0/]
+    F --> D{Interes komunik dago?}
+    D -- Ez --> I[/Saiakerak = Saiakerak + 1/]
     I --> J{Saiakerak 3 baino gutxiago?}
-    J -- Bai --> K[Beste jarduera bat proposatu]
-    K --> H
-    J -- Ez --> L([Saiakera utzi])
+    J -- Bai --> E[Beste interes batez galdetu]
+    E --> D
+    J -- Ez --> L[Jarduerarik desatseginena aukeratu]
+    L --> G
+    D -- Bai --> G[Jarduera hori partekatzea proposatu]
+    G --> H{Gonbidapena onartzen du?}
+    H -- Ez --> I
     H -- Bai --> M[Jarduera partekatu]
     M --> N{Atsegina izan da?}
     N -- Ez --> B
@@ -150,20 +150,20 @@ window.SIRENA_EXAMPLES = [
     O --> P([Adiskidetasuna sortuta])`,
           en: `flowchart TD
     accTitle: Friendship algorithm, by Sheldon Cooper (The Big Bang Theory)
-    accDescr: The diagram Sheldon Cooper uses to make friends in the series The Big Bang Theory, with the attempt counter Howard Wolowitz added to break out of the activity loop.
+    accDescr: The diagram Sheldon Cooper uses to make friends in the series The Big Bang Theory, with Howard Wolowitz's fix: an attempt counter and an exit that settles for the least objectionable activity.
     A([Start]) --> B[Choose the person]
     B --> C[Find out their interests]
-    C --> D{Any shared interest?}
-    D -- No --> E[Ask about another interest]
-    E --> D
-    D -- Yes --> F[/Attempts = 0/]
-    F --> G[Suggest an activity about that interest]
-    G --> H{Do they accept?}
-    H -- No --> I[/Attempts = Attempts + 1/]
+    C --> F[/Attempts = 0/]
+    F --> D{Any shared interest?}
+    D -- No --> I[/Attempts = Attempts + 1/]
     I --> J{Attempts fewer than 3?}
-    J -- Yes --> K[Suggest another activity]
-    K --> H
-    J -- No --> L([Give up])
+    J -- Yes --> E[Ask about another interest]
+    E --> D
+    J -- No --> L[Settle for the least objectionable activity]
+    L --> G
+    D -- Yes --> G[Suggest sharing that activity]
+    G --> H{Do they accept?}
+    H -- No --> I
     H -- Yes --> M[Share the activity]
     M --> N{Was it enjoyable?}
     N -- No --> B
