@@ -13,7 +13,9 @@ const STORE = {
   color: 'sirena.color',
   curve: 'sirena.curve',
   layout: 'sirena.layout',
-  width: 'sirena.editorWidth'
+  width: 'sirena.editorWidth',
+  docs: 'sirena.docs',
+  docActivo: 'sirena.docActivo'
 };
 
 const DEFAULT_CODE = {
@@ -107,7 +109,10 @@ const el = {
   directionSelect: $('direction-select'),
   spacingSelect: $('spacing-select'),
   numberingSelect: $('numbering-select'),
-  showDataSelect: $('showdata-select')
+  showDataSelect: $('showdata-select'),
+  libraryModal: $('library-modal'),
+  listaDocs: $('lista-docs'),
+  docName: $('doc-name')
 
 };
 
@@ -120,6 +125,202 @@ let viewer = false;
 let errorLine = 0;
 const coloresTocados = new Set();
 const view = { scale: 1, x: 0, y: 0 };
+
+/* --- Biblioteca de diagramas, guardada en este navegador --- */
+
+let docActivo = null;
+let guardadoTimer = null;
+
+function leerDocs() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(STORE.docs) || '[]');
+    return Array.isArray(guardado) ? guardado : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function escribirDocs(docs) {
+  try {
+    localStorage.setItem(STORE.docs, JSON.stringify(docs));
+  } catch (_) {
+    toast(t('copyFailed'));
+  }
+}
+
+// El nombre sale del título accesible, del título del diagrama o de la primera
+// línea con contenido, para no tener que ponerlo a mano.
+function nombreSugerido(codigo) {
+  const acc = /^[ \t]*accTitle[ \t]*:[ \t]*(.+)$/m.exec(codigo);
+  if (acc) return acc[1].trim().slice(0, 60);
+  const titulo = /^[ \t]*title[ \t]+(.+)$/m.exec(codigo);
+  if (titulo) return titulo[1].trim().slice(0, 60);
+  const linea = codigo.split('\n').map((l) => l.trim()).find((l) => l && !l.startsWith('%%'));
+  // La primera línea suele ser solo el tipo de diagrama, que no dice nada como
+  // nombre; en ese caso se deja «Sin título» hasta que el contenido lo sugiera.
+  if (!linea || /^(flowchart(-elk)?|graph|sequenceDiagram|classDiagram|stateDiagram(-v2)?|erDiagram|journey|gantt|pie|quadrantChart|mindmap|timeline|gitGraph|kanban|sankey-beta|xychart-beta|treemap-beta|block-beta|architecture-beta|requirementDiagram|C4Context|radar-beta|packet-beta)\b[ \t]*(TB|TD|BT|LR|RL)?$/.test(linea)) {
+    return t('untitled');
+  }
+  return linea.slice(0, 60);
+}
+
+// Si el diagrama abierto está vacío se reaprovecha, para no dejar fichas
+// vacías en la lista cada vez que se carga un ejemplo o un archivo.
+function crearDoc(codigo, nombre) {
+  const docs = leerDocs();
+  const actual = docs.find((d) => d.id === docActivo);
+  if (actual && !actual.codigo.trim() && codigo.trim()) {
+    actual.codigo = codigo;
+    actual.nombre = nombre || nombreSugerido(codigo);
+    actual.nombrePropio = Boolean(nombre);
+    actual.modificado = Date.now();
+    escribirDocs(docs);
+    updateDocName();
+    return actual;
+  }
+  const doc = {
+    id: 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    nombre: nombre || nombreSugerido(codigo),
+    nombrePropio: Boolean(nombre),
+    codigo,
+    modificado: Date.now()
+  };
+  docs.unshift(doc);
+  escribirDocs(docs);
+  docActivo = doc.id;
+  localStorage.setItem(STORE.docActivo, doc.id);
+  updateDocName();
+  return doc;
+}
+
+// Cada cambio se guarda solo en el diagrama abierto, sin botón de guardar.
+function guardarDocActivo() {
+  clearTimeout(guardadoTimer);
+  guardadoTimer = setTimeout(() => {
+    const docs = leerDocs();
+    const doc = docs.find((d) => d.id === docActivo);
+    if (!doc) {
+      if (el.editor.value.trim()) crearDoc(el.editor.value);
+      return;
+    }
+    doc.codigo = el.editor.value;
+    doc.modificado = Date.now();
+    if (!doc.nombrePropio) doc.nombre = nombreSugerido(el.editor.value);
+    escribirDocs(docs);
+    updateDocName();
+  }, 600);
+}
+
+function abrirDoc(id) {
+  const doc = leerDocs().find((d) => d.id === id);
+  if (!doc) return;
+  docActivo = doc.id;
+  localStorage.setItem(STORE.docActivo, doc.id);
+  el.editor.value = doc.codigo;
+  history.replaceState(null, '', location.pathname);
+  updateDocName();
+  readAppearance();
+  renderGutter();
+  render();
+}
+
+function updateDocName() {
+  const doc = leerDocs().find((d) => d.id === docActivo);
+  el.docName.textContent = doc ? doc.nombre : t('untitled');
+}
+
+function renombrarDoc(id) {
+  const docs = leerDocs();
+  const doc = docs.find((d) => d.id === id);
+  if (!doc) return;
+  const nombre = prompt(t('rename'), doc.nombre);
+  if (nombre === null) return;
+  doc.nombre = nombre.trim() || t('untitled');
+  doc.nombrePropio = true;
+  escribirDocs(docs);
+  updateDocName();
+  buildLibrary();
+}
+
+function duplicarDoc(id) {
+  const doc = leerDocs().find((d) => d.id === id);
+  if (!doc) return;
+  crearDoc(doc.codigo, doc.nombre + ' (' + t('copySuffix') + ')');
+  abrirDoc(docActivo);
+  buildLibrary();
+}
+
+function borrarDoc(id) {
+  const docs = leerDocs();
+  const doc = docs.find((d) => d.id === id);
+  if (!doc || !confirm(t('removeConfirm').replace('{nombre}', doc.nombre))) return;
+  escribirDocs(docs.filter((d) => d.id !== id));
+  if (docActivo === id) {
+    const resto = leerDocs();
+    if (resto.length) abrirDoc(resto[0].id);
+    else {
+      docActivo = null;
+      localStorage.removeItem(STORE.docActivo);
+      el.editor.value = '';
+      updateDocName();
+      render();
+    }
+  }
+  buildLibrary();
+}
+
+function fechaCorta(marca) {
+  try {
+    return new Date(marca).toLocaleString(lang, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  } catch (_) {
+    return '';
+  }
+}
+
+function buildLibrary() {
+  const docs = leerDocs().sort((a, b) => b.modificado - a.modificado);
+  el.listaDocs.innerHTML = '';
+  if (!docs.length) {
+    const vacio = document.createElement('li');
+    vacio.textContent = t('libraryEmpty');
+    el.listaDocs.appendChild(vacio);
+    return;
+  }
+  docs.forEach((doc) => {
+    const fila = document.createElement('li');
+    if (doc.id === docActivo) fila.setAttribute('aria-current', 'true');
+
+    const abrir = document.createElement('button');
+    abrir.type = 'button';
+    abrir.className = 'doc-abrir';
+    abrir.title = t('openDoc');
+    const nombre = document.createElement('strong');
+    nombre.textContent = doc.nombre;
+    const fecha = document.createElement('small');
+    fecha.textContent = fechaCorta(doc.modificado);
+    abrir.append(nombre, fecha);
+    abrir.addEventListener('click', () => {
+      abrirDoc(doc.id);
+      el.libraryModal.hidden = true;
+    });
+    fila.appendChild(abrir);
+
+    [['i-pencil', 'rename', () => renombrarDoc(doc.id)],
+     ['i-duplicate', 'duplicate', () => duplicarDoc(doc.id)],
+     ['i-trash', 'remove', () => borrarDoc(doc.id)]].forEach(([icono, clave, accion]) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.className = 'doc-accion';
+      boton.title = t(clave);
+      boton.setAttribute('aria-label', t(clave));
+      boton.innerHTML = '<svg><use href="#' + icono + '"></use></svg>';
+      boton.addEventListener('click', accion);
+      fila.appendChild(boton);
+    });
+
+    el.listaDocs.appendChild(fila);
+  });
+}
 
 /* --- Idioma --- */
 
@@ -364,6 +565,7 @@ function render() {
 async function renderOnce() {
   const code = el.editor.value.trim();
   localStorage.setItem(STORE.code, el.editor.value);
+  guardarDocActivo();
   updateStatus();
   renderGutter();
 
@@ -1159,11 +1361,27 @@ function setupSplitter() {
 
 function setupToolbar() {
   $('btn-new').addEventListener('click', () => {
-    if (el.editor.value.trim() && !confirm(t('newConfirm'))) return;
+    crearDoc('', t('newDoc'));
     el.editor.value = '';
     history.replaceState(null, '', location.pathname);
+    renderGutter();
     render();
     el.editor.focus();
+  });
+
+  $('btn-library').addEventListener('click', () => {
+    buildLibrary();
+    el.libraryModal.hidden = false;
+  });
+
+  $('library-close').addEventListener('click', () => { el.libraryModal.hidden = true; });
+  el.libraryModal.addEventListener('click', (event) => {
+    if (event.target === el.libraryModal) el.libraryModal.hidden = true;
+  });
+
+  el.docName.addEventListener('click', () => {
+    if (!docActivo) crearDoc(el.editor.value);
+    renombrarDoc(docActivo);
   });
 
   $('btn-open').addEventListener('click', () => el.fileInput.click());
@@ -1173,7 +1391,9 @@ function setupToolbar() {
     if (!file) return;
     el.editor.value = await file.text();
     el.fileInput.value = '';
+    crearDoc(el.editor.value, file.name.replace(/\.[^.]+$/, ''));
     readAppearance();
+    renderGutter();
     render();
   });
 
@@ -1261,7 +1481,9 @@ function setupToolbar() {
     const found = findExample(el.exampleSelect.value);
     if (!found) return;
     el.editor.value = exampleCode(found);
+    crearDoc(el.editor.value, found.label[lang] || found.label.es);
     readAppearance();
+    renderGutter();
     render();
   });
 
@@ -1354,6 +1576,7 @@ function setupToolbar() {
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
       el.appearanceMenu.hidden = true;
+      el.libraryModal.hidden = true;
     }
   });
 }
@@ -1387,9 +1610,25 @@ async function start() {
   setupPan();
 
   const fromLink = await loadFromHash();
-  if (!fromLink) {
-    el.editor.value = localStorage.getItem(STORE.code) || DEFAULT_CODE[lang] || DEFAULT_CODE.es;
+  if (fromLink) {
+    // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
+    // toca: así abrirlo no ensucia lo que la persona tenga guardado.
+    docActivo = null;
+  } else {
+    const docs = leerDocs();
+    const ultimo = docs.find((d) => d.id === localStorage.getItem(STORE.docActivo))
+      || docs.sort((a, b) => b.modificado - a.modificado)[0];
+    if (ultimo) {
+      docActivo = ultimo.id;
+      localStorage.setItem(STORE.docActivo, ultimo.id);
+      el.editor.value = ultimo.codigo;
+    } else {
+      const inicial = localStorage.getItem(STORE.code) || DEFAULT_CODE[lang] || DEFAULT_CODE.es;
+      el.editor.value = inicial;
+      crearDoc(inicial);
+    }
   }
+  updateDocName();
 
   initMermaid();
   el.editor.addEventListener('input', () => {

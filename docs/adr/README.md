@@ -16,6 +16,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [8](0008-ajustes-escritos-en-el-codigo.md) | Los ajustes del dibujo se escriben en el código del diagrama | aceptado |
 | [9](0009-ajuste-de-la-vista.md) | Un diagrama muy alargado se ajusta por su lado corto | aceptado |
 | [10](0010-sugerencia-de-orientacion.md) | La página propone la dirección en lugar de maquillar el resultado | descartado |
+| [11](0011-biblioteca-en-el-navegador.md) | Los diagramas se guardan en el propio navegador | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

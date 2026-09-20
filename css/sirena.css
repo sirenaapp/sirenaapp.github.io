@@ -299,6 +299,9 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 #editor:focus { outline: none; }
 
 .editor-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 5px 12px;
   border-top: 1px solid var(--border);
   background: var(--surface-2);
@@ -306,6 +309,71 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   font-size: 12px;
   min-height: 26px;
 }
+
+.doc-name {
+  max-width: 55%;
+  overflow: hidden;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.doc-name:hover { background: var(--accent-soft); border-color: var(--border); }
+
+.lista-docs {
+  max-height: 46vh;
+  margin: 12px 0 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.lista-docs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--radius);
+}
+
+.lista-docs li:hover { background: var(--surface-2); }
+.lista-docs li[aria-current="true"] { background: var(--accent-soft); }
+
+.doc-abrir {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.doc-abrir strong { display: block; font-size: 13.5px; font-weight: 600; }
+.doc-abrir small { color: var(--text-soft); font-size: 11.5px; }
+
+.doc-accion {
+  flex: none;
+  display: inline-flex;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.doc-accion:hover { background: var(--surface); border-color: var(--border); color: var(--text); }
+.doc-accion svg { width: 16px; height: 16px; }
 
 .splitter {
   flex: none;
