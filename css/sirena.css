@@ -1,0 +1,374 @@
+/* Sirena — editor de diagramas Mermaid */
+
+:root {
+  --bg: #f4f7f8;
+  --surface: #ffffff;
+  --surface-2: #eef3f4;
+  --border: #d3dde0;
+  --text: #17262b;
+  --text-soft: #5c7078;
+  --accent: #0d7c8c;
+  --accent-soft: #e0f1f3;
+  --danger: #b3261e;
+  --danger-soft: #fdecea;
+  --shadow: 0 1px 3px rgba(9, 32, 38, .12);
+  --radius: 8px;
+  --toolbar-h: 40px;
+}
+
+html[data-theme="dark"] {
+  --bg: #10181b;
+  --surface: #172227;
+  --surface-2: #1e2c32;
+  --border: #2c3d44;
+  --text: #e6eef0;
+  --text-soft: #9db0b7;
+  --accent: #4fc3d4;
+  --accent-soft: #1d3339;
+  --danger: #ff8a80;
+  --danger-soft: #3a1f1d;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .5);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.sprite { display: none; }
+
+svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Barra superior --- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { flex: none; }
+.brand-text h1 { margin: 0; font-size: 19px; letter-spacing: .3px; }
+.brand-text p { margin: 0; font-size: 12px; color: var(--text-soft); }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.tb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tb:hover { background: var(--accent-soft); border-color: var(--border); }
+.tb:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tb svg { width: 20px; height: 20px; }
+.tb-tag { font-size: 12px; font-weight: 600; letter-spacing: .4px; }
+.tb-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+
+.tb-select {
+  height: 34px;
+  max-width: 190px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.menu-wrap { position: relative; }
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: 38px;
+  z-index: 30;
+  min-width: 150px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu button:hover { background: var(--accent-soft); }
+.menu button[aria-current="true"] { color: var(--accent); font-weight: 600; }
+
+/* --- Pestañas en pantalla pequeña --- */
+
+.tabs { display: none; background: var(--surface); border-bottom: 1px solid var(--border); }
+
+.tabs .tab {
+  flex: 1;
+  padding: 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tabs .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* --- Espacio de trabajo --- */
+
+.workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  padding: 10px;
+  gap: 0;
+}
+
+.pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.pane-editor { flex: 0 0 var(--editor-width, 38%); }
+.pane-preview { flex: 1; }
+
+#editor {
+  flex: 1;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  tab-size: 2;
+}
+
+#editor:focus { outline: none; }
+
+.editor-status {
+  padding: 5px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-size: 12px;
+  min-height: 26px;
+}
+
+.splitter {
+  flex: none;
+  width: 10px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.splitter::after {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 100%;
+  margin: 0 auto;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.splitter:hover::after, .splitter:focus-visible::after { background: var(--accent); }
+
+.preview-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.zoom-value { min-width: 56px; text-align: center; font-size: 12px; color: var(--text-soft); }
+.preview-tools .btn-full { margin-left: auto; }
+
+.preview-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--surface);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 22px 22px;
+  cursor: grab;
+}
+
+.preview-viewport.dragging { cursor: grabbing; }
+
+.preview-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  padding: 16px;
+}
+
+.preview-canvas svg { display: block; max-width: none; height: auto; }
+
+.preview-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-soft);
+  text-align: center;
+}
+
+.error-box {
+  max-height: 34%;
+  overflow: auto;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.error-box strong { display: block; margin-bottom: 4px; }
+.error-box pre { margin: 0; white-space: pre-wrap; font-size: 12px; }
+
+/* --- Pie --- */
+
+.footer {
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+.footer-line { margin: 0 0 4px; }
+.footer a { color: var(--accent); }
+
+/* --- Ventana de ayuda --- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(9, 32, 38, .5);
+}
+
+.modal {
+  max-width: 560px;
+  width: 100%;
+  padding: 22px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+}
+
+.modal h2 { margin-top: 0; font-size: 18px; }
+.modal a { color: var(--accent); }
+.modal-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* --- Aviso emergente --- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 60;
+  transform: translateX(-50%);
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 13px;
+  box-shadow: var(--shadow);
+}
+
+/* --- Pantalla pequeña --- */
+
+@media (max-width: 900px) {
+  .topbar { gap: 8px; padding: 8px 10px; }
+  .brand-text p { display: none; }
+  .toolbar { width: 100%; margin-left: 0; justify-content: flex-start; }
+  .tabs { display: flex; }
+  .workspace { padding: 8px; }
+  .splitter { display: none; }
+  .pane-editor, .pane-preview { flex: 1 1 auto; }
+  body[data-pane="editor"] .pane-preview { display: none; }
+  body[data-pane="preview"] .pane-editor { display: none; }
+}
+
+@media print {
+  .topbar, .tabs, .preview-tools, .footer, .splitter, .pane-editor, .error-box { display: none !important; }
+  .pane-preview { border: 0; box-shadow: none; }
+  .preview-viewport { overflow: visible; background: none; }
+}
+
+/* Los elementos ocultos mandan sobre display: flex */
+[hidden] { display: none !important; }
