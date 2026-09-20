@@ -23,37 +23,41 @@ se come media caja.
 
 ```mermaid
 flowchart LR
+    accTitle: Algoritmo de la amistad en cajas, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: El mismo algoritmo de la serie The Big Bang Theory, plegado en tres cajas unidas por conectores numerados.
     subgraph S1[1. Elegir a la persona]
         direction TB
-        A([Inicio: quiero hacer un amigo]) --> B[Elegir una persona]
+        A([Inicio]) --> B[Elegir a la persona]
         V3([3]) --> B
-        B --> C{¿Conozco sus intereses?}
-        C -- No --> D[Preguntarle qué le gusta]
-        C -- Sí --> X1([1])
-        D --> X1
+        B --> C[Averiguar sus intereses]
+        C --> F[/Intentos = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Buscar un interés común]
         direction TB
-        Y1([1]) --> E[Buscar un interés común]
-        E --> F{¿Tenemos algún interés común?}
-        F -- No --> H[Preguntar por otro interés]
-        H --> E
-        F -- Sí --> X2([2])
+        Y1([1]) --> D{¿Hay algún interés común?}
+        Y4([4]) --> I
+        D -- No --> I[/Intentos = Intentos + 1/]
+        I --> J{¿Intentos menor que 3?}
+        J -- Sí --> E[Preguntar por otro interés]
+        E --> D
+        J -- No --> L[Quedarse con la actividad menos desagradable]
+        L --> X2([2])
+        D -- Sí --> X2
     end
 
     subgraph S3[3. Quedar y valorar]
         direction TB
-        Y2([2]) --> G[Invitarle a hacer una actividad]
-        G --> I{¿Acepta la invitación?}
-        I -- No --> K[Proponer otra actividad]
-        K --> I
-        I -- Sí --> J[Realizar la actividad juntos]
-        J --> L{¿La interacción ha ido bien?}
-        L -- Sí --> M[Repetir actividades]
-        M --> O([Amistad establecida])
-        L -- No --> N[Elegir otra persona]
-        N --> X3([3])
+        Y2([2]) --> G[Proponer compartir esa actividad]
+        G --> H{¿Acepta la invitación?}
+        H -- No --> X4([4])
+        H -- Sí --> M[Compartir la actividad]
+        M --> N{¿Ha resultado agradable?}
+        N -- Sí --> O[Repetir la actividad]
+        O --> P([Amistad establecida])
+        N -- No --> Q[Elegir otra persona]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2

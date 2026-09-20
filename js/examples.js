@@ -176,191 +176,201 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Proceso largo en cajas', ca: 'Procés llarg en caixes', gl: 'Proceso longo en caixas', eu: 'Prozesu luzea kutxetan', en: 'Long process in boxes' },
         code: {
           es: `flowchart LR
-    accTitle: Proceso largo en cajas
-    accDescr: Proceso largo plegado en tres cajas unidas por conectores numerados.
+    accTitle: Algoritmo de la amistad en cajas, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: El mismo algoritmo de la serie The Big Bang Theory, plegado en tres cajas unidas por conectores numerados.
     subgraph S1[1. Elegir a la persona]
         direction TB
-        A([Inicio: quiero hacer un amigo]) --> B[Elegir una persona]
+        A([Inicio]) --> B[Elegir a la persona]
         V3([3]) --> B
-        B --> C{¿Conozco sus intereses?}
-        C -- No --> D[Preguntarle qué le gusta]
-        C -- Sí --> X1([1])
-        D --> X1
+        B --> C[Averiguar sus intereses]
+        C --> F[/Intentos = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Buscar un interés común]
         direction TB
-        Y1([1]) --> E[Buscar un interés común]
-        E --> F{¿Tenemos algún interés común?}
-        F -- No --> H[Preguntar por otro interés]
-        H --> E
-        F -- Sí --> X2([2])
+        Y1([1]) --> D{¿Hay algún interés común?}
+        Y4([4]) --> I
+        D -- No --> I[/Intentos = Intentos + 1/]
+        I --> J{¿Intentos menor que 3?}
+        J -- Sí --> E[Preguntar por otro interés]
+        E --> D
+        J -- No --> L[Quedarse con la actividad menos desagradable]
+        L --> X2([2])
+        D -- Sí --> X2
     end
 
     subgraph S3[3. Quedar y valorar]
         direction TB
-        Y2([2]) --> G[Invitarle a hacer una actividad]
-        G --> I{¿Acepta la invitación?}
-        I -- No --> K[Proponer otra actividad]
-        K --> I
-        I -- Sí --> J[Realizar la actividad juntos]
-        J --> L{¿La interacción ha ido bien?}
-        L -- Sí --> M[Repetir actividades]
-        M --> O([Amistad establecida])
-        L -- No --> N[Elegir otra persona]
-        N --> X3([3])
+        Y2([2]) --> G[Proponer compartir esa actividad]
+        G --> H{¿Acepta la invitación?}
+        H -- No --> X4([4])
+        H -- Sí --> M[Compartir la actividad]
+        M --> N{¿Ha resultado agradable?}
+        N -- Sí --> O[Repetir la actividad]
+        O --> P([Amistad establecida])
+        N -- No --> Q[Elegir otra persona]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           ca: `flowchart LR
-    accTitle: Procés llarg en caixes
-    accDescr: Procés llarg plegat en tres caixes unides per connectors numerats.
+    accTitle: Algorisme de l'amistat en caixes, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: El mateix algorisme de la sèrie The Big Bang Theory, plegat en tres caixes unides per connectors numerats.
     subgraph S1[1. Triar la persona]
         direction TB
-        A([Inici: vull fer un amic]) --> B[Triar una persona]
+        A([Inici]) --> B[Triar la persona]
         V3([3]) --> B
-        B --> C{Conec els seus interessos?}
-        C -- No --> D[Preguntar-li què li agrada]
-        C -- Sí --> X1([1])
-        D --> X1
+        B --> C[Esbrinar els seus interessos]
+        C --> F[/Intents = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Buscar un interès comú]
         direction TB
-        Y1([1]) --> E[Buscar un interès comú]
-        E --> F{Tenim algun interès comú?}
-        F -- No --> H[Preguntar per un altre interès]
-        H --> E
-        F -- Sí --> X2([2])
+        Y1([1]) --> D{Hi ha algun interès comú?}
+        Y4([4]) --> I
+        D -- No --> I[/Intents = Intents + 1/]
+        I --> J{Intents menor que 3?}
+        J -- Sí --> E[Preguntar per un altre interès]
+        E --> D
+        J -- No --> L[Quedar-se amb l'activitat menys desagradable]
+        L --> X2([2])
+        D -- Sí --> X2
     end
 
     subgraph S3[3. Quedar i valorar]
         direction TB
-        Y2([2]) --> G[Convidar-lo a fer una activitat]
-        G --> I{Accepta la invitació?}
-        I -- No --> K[Proposar una altra activitat]
-        K --> I
-        I -- Sí --> J[Fer l'activitat junts]
-        J --> L{La interacció ha anat bé?}
-        L -- Sí --> M[Repetir activitats]
-        M --> O([Amistat establerta])
-        L -- No --> N[Triar una altra persona]
-        N --> X3([3])
+        Y2([2]) --> G[Proposar compartir aquesta activitat]
+        G --> H{Accepta la invitació?}
+        H -- No --> X4([4])
+        H -- Sí --> M[Compartir l'activitat]
+        M --> N{Ha resultat agradable?}
+        N -- Sí --> O[Repetir l'activitat]
+        O --> P([Amistat establerta])
+        N -- No --> Q[Triar una altra persona]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           gl: `flowchart LR
-    accTitle: Proceso longo en caixas
-    accDescr: Proceso longo dobrado en tres caixas unidas por conectores numerados.
+    accTitle: Algoritmo da amizade en caixas, de Sheldon Cooper (The Big Bang Theory)
+    accDescr: O mesmo algoritmo da serie The Big Bang Theory, dobrado en tres caixas unidas por conectores numerados.
     subgraph S1[1. Escoller a persoa]
         direction TB
-        A([Inicio: quero facer un amigo]) --> B[Escoller unha persoa]
+        A([Inicio]) --> B[Escoller a persoa]
         V3([3]) --> B
-        B --> C{Coñezo os seus intereses?}
-        C -- Non --> D[Preguntarlle que lle gusta]
-        C -- Si --> X1([1])
-        D --> X1
+        B --> C[Averiguar os seus intereses]
+        C --> F[/Intentos = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Buscar un interese común]
         direction TB
-        Y1([1]) --> E[Buscar un interese común]
-        E --> F{Temos algún interese común?}
-        F -- Non --> H[Preguntar por outro interese]
-        H --> E
-        F -- Si --> X2([2])
+        Y1([1]) --> D{Hai algún interese común?}
+        Y4([4]) --> I
+        D -- Non --> I[/Intentos = Intentos + 1/]
+        I --> J{Intentos menor que 3?}
+        J -- Si --> E[Preguntar por outro interese]
+        E --> D
+        J -- Non --> L[Quedar coa actividade menos desagradable]
+        L --> X2([2])
+        D -- Si --> X2
     end
 
     subgraph S3[3. Quedar e valorar]
         direction TB
-        Y2([2]) --> G[Convidalo a facer unha actividade]
-        G --> I{Acepta a invitación?}
-        I -- Non --> K[Propoñer outra actividade]
-        K --> I
-        I -- Si --> J[Facer a actividade xuntos]
-        J --> L{A interacción foi ben?}
-        L -- Si --> M[Repetir actividades]
-        M --> O([Amizade establecida])
-        L -- Non --> N[Escoller outra persoa]
-        N --> X3([3])
+        Y2([2]) --> G[Propoñer compartir esa actividade]
+        G --> H{Acepta a invitación?}
+        H -- Non --> X4([4])
+        H -- Si --> M[Compartir a actividade]
+        M --> N{Resultou agradable?}
+        N -- Si --> O[Repetir a actividade]
+        O --> P([Amizade establecida])
+        N -- Non --> Q[Escoller outra persoa]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           eu: `flowchart LR
-    accTitle: Prozesu luzea kutxetan
-    accDescr: Prozesu luzea hiru kutxatan tolestuta, zenbakitutako konektoreekin lotuta.
+    accTitle: Adiskidetasunaren algoritmoa kutxetan, Sheldon Cooperrena (The Big Bang Theory)
+    accDescr: The Big Bang Theory telesaileko algoritmo bera, hiru kutxatan tolestuta eta zenbakitutako konektoreekin lotuta.
     subgraph S1[1. Pertsona aukeratu]
         direction TB
-        A([Hasiera: lagun bat egin nahi dut]) --> B[Pertsona bat aukeratu]
+        A([Hasiera]) --> B[Pertsona aukeratu]
         V3([3]) --> B
-        B --> C{Bere interesak ezagutzen ditut?}
-        C -- Ez --> D[Zer gustatzen zaion galdetu]
-        C -- Bai --> X1([1])
-        D --> X1
+        B --> C[Bere interesak jakin]
+        C --> F[/Saiakerak = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Interes komun bat bilatu]
         direction TB
-        Y1([1]) --> E[Interes komun bat bilatu]
-        E --> F{Interes komunik dugu?}
-        F -- Ez --> H[Beste interes batez galdetu]
-        H --> E
-        F -- Bai --> X2([2])
+        Y1([1]) --> D{Interes komunik dago?}
+        Y4([4]) --> I
+        D -- Ez --> I[/Saiakerak = Saiakerak + 1/]
+        I --> J{Saiakerak 3 baino gutxiago?}
+        J -- Bai --> E[Beste interes batez galdetu]
+        E --> D
+        J -- Ez --> L[Jarduerarik desatseginena aukeratu]
+        L --> X2([2])
+        D -- Bai --> X2
     end
 
     subgraph S3[3. Elkartu eta balioetsi]
         direction TB
-        Y2([2]) --> G[Jarduera bat egitera gonbidatu]
-        G --> I{Gonbidapena onartzen du?}
-        I -- Ez --> K[Beste jarduera bat proposatu]
-        K --> I
-        I -- Bai --> J[Jarduera elkarrekin egin]
-        J --> L{Ondo joan da?}
-        L -- Bai --> M[Jarduerak errepikatu]
-        M --> O([Adiskidetasuna sortuta])
-        L -- Ez --> N[Beste pertsona bat aukeratu]
-        N --> X3([3])
+        Y2([2]) --> G[Jarduera hori partekatzea proposatu]
+        G --> H{Gonbidapena onartzen du?}
+        H -- Ez --> X4([4])
+        H -- Bai --> M[Jarduera partekatu]
+        M --> N{Atsegina izan da?}
+        N -- Bai --> O[Jarduera errepikatu]
+        O --> P([Adiskidetasuna sortuta])
+        N -- Ez --> Q[Beste pertsona bat aukeratu]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           en: `flowchart LR
-    accTitle: Long process in boxes
-    accDescr: A long process folded into three boxes joined by numbered connectors.
+    accTitle: Friendship algorithm in boxes, by Sheldon Cooper (The Big Bang Theory)
+    accDescr: The same algorithm from The Big Bang Theory, folded into three boxes joined by numbered connectors.
     subgraph S1[1. Choose the person]
         direction TB
-        A([Start: I want to make a friend]) --> B[Choose a person]
+        A([Start]) --> B[Choose the person]
         V3([3]) --> B
-        B --> C{Do I know their interests?}
-        C -- No --> D[Ask what they like]
-        C -- Yes --> X1([1])
-        D --> X1
+        B --> C[Find out their interests]
+        C --> F[/Attempts = 0/]
+        F --> X1([1])
     end
 
     subgraph S2[2. Find a shared interest]
         direction TB
-        Y1([1]) --> E[Look for a shared interest]
-        E --> F{Any shared interest?}
-        F -- No --> H[Ask about another interest]
-        H --> E
-        F -- Yes --> X2([2])
+        Y1([1]) --> D{Any shared interest?}
+        Y4([4]) --> I
+        D -- No --> I[/Attempts = Attempts + 1/]
+        I --> J{Attempts fewer than 3?}
+        J -- Yes --> E[Ask about another interest]
+        E --> D
+        J -- No --> L[Settle for the least objectionable activity]
+        L --> X2([2])
+        D -- Yes --> X2
     end
 
     subgraph S3[3. Meet up and reflect]
         direction TB
-        Y2([2]) --> G[Invite them to an activity]
-        G --> I{Do they accept?}
-        I -- No --> K[Suggest another activity]
-        K --> I
-        I -- Yes --> J[Do the activity together]
-        J --> L{Did it go well?}
-        L -- Yes --> M[Repeat activities]
-        M --> O([Friendship established])
-        L -- No --> N[Choose another person]
-        N --> X3([3])
+        Y2([2]) --> G[Suggest sharing that activity]
+        G --> H{Do they accept?}
+        H -- No --> X4([4])
+        H -- Yes --> M[Share the activity]
+        M --> N{Was it enjoyable?}
+        N -- Yes --> O[Repeat the activity]
+        O --> P([Friendship established])
+        N -- No --> Q[Choose another person]
+        Q --> X3([3])
     end
 
     S1 ~~~ S2
