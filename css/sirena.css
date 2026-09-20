@@ -361,6 +361,10 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   background-image: radial-gradient(var(--border) 1px, transparent 1px);
   background-size: 22px 22px;
   cursor: grab;
+  /* El gesto es nuestro: sin esto, el navegador del móvil se queda el
+     desplazamiento y el arrastre va a tirones. */
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .preview-viewport.dragging { cursor: grabbing; }

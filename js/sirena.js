@@ -512,36 +512,76 @@ function fitToWindow() {
 }
 
 function setupPan() {
-  let dragging = false;
-  let startX = 0;
-  let startY = 0;
+  // Se lleva la cuenta de todos los dedos (o punteros) que hay encima: con uno
+  // se arrastra y con dos se amplía o se reduce pellizcando.
+  const punteros = new Map();
+  let inicio = null;
+
+  const centro = () => {
+    const lista = [...punteros.values()];
+    const x = lista.reduce((suma, p) => suma + p.x, 0) / lista.length;
+    const y = lista.reduce((suma, p) => suma + p.y, 0) / lista.length;
+    return { x, y };
+  };
+
+  const distancia = () => {
+    const [a, b] = [...punteros.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+
+  const tomarReferencia = () => {
+    const c = centro();
+    inicio = {
+      cx: c.x, cy: c.y,
+      x: view.x, y: view.y,
+      escala: view.scale,
+      separacion: punteros.size === 2 ? distancia() : 0
+    };
+  };
 
   el.viewport.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
     event.preventDefault();
-    dragging = true;
-    startX = event.clientX - view.x;
-    startY = event.clientY - view.y;
+    punteros.set(event.pointerId, { x: event.clientX, y: event.clientY });
     el.viewport.setPointerCapture(event.pointerId);
     el.viewport.classList.add('dragging');
+    tomarReferencia();
   });
 
   el.viewport.addEventListener('pointermove', (event) => {
-    if (!dragging) return;
-    view.x = event.clientX - startX;
-    view.y = event.clientY - startY;
+    if (!punteros.has(event.pointerId) || !inicio) return;
+    event.preventDefault();
+    punteros.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    const c = centro();
+
+    if (punteros.size === 2 && inicio.separacion > 0) {
+      const factor = distancia() / inicio.separacion;
+      const escala = Math.min(8, Math.max(0.1, inicio.escala * factor));
+      const rect = el.viewport.getBoundingClientRect();
+      const px = inicio.cx - rect.left;
+      const py = inicio.cy - rect.top;
+      view.scale = escala;
+      view.x = (c.x - rect.left) - ((px - inicio.x) * escala) / inicio.escala;
+      view.y = (c.y - rect.top) - ((py - inicio.y) * escala) / inicio.escala;
+    } else {
+      view.x = inicio.x + (c.x - inicio.cx);
+      view.y = inicio.y + (c.y - inicio.cy);
+    }
     applyView();
   });
 
-  const end = (event) => {
-    if (!dragging) return;
-    dragging = false;
-    el.viewport.classList.remove('dragging');
+  const soltar = (event) => {
+    if (!punteros.delete(event.pointerId)) return;
     try { el.viewport.releasePointerCapture(event.pointerId); } catch (_) { /* nada */ }
+    if (punteros.size) tomarReferencia();
+    else {
+      inicio = null;
+      el.viewport.classList.remove('dragging');
+    }
   };
 
-  el.viewport.addEventListener('pointerup', end);
-  el.viewport.addEventListener('pointercancel', end);
+  el.viewport.addEventListener('pointerup', soltar);
+  el.viewport.addEventListener('pointercancel', soltar);
 
   // Firefox y Chromium arrancan su propio arrastre de imagen sobre el SVG.
   el.viewport.addEventListener('dragstart', (event) => event.preventDefault());

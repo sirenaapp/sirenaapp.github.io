@@ -32,7 +32,8 @@ de la propia dirección.
   que copia el código listo para pegar.
 - Trabajar en castellano, catalán, gallego, euskera o inglés, con los ejemplos y
   la ayuda también traducidos.
-- Usarlo en móvil y tableta. El aspecto sigue al del dispositivo mientras no se
+- Usarlo en móvil y tableta: el diagrama se arrastra con un dedo y se amplía
+  pellizcando. El aspecto sigue al del dispositivo mientras no se
   elija otro.
 
 ## Incrustar un diagrama en otra página
