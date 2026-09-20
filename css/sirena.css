@@ -137,6 +137,10 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 }
 
 .menu button:hover { background: var(--accent-soft); }
+.menu-ancho { min-width: 280px; }
+.menu-ancho button { padding: 8px 10px; }
+.menu-ancho strong { display: block; font-size: 13.5px; font-weight: 600; }
+.menu-ancho small { display: block; color: var(--text-soft); font-size: 11.5px; line-height: 1.35; }
 .menu button[aria-current="true"] { color: var(--accent); font-weight: 600; }
 
 /* --- Pestañas en pantalla pequeña --- */
@@ -181,6 +185,39 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 
 .pane-editor { flex: 0 0 var(--editor-width, 38%); }
 .pane-preview { flex: 1; }
+
+.editor-wrap {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gutter {
+  flex: none;
+  width: 44px;
+  padding: 12px 6px 12px 0;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: right;
+  user-select: none;
+}
+
+.gutter span { display: block; }
+
+.gutter .line-error {
+  color: #fff;
+  background: var(--danger);
+  border-radius: 3px;
+  padding-right: 4px;
+  margin-right: -4px;
+  font-weight: 600;
+}
 
 #editor {
   flex: 1;
@@ -297,6 +334,8 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 }
 
 .error-box strong { display: block; margin-bottom: 4px; }
+.error-box.clickable { cursor: pointer; }
+.error-box.clickable:hover { filter: brightness(.97); }
 .error-box pre { margin: 0; white-space: pre-wrap; font-size: 12px; }
 
 /* --- Pie --- */
@@ -335,9 +374,63 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
   box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
 }
 
+.modal { max-height: 86vh; overflow: auto; }
 .modal h2 { margin-top: 0; font-size: 18px; }
+
+.syntax h3 { margin: 18px 0 4px; font-size: 15px; }
+.syntax > p { margin: 0 0 8px; color: var(--text-soft); font-size: 12px; }
+
+.syntax-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.syntax-row:hover { background: var(--accent-soft); border-color: var(--border); }
+
+.syntax-row code {
+  flex: 0 0 46%;
+  white-space: pre;
+  overflow-x: auto;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.syntax-row span { flex: 1; font-size: 13px; color: var(--text-soft); }
+
+@media (max-width: 620px) {
+  .syntax-row { flex-direction: column; gap: 2px; }
+  .syntax-row code { flex: none; width: 100%; }
+}
 .modal a { color: var(--accent); }
-.modal-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.modal-help { color: var(--text-soft); font-size: 13px; }
+
+.campo { display: block; margin-top: 14px; }
+.campo > span { display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-soft); }
+
+.campo input, .campo textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.btn-secundario { background: transparent; color: var(--text); }
 
 .btn {
   padding: 8px 16px;

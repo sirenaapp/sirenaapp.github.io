@@ -11,11 +11,33 @@ const STORE = {
   width: 'sirena.editorWidth'
 };
 
-const DEFAULT_CODE = `flowchart TD
+const DEFAULT_CODE = {
+  es: `flowchart TD
     A[Idea] --> B[Diagrama]
     B --> C{¿Se entiende?}
     C -- Sí --> D[Compartir]
-    C -- No --> B`;
+    C -- No --> B`,
+  ca: `flowchart TD
+    A[Idea] --> B[Diagrama]
+    B --> C{S'entén?}
+    C -- Sí --> D[Compartir]
+    C -- No --> B`,
+  gl: `flowchart TD
+    A[Idea] --> B[Diagrama]
+    B --> C{Enténdese?}
+    C -- Si --> D[Compartir]
+    C -- Non --> B`,
+  eu: `flowchart TD
+    A[Ideia] --> B[Diagrama]
+    B --> C{Ulertzen da?}
+    C -- Bai --> D[Partekatu]
+    C -- Ez --> B`,
+  en: `flowchart TD
+    A[Idea] --> B[Diagram]
+    B --> C{Is it clear?}
+    C -- Yes --> D[Share]
+    C -- No --> B`
+};
 
 const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
 const THEME_KEYS = {
@@ -43,7 +65,13 @@ const el = {
   splitter: $('splitter'),
   workspace: $('workspace'),
   helpModal: $('help-modal'),
-  viewerLink: $('viewer-link')
+  viewerLink: $('viewer-link'),
+  gutter: $('gutter'),
+  a11yModal: $('a11y-modal'),
+  a11yTitle: $('a11y-title'),
+  a11yDescr: $('a11y-descr'),
+  syntaxBox: $('syntax-box'),
+  downloadMenu: $('download-menu')
 };
 
 let lang = 'es';
@@ -52,6 +80,7 @@ let renderTimer = null;
 let renderToken = 0;
 let currentSvg = '';
 let viewer = false;
+let errorLine = 0;
 const view = { scale: 1, x: 0, y: 0 };
 
 /* --- Idioma --- */
@@ -102,8 +131,10 @@ function buildLangMenu() {
     button.textContent = window.SIRENA_LANG[code].name;
     if (code === lang) button.setAttribute('aria-current', 'true');
     button.addEventListener('click', () => {
+      const anterior = lang;
       applyLang(code);
       el.langMenu.hidden = true;
+      if (anterior !== lang) translateExampleInEditor(anterior);
     });
     el.langMenu.appendChild(button);
   });
@@ -135,6 +166,37 @@ function buildThemeSelect() {
   el.themeSelect.value = MERMAID_THEMES.includes(current) ? current : 'default';
 }
 
+function findExample(id) {
+  if (!id) return null;
+  for (const group of window.SIRENA_EXAMPLES) {
+    const found = group.items.find((item) => item.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function exampleCode(item) {
+  return item.code[lang] || item.code.es;
+}
+
+// Si en el editor está un ejemplo tal cual, al cambiar de idioma se sustituye
+// por ese mismo ejemplo traducido, en lugar de dejarlo en el idioma anterior.
+function translateExampleInEditor(previous) {
+  const actual = el.editor.value.trim();
+  if (!actual) return;
+  for (const group of window.SIRENA_EXAMPLES) {
+    for (const item of group.items) {
+      const anterior = item.code[previous];
+      if (anterior && anterior.trim() === actual) {
+        el.editor.value = exampleCode(item);
+        el.exampleSelect.value = item.id;
+        render();
+        return;
+      }
+    }
+  }
+}
+
 /* --- Aspecto --- */
 
 function isDark() {
@@ -145,11 +207,22 @@ function defaultMermaidTheme() {
   return isDark() ? 'dark' : 'default';
 }
 
-function applyDark(dark) {
+const sistemaOscuro = matchMedia('(prefers-color-scheme: dark)');
+
+// El aspecto sigue al del dispositivo mientras no se elija otra cosa. Si se
+// elige justo el que ya trae el dispositivo, se vuelve a seguirlo.
+function applyDark(dark, manual) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-  localStorage.setItem(STORE.dark, dark ? '1' : '0');
+  if (manual) {
+    if (dark === sistemaOscuro.matches) localStorage.removeItem(STORE.dark);
+    else localStorage.setItem(STORE.dark, dark ? '1' : '0');
+  }
   const icon = $('btn-dark').querySelector('use');
   if (icon) icon.setAttribute('href', dark ? '#i-sun' : '#i-moon');
+}
+
+function followsSystem() {
+  return localStorage.getItem(STORE.dark) === null;
 }
 
 /* --- Avisos --- */
@@ -200,6 +273,7 @@ async function render() {
   const code = el.editor.value.trim();
   localStorage.setItem(STORE.code, el.editor.value);
   updateStatus();
+  renderGutter();
 
   if (!code) {
     currentSvg = '';
@@ -227,9 +301,34 @@ async function render() {
   }
 }
 
+// Números de línea al lado del editor, con la línea del error marcada.
+function renderGutter() {
+  const total = el.editor.value.split('\n').length;
+  let html = '';
+  for (let i = 1; i <= total; i += 1) {
+    html += i === errorLine ? `<span class="line-error">${i}</span>` : `<span>${i}</span>`;
+  }
+  el.gutter.innerHTML = html;
+  el.gutter.scrollTop = el.editor.scrollTop;
+}
+
+// Lleva el cursor a la línea indicada y la deja seleccionada.
+function goToLine(line) {
+  const lines = el.editor.value.split('\n');
+  if (line < 1 || line > lines.length) return;
+  const inicio = lines.slice(0, line - 1).reduce((n, l) => n + l.length + 1, 0);
+  el.editor.focus();
+  el.editor.setSelectionRange(inicio, inicio + lines[line - 1].length);
+  const alto = el.editor.clientHeight;
+  const altoLinea = parseFloat(getComputedStyle(el.editor).lineHeight) || 22;
+  el.editor.scrollTop = Math.max(0, (line - 1) * altoLinea - alto / 2);
+  renderGutter();
+}
+
 function showError(error) {
   const message = (error && (error.str || error.message)) || String(error);
   const line = /line\s+(\d+)/i.exec(message);
+  errorLine = line ? parseInt(line[1], 10) : 0;
   el.errorBox.innerHTML = '';
   const title = document.createElement('strong');
   title.textContent = t('errorTitle') + (line ? ` · ${t('errorLine')} ${line[1]}` : '');
@@ -237,11 +336,18 @@ function showError(error) {
   body.textContent = message;
   el.errorBox.append(title, body);
   el.errorBox.hidden = false;
+  el.errorBox.classList.toggle('clickable', !!errorLine);
+  renderGutter();
 }
 
 function hideError() {
   el.errorBox.hidden = true;
   el.errorBox.innerHTML = '';
+  el.errorBox.classList.remove('clickable');
+  if (errorLine) {
+    errorLine = 0;
+    renderGutter();
+  }
 }
 
 function showEmpty() {
@@ -299,7 +405,9 @@ function fitToWindow() {
   const box = el.canvas.getBoundingClientRect();
   const port = el.viewport.getBoundingClientRect();
   if (!box.width || !box.height) return;
-  const scale = Math.min(port.width / box.width, port.height / box.height, 1);
+  // El ajuste amplía los diagramas pequeños además de reducir los grandes,
+  // hasta el doble de su tamaño, para que no se queden diminutos en el lienzo.
+  const scale = Math.min(port.width / box.width, port.height / box.height, 2.5);
   view.scale = scale > 0 ? scale : 1;
   view.x = Math.max(0, (port.width - box.width * view.scale) / 2);
   view.y = Math.max(0, (port.height - box.height * view.scale) / 2);
@@ -342,6 +450,86 @@ function setupPan() {
     event.preventDefault();
     zoomBy(event.deltaY < 0 ? 1.12 : 1 / 1.12, { x: event.clientX, y: event.clientY });
   }, { passive: false });
+}
+
+/* --- Chuleta de sintaxis --- */
+
+function currentSyntax() {
+  const code = el.editor.value;
+  return (window.SIRENA_SYNTAX || []).find((tipo) => tipo.detect.test(code)) || null;
+}
+
+function insertSnippet(fragmento) {
+  const inicio = el.editor.selectionStart;
+  const fin = el.editor.selectionEnd;
+  const antes = el.editor.value.slice(0, inicio);
+  const despues = el.editor.value.slice(fin);
+  const salto = antes && !antes.endsWith('\n') ? '\n' : '';
+  el.editor.value = antes + salto + fragmento + despues;
+  const cursor = (antes + salto + fragmento).length;
+  el.editor.focus();
+  el.editor.setSelectionRange(cursor, cursor);
+  render();
+}
+
+function buildSyntaxBox() {
+  const tipo = currentSyntax();
+  el.syntaxBox.innerHTML = '';
+  const titulo = document.createElement('h3');
+  titulo.textContent = t('syntaxHeading');
+  el.syntaxBox.appendChild(titulo);
+
+  if (!tipo) {
+    const aviso = document.createElement('p');
+    aviso.textContent = t('syntaxUnknown');
+    el.syntaxBox.appendChild(aviso);
+    return;
+  }
+
+  const pista = document.createElement('p');
+  pista.textContent = t('syntaxInsert');
+  el.syntaxBox.appendChild(pista);
+
+  tipo.rows.forEach((fila) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'syntax-row';
+    const codigo = document.createElement('code');
+    codigo.textContent = fila.c;
+    const texto = document.createElement('span');
+    texto.textContent = fila.t[lang] || fila.t.es;
+    boton.append(codigo, texto);
+    boton.addEventListener('click', () => {
+      insertSnippet(fila.c);
+      el.helpModal.hidden = true;
+    });
+    el.syntaxBox.appendChild(boton);
+  });
+}
+
+/* --- Título y descripción accesibles (accTitle y accDescr de Mermaid) --- */
+
+function readAccessibility() {
+  const code = el.editor.value;
+  const titulo = /^[ \t]*accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
+  const descr = /^[ \t]*accDescr[ \t]*:[ \t]*(.*)$/m.exec(code);
+  return { titulo: titulo ? titulo[1].trim() : '', descr: descr ? descr[1].trim() : '' };
+}
+
+// Las dos líneas van justo debajo de la primera del diagrama, que es donde
+// Mermaid las espera, con la misma sangría que el resto del código.
+function writeAccessibility(titulo, descr) {
+  const lineas = el.editor.value.split('\n')
+    .filter((linea) => !/^[ \t]*acc(Title|Descr)[ \t]*:/.test(linea));
+  const primera = lineas.findIndex((linea) => linea.trim());
+  if (primera === -1) return;
+  const sangria = (lineas[primera + 1] || '').match(/^[ \t]*/)[0] || '    ';
+  const nuevas = [];
+  if (titulo.trim()) nuevas.push(`${sangria}accTitle: ${titulo.trim()}`);
+  if (descr.trim()) nuevas.push(`${sangria}accDescr: ${descr.trim()}`);
+  lineas.splice(primera + 1, 0, ...nuevas);
+  el.editor.value = lineas.join('\n');
+  render();
 }
 
 /* --- Archivos e imágenes --- */
@@ -448,6 +636,64 @@ async function svgToCanvas(scale = 2) {
   } finally {
     URL.revokeObjectURL(url);
   }
+}
+
+// Página autónoma: el diagrama va dentro, sin depender de Sirena ni de nada.
+function htmlPage() {
+  const data = svgForExport();
+  if (!data) return null;
+  const acc = readAccessibility();
+  const titulo = acc.titulo || diagramName();
+  const pie = acc.titulo || acc.descr
+    ? `\n<figcaption>${escapeHtml(acc.titulo)}${acc.descr ? `<p>${escapeHtml(acc.descr)}</p>` : ''}</figcaption>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(titulo)}</title>
+<style>
+  body { margin: 0; padding: 24px; background: #fff; color: #17262b;
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  figure { margin: 0 auto; max-width: 1200px; text-align: center; }
+  svg { max-width: 100%; height: auto; }
+  figcaption { margin-top: 12px; color: #5c7078; font-size: 14px; }
+  @media (prefers-color-scheme: dark) { body { background: #10181b; color: #e6eef0; } }
+</style>
+</head>
+<body>
+<figure role="img" aria-label="${escapeHtml(titulo)}">
+${data.markup}${pie}
+</figure>
+</body>
+</html>`;
+}
+
+function escapeHtml(texto) {
+  return String(texto).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+async function downloadAs(formato) {
+  const nombre = diagramName();
+  if (formato === 'mmd') {
+    download(new Blob([el.editor.value], { type: 'text/plain;charset=utf-8' }), nombre + '.mmd');
+    return;
+  }
+  if (formato === 'svg') {
+    const data = svgForExport();
+    if (data) download(new Blob([data.markup], { type: 'image/svg+xml;charset=utf-8' }), nombre + '.svg');
+    return;
+  }
+  if (formato === 'html') {
+    const pagina = htmlPage();
+    if (pagina) download(new Blob([pagina], { type: 'text/html;charset=utf-8' }), nombre + '.html');
+    return;
+  }
+  const canvas = await svgToCanvas(2);
+  if (canvas) canvas.toBlob((blob) => blob && download(blob, nombre + '.png'), 'image/png');
 }
 
 async function copyText(text, message) {
@@ -624,23 +870,20 @@ function setupToolbar() {
     render();
   });
 
-  $('btn-save').addEventListener('click', () => {
-    download(new Blob([el.editor.value], { type: 'text/plain;charset=utf-8' }), diagramName() + '.mmd');
+  $('btn-download').addEventListener('click', (event) => {
+    event.stopPropagation();
+    el.downloadMenu.hidden = !el.downloadMenu.hidden;
+    el.langMenu.hidden = true;
+  });
+
+  el.downloadMenu.querySelectorAll('button[data-formato]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      el.downloadMenu.hidden = true;
+      downloadAs(boton.dataset.formato);
+    });
   });
 
   $('btn-copy-code').addEventListener('click', () => copyText(el.editor.value, t('copied')));
-
-  $('btn-svg').addEventListener('click', () => {
-    const data = svgForExport();
-    if (!data) return;
-    download(new Blob([data.markup], { type: 'image/svg+xml;charset=utf-8' }), diagramName() + '.svg');
-  });
-
-  $('btn-png').addEventListener('click', async () => {
-    const canvas = await svgToCanvas(2);
-    if (!canvas) return;
-    canvas.toBlob((blob) => blob && download(blob, diagramName() + '.png'), 'image/png');
-  });
 
   $('btn-copy-image').addEventListener('click', async () => {
     try {
@@ -659,7 +902,7 @@ function setupToolbar() {
 
   $('btn-dark').addEventListener('click', () => {
     const dark = !isDark();
-    applyDark(dark);
+    applyDark(dark, true);
     if (!localStorage.getItem(STORE.theme)) {
       el.themeSelect.value = defaultMermaidTheme();
     }
@@ -672,25 +915,43 @@ function setupToolbar() {
     el.langMenu.hidden = !el.langMenu.hidden;
   });
 
-  document.addEventListener('click', () => { el.langMenu.hidden = true; });
+  document.addEventListener('click', () => {
+    el.langMenu.hidden = true;
+    el.downloadMenu.hidden = true;
+  });
 
-  $('btn-help').addEventListener('click', () => { el.helpModal.hidden = false; });
+  $('btn-a11y').addEventListener('click', () => {
+    const actual = readAccessibility();
+    el.a11yTitle.value = actual.titulo;
+    el.a11yDescr.value = actual.descr;
+    el.a11yModal.hidden = false;
+    el.a11yTitle.focus();
+  });
+
+  $('a11y-apply').addEventListener('click', () => {
+    writeAccessibility(el.a11yTitle.value, el.a11yDescr.value);
+    el.a11yModal.hidden = true;
+  });
+
+  $('a11y-cancel').addEventListener('click', () => { el.a11yModal.hidden = true; });
+  el.a11yModal.addEventListener('click', (event) => {
+    if (event.target === el.a11yModal) el.a11yModal.hidden = true;
+  });
+
+  $('btn-help').addEventListener('click', () => {
+    buildSyntaxBox();
+    el.helpModal.hidden = false;
+  });
   $('help-close').addEventListener('click', () => { el.helpModal.hidden = true; });
   el.helpModal.addEventListener('click', (event) => {
     if (event.target === el.helpModal) el.helpModal.hidden = true;
   });
 
   el.exampleSelect.addEventListener('change', () => {
-    const id = el.exampleSelect.value;
-    if (!id) return;
-    for (const group of window.SIRENA_EXAMPLES) {
-      const found = group.items.find((item) => item.id === id);
-      if (found) {
-        el.editor.value = found.code;
-        render();
-        break;
-      }
-    }
+    const found = findExample(el.exampleSelect.value);
+    if (!found) return;
+    el.editor.value = exampleCode(found);
+    render();
   });
 
   el.themeSelect.addEventListener('change', () => {
@@ -724,11 +985,13 @@ function setupToolbar() {
   document.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
-      $('btn-save').click();
+      downloadAs('mmd');
     }
     if (event.key === 'Escape') {
       el.helpModal.hidden = true;
+      el.a11yModal.hidden = true;
       el.langMenu.hidden = true;
+      el.downloadMenu.hidden = true;
     }
   });
 }
@@ -736,8 +999,19 @@ function setupToolbar() {
 /* --- Arranque --- */
 
 async function start() {
-  applyDark(localStorage.getItem(STORE.dark) === '1'
-    || (localStorage.getItem(STORE.dark) === null && matchMedia('(prefers-color-scheme: dark)').matches));
+  applyDark(followsSystem() ? sistemaOscuro.matches : localStorage.getItem(STORE.dark) === '1');
+
+  // Si el dispositivo cambia de claro a oscuro (o al revés), la página lo sigue
+  // al momento, salvo que se haya elegido un aspecto a mano.
+  sistemaOscuro.addEventListener('change', (evento) => {
+    if (!followsSystem()) return;
+    applyDark(evento.matches);
+    if (!localStorage.getItem(STORE.theme)) {
+      el.themeSelect.value = defaultMermaidTheme();
+    }
+    initMermaid();
+    render();
+  });
 
   applyLang(detectLang());
   buildThemeSelect();
@@ -751,11 +1025,13 @@ async function start() {
 
   const fromLink = await loadFromHash();
   if (!fromLink) {
-    el.editor.value = localStorage.getItem(STORE.code) || DEFAULT_CODE;
+    el.editor.value = localStorage.getItem(STORE.code) || DEFAULT_CODE[lang] || DEFAULT_CODE.es;
   }
 
   initMermaid();
-  el.editor.addEventListener('input', () => { updateStatus(); scheduleRender(); });
+  el.editor.addEventListener('input', () => { updateStatus(); renderGutter(); scheduleRender(); });
+  el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });
+  el.errorBox.addEventListener('click', () => { if (errorLine) goToLine(errorLine); });
 
   // Si llega un enlace nuevo sin recargar la página (se pega en la barra de
   // direcciones, por ejemplo), se carga igualmente el diagrama que trae.
@@ -768,6 +1044,7 @@ async function start() {
   window.addEventListener('resize', () => scheduleRender(250));
   document.body.dataset.pane = 'editor';
 
+  renderGutter();
   await render();
 }
 

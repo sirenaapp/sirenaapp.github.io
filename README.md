@@ -13,13 +13,20 @@ de la propia dirección.
 - Elegir entre 18 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama entre los cinco temas de Mermaid.
-- Descargar el resultado en SVG o en PNG, o copiarlo como imagen.
+- Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
+  como imagen.
+- Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
+  leen los lectores de pantalla.
+- Consultar la sintaxis del tipo de diagrama que se está escribiendo, en la
+  ventana de ayuda, e insertar los fragmentos con una pulsación.
 - Abrir y guardar archivos `.mmd`.
 - Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio.
 - Incrustar el diagrama en un blog o en un material de eXeLearning, con el botón
   que copia el código listo para pegar.
-- Trabajar en castellano, catalán, gallego, euskera o inglés.
-- Usarlo en móvil y tableta, con tema claro u oscuro.
+- Trabajar en castellano, catalán, gallego, euskera o inglés, con los ejemplos y
+  la ayuda también traducidos.
+- Usarlo en móvil y tableta. El aspecto sigue al del dispositivo mientras no se
+  elija otro.
 
 ## Incrustar un diagrama en otra página
 
