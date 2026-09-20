@@ -341,7 +341,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 /* --- Pie --- */
 
 .footer {
-  padding: 10px 14px 14px;
+  padding: 8px 14px 10px;
   border-top: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-soft);
@@ -349,7 +349,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
   text-align: center;
 }
 
-.footer-line { margin: 0 0 4px; }
+.footer-line { margin: 0; }
 .footer a { color: var(--accent); }
 
 /* --- Ventana de ayuda --- */
