@@ -43,10 +43,22 @@ tiene efecto, y se actualiza al cambiar el código aunque el menú esté abierto
 - **Escribir la cabecera solo al guardar o al compartir.** Descartada porque
   seguiría sin verse mientras se trabaja.
 
-El motor de distribución elk se probó y se retiró del menú: en Mermaid 12.0.0 no
-cambia el dibujo, ni configurado como `layout: elk` ni escribiendo
-`flowchart-elk`. Medido sobre dos diagramas distintos, el resultado es idéntico
-al de dagre, así que era un control que no hacía nada.
+Solo se ofrecen los ajustes que en Mermaid 12.0.0 cambian el dibujo de verdad.
+Se midieron uno a uno sobre el mismo diagrama y varios quedaron fuera:
+
+| Ajuste | Efecto medido |
+|---|---|
+| `look` (clásico, a mano alzada, moderno) | **sí** |
+| `themeVariables.fontSize` y los colores | **sí** |
+| `flowchart.diagramPadding` | **sí** |
+| `layout: elk` y el tipo `flowchart-elk` | ninguno |
+| `flowchart.curve` (curvas, rectas, escalonadas) | ninguno |
+| `flowchart.nodeSpacing` y `rankSpacing` | ninguno |
+| `flowchart.padding` y `wrappingWidth` | ninguno |
+
+Los que no hacen nada se retiraron del menú en lugar de dejarlos puestos: un
+control que no cambia nada engaña a quien lo usa. Conviene volver a medirlos
+cuando Mermaid publique una versión nueva, por si vuelven a funcionar.
 
 ## Consecuencias
 

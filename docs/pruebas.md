@@ -24,3 +24,13 @@ Cada lunes, la acción `.github/workflows/check-mermaid-version.yml` compara
 `vendor/mermaid/VERSION` con la última versión publicada en npm y, si son
 distintas, abre una incidencia con los pasos de actualización. También se puede
 lanzar a mano desde la pestaña Actions del repositorio.
+
+## Ajustes que dependen de la versión de Mermaid
+
+Varios ajustes de configuración no tienen efecto en Mermaid 12.0.0, y por eso no
+están en el menú de aspecto: el motor `elk`, la forma de las líneas
+(`flowchart.curve`) y la separación entre elementos (`nodeSpacing`,
+`rankSpacing`). La tabla con lo medido está en
+[docs/adr/0008](adr/0008-ajustes-escritos-en-el-codigo.md). Al actualizar
+Mermaid conviene volver a medirlos: si vuelven a funcionar, merece la pena
+recuperarlos.

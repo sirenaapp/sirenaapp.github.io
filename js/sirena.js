@@ -51,9 +51,8 @@ const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
 // Ajustes del dibujo: cada uno es un valor de configuración de Mermaid.
 const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
 const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
-const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
-const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
+const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
 const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
 const COLORS = [
   ['', 'colorDefault', null],
@@ -100,14 +99,13 @@ const el = {
   lookSelect: $('look-select'),
   sizeSelect: $('size-select'),
   colorSelect: $('color-select'),
-  curveSelect: $('curve-select'),
   coloresPropios: $('colores-propios'),
   colorFill: $('color-fill'),
   colorBorder: $('color-border'),
   colorLine: $('color-line'),
   colorText: $('color-text'),
   directionSelect: $('direction-select'),
-  spacingSelect: $('spacing-select'),
+  paddingSelect: $('padding-select'),
   numberingSelect: $('numbering-select'),
   showDataSelect: $('showdata-select'),
   libraryModal: $('library-modal'),
@@ -409,9 +407,8 @@ function buildAppearanceSelects() {
   fillSelect(el.lookSelect, LOOKS, localStorage.getItem(STORE.look));
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
-  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve));
   fillSelect(el.directionSelect, DIRECTIONS, null, 'TD');
-  fillSelect(el.spacingSelect, SPACINGS, null, '50');
+  fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
   fillSelect(el.showDataSelect, YESNO, null, 'no');
 }
@@ -433,8 +430,7 @@ function updateAppearanceVisibility() {
   const tipo = diagramKind();
   const esFlujo = tipo === 'flowchart';
   const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(tipo);
-  $('ajuste-curve').hidden = !esFlujo;
-  $('ajuste-spacing').hidden = !esFlujo;
+  $('ajuste-padding').hidden = !esFlujo;
   $('ajuste-direction').hidden = !conDireccion;
   $('ajuste-numbering').hidden = tipo !== 'sequence';
   $('ajuste-showdata').hidden = tipo !== 'pie';
@@ -841,13 +837,9 @@ function appearanceConfig() {
     config.theme = 'base';
   }
   if (Object.keys(variables).length) config.themeVariables = variables;
-  const flowchart = {};
-  if (el.curveSelect.value && el.curveSelect.value !== 'basis') flowchart.curve = el.curveSelect.value;
-  if (el.spacingSelect.value && el.spacingSelect.value !== '50') {
-    flowchart.nodeSpacing = Number(el.spacingSelect.value);
-    flowchart.rankSpacing = Number(el.spacingSelect.value);
+  if (el.paddingSelect.value && el.paddingSelect.value !== '20') {
+    config.flowchart = { diagramPadding: Number(el.paddingSelect.value) };
   }
-  if (Object.keys(flowchart).length) config.flowchart = flowchart;
   if (el.numberingSelect.value === 'yes') config.sequence = { showSequenceNumbers: true };
   return config;
 }
@@ -919,8 +911,7 @@ function readAppearance() {
   }
   const variables = config.themeVariables || {};
   el.lookSelect.value = config.look || 'classic';
-  el.curveSelect.value = (config.flowchart && config.flowchart.curve) || 'basis';
-  el.spacingSelect.value = String((config.flowchart && config.flowchart.nodeSpacing) || 50);
+  el.paddingSelect.value = String((config.flowchart && config.flowchart.diagramPadding) || 20);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readDirection();
   readShowData();
@@ -1288,7 +1279,7 @@ async function loadFromHash() {
     const theme = params.get('t');
     if (theme && MERMAID_THEMES.includes(theme)) el.themeSelect.value = theme;
     const desdeEnlace = [[el.lookSelect, 'l', LOOKS], [el.sizeSelect, 's', SIZES],
-                         [el.colorSelect, 'c', COLORS], [el.curveSelect, 'cv', CURVES]];
+                         [el.colorSelect, 'c', COLORS]];
     desdeEnlace.forEach(([select, clave, opciones]) => {
       const valor = params.get(clave);
       if (valor !== null && opciones.some((opcion) => opcion[0] === valor)) select.value = valor;
@@ -1498,8 +1489,8 @@ function setupToolbar() {
 
   el.appearanceMenu.addEventListener('click', (event) => event.stopPropagation());
 
-  [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size], [el.colorSelect, STORE.color],
-   [el.curveSelect, STORE.curve]].forEach(([select, clave]) => {
+  [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size],
+   [el.colorSelect, STORE.color]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
       localStorage.setItem(clave, select.value);
       if (select === el.colorSelect && select.value === 'custom') {
@@ -1521,7 +1512,7 @@ function setupToolbar() {
     render();
   });
 
-  [el.spacingSelect, el.numberingSelect].forEach((select) => {
+  [el.paddingSelect, el.numberingSelect].forEach((select) => {
     select.addEventListener('change', () => writeAppearance());
   });
 
