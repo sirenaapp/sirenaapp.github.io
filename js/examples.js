@@ -9,6 +9,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de flujo', ca: 'Diagrama de flux', gl: 'Diagrama de fluxo', eu: 'Fluxu-diagrama', en: 'Flowchart' },
         code: {
           es: `flowchart TD
+    accTitle: Diagrama de flujo
+    accDescr: Recorrido de una entrega de trabajo, desde que llega hasta que se publica la nota.
     A[Entrega del trabajo] --> B{¿Llega a tiempo?}
     B -- Sí --> C[Se corrige]
     B -- No --> D[Se avisa al alumnado]
@@ -17,6 +19,8 @@ window.SIRENA_EXAMPLES = [
     E -- No --> F[Queda pendiente]
     C --> G[Se publica la nota]`,
           ca: `flowchart TD
+    accTitle: Diagrama de flux
+    accDescr: Recorregut d'un lliurament de treball, des que arriba fins que es publica la nota.
     A[Lliurament del treball] --> B{Arriba a temps?}
     B -- Sí --> C[Es corregeix]
     B -- No --> D[S'avisa l'alumnat]
@@ -25,6 +29,8 @@ window.SIRENA_EXAMPLES = [
     E -- No --> F[Queda pendent]
     C --> G[Es publica la nota]`,
           gl: `flowchart TD
+    accTitle: Diagrama de fluxo
+    accDescr: Percorrido dunha entrega de traballo, desde que chega ata que se publica a nota.
     A[Entrega do traballo] --> B{Chega a tempo?}
     B -- Si --> C[Corríxese]
     B -- Non --> D[Avísase ao alumnado]
@@ -33,6 +39,8 @@ window.SIRENA_EXAMPLES = [
     E -- Non --> F[Queda pendente]
     C --> G[Publícase a nota]`,
           eu: `flowchart TD
+    accTitle: Fluxu-diagrama
+    accDescr: Lan baten entregaren ibilbidea, iristen denetik nota argitaratu arte.
     A[Lanaren entrega] --> B{Garaiz iristen da?}
     B -- Bai --> C[Zuzendu egiten da]
     B -- Ez --> D[Ikasleei jakinarazten zaie]
@@ -41,6 +49,8 @@ window.SIRENA_EXAMPLES = [
     E -- Ez --> F[Zain geratzen da]
     C --> G[Nota argitaratzen da]`,
           en: `flowchart TD
+    accTitle: Flowchart
+    accDescr: Path of an assignment, from being handed in to the grade being published.
     A[Assignment handed in] --> B{On time?}
     B -- Yes --> C[Marked]
     B -- No --> D[Student is notified]
@@ -55,6 +65,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Proceso largo en cajas', ca: 'Procés llarg en caixes', gl: 'Proceso longo en caixas', eu: 'Prozesu luzea kutxetan', en: 'Long process in boxes' },
         code: {
           es: `flowchart LR
+    accTitle: Proceso largo en cajas
+    accDescr: Proceso largo plegado en tres cajas unidas por conectores numerados.
     subgraph S1[1. Elegir a la persona]
         direction TB
         A([Inicio: quiero hacer un amigo]) --> B[Elegir una persona]
@@ -91,6 +103,8 @@ window.SIRENA_EXAMPLES = [
     S1 ~~~ S2
     S2 ~~~ S3`,
           ca: `flowchart LR
+    accTitle: Procés llarg en caixes
+    accDescr: Procés llarg plegat en tres caixes unides per connectors numerats.
     subgraph S1[1. Triar la persona]
         direction TB
         A([Inici: vull fer un amic]) --> B[Triar una persona]
@@ -127,6 +141,8 @@ window.SIRENA_EXAMPLES = [
     S1 ~~~ S2
     S2 ~~~ S3`,
           gl: `flowchart LR
+    accTitle: Proceso longo en caixas
+    accDescr: Proceso longo dobrado en tres caixas unidas por conectores numerados.
     subgraph S1[1. Escoller a persoa]
         direction TB
         A([Inicio: quero facer un amigo]) --> B[Escoller unha persoa]
@@ -163,6 +179,8 @@ window.SIRENA_EXAMPLES = [
     S1 ~~~ S2
     S2 ~~~ S3`,
           eu: `flowchart LR
+    accTitle: Prozesu luzea kutxetan
+    accDescr: Prozesu luzea hiru kutxatan tolestuta, zenbakitutako konektoreekin lotuta.
     subgraph S1[1. Pertsona aukeratu]
         direction TB
         A([Hasiera: lagun bat egin nahi dut]) --> B[Pertsona bat aukeratu]
@@ -199,6 +217,8 @@ window.SIRENA_EXAMPLES = [
     S1 ~~~ S2
     S2 ~~~ S3`,
           en: `flowchart LR
+    accTitle: Long process in boxes
+    accDescr: A long process folded into three boxes joined by numbered connectors.
     subgraph S1[1. Choose the person]
         direction TB
         A([Start: I want to make a friend]) --> B[Choose a person]
@@ -241,6 +261,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de estados', ca: "Diagrama d'estats", gl: 'Diagrama de estados', eu: 'Egoera-diagrama', en: 'State diagram' },
         code: {
           es: `stateDiagram-v2
+    accTitle: Diagrama de estados
+    accDescr: Estados por los que pasa el alumnado a lo largo de un curso escolar.
     [*] --> Matriculado
     Matriculado --> Cursando: comienza el curso
     Cursando --> Evaluado: fin de trimestre
@@ -248,6 +270,8 @@ window.SIRENA_EXAMPLES = [
     Evaluado --> Titulado: supera el curso
     Titulado --> [*]`,
           ca: `stateDiagram-v2
+    accTitle: Diagrama de estados
+    accDescr: Estats pels quals passa l'alumnat al llarg d'un curs escolar.
     [*] --> Matriculat
     Matriculat --> Cursant: comença el curs
     Cursant --> Avaluat: fi de trimestre
@@ -255,6 +279,8 @@ window.SIRENA_EXAMPLES = [
     Avaluat --> Titulat: supera el curs
     Titulat --> [*]`,
           gl: `stateDiagram-v2
+    accTitle: Diagrama de estados
+    accDescr: Estados polos que pasa o alumnado ao longo dun curso escolar.
     [*] --> Matriculado
     Matriculado --> Cursando: comeza o curso
     Cursando --> Avaliado: fin de trimestre
@@ -262,6 +288,8 @@ window.SIRENA_EXAMPLES = [
     Avaliado --> Titulado: supera o curso
     Titulado --> [*]`,
           eu: `stateDiagram-v2
+    accTitle: Egoera-diagrama
+    accDescr: Ikasleek ikasturte batean zehar igarotzen dituzten egoerak.
     [*] --> Matrikulatuta
     Matrikulatuta --> Ikasten: ikasturtea hasten da
     Ikasten --> Ebaluatuta: hiruhilekoaren amaiera
@@ -269,6 +297,8 @@ window.SIRENA_EXAMPLES = [
     Ebaluatuta --> Tituluduna: ikasturtea gainditzen du
     Tituluduna --> [*]`,
           en: `stateDiagram-v2
+    accTitle: State diagram
+    accDescr: States a student goes through over a school year.
     [*] --> Enrolled
     Enrolled --> Attending: the course starts
     Attending --> Assessed: end of term
@@ -282,6 +312,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Ramas de Git', ca: 'Branques de Git', gl: 'Ramas de Git', eu: 'Git adarrak', en: 'Git branches' },
         code: {
           es: `gitGraph
+    accTitle: Ramas de Git
+    accDescr: Ramas de un repositorio, con una rama de actividades que se integra en la principal.
     commit id: "Versión inicial"
     branch actividades
     commit id: "Actividad 1"
@@ -290,6 +322,8 @@ window.SIRENA_EXAMPLES = [
     merge actividades
     commit id: "Publicación"`,
           ca: `gitGraph
+    accTitle: Branques de Git
+    accDescr: Branques d'un repositori, amb una branca d'activitats que s'integra en la principal.
     commit id: "Versió inicial"
     branch activitats
     commit id: "Activitat 1"
@@ -298,6 +332,8 @@ window.SIRENA_EXAMPLES = [
     merge activitats
     commit id: "Publicació"`,
           gl: `gitGraph
+    accTitle: Ramas de Git
+    accDescr: Ramas dun repositorio, cunha rama de actividades que se integra na principal.
     commit id: "Versión inicial"
     branch actividades
     commit id: "Actividade 1"
@@ -306,6 +342,8 @@ window.SIRENA_EXAMPLES = [
     merge actividades
     commit id: "Publicación"`,
           eu: `gitGraph
+    accTitle: Git adarrak
+    accDescr: Biltegi bateko adarrak, jardueren adar bat nagusian integratzen dena.
     commit id: "Hasierako bertsioa"
     branch jarduerak
     commit id: "1. jarduera"
@@ -314,6 +352,8 @@ window.SIRENA_EXAMPLES = [
     merge jarduerak
     commit id: "Argitalpena"`,
           en: `gitGraph
+    accTitle: Git branches
+    accDescr: Branches of a repository, with an activities branch merged into the main one.
     commit id: "First version"
     branch activities
     commit id: "Activity 1"
@@ -333,6 +373,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de Gantt', ca: 'Diagrama de Gantt', gl: 'Diagrama de Gantt', eu: 'Gantt diagrama', en: 'Gantt chart' },
         code: {
           es: `gantt
+    accTitle: Diagrama de Gantt
+    accDescr: Calendario de un proyecto, con las tareas de preparación y las de aula.
     title Proyecto de trabajo por ámbitos
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
@@ -343,6 +385,8 @@ window.SIRENA_EXAMPLES = [
     Trabajo en grupo   :b1, after a2, 20d
     Exposiciones       :b2, after b1, 5d`,
           ca: `gantt
+    accTitle: Diagrama de Gantt
+    accDescr: Calendari d'un projecte, amb les tasques de preparació i les d'aula.
     title Projecte de treball per àmbits
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
@@ -353,6 +397,8 @@ window.SIRENA_EXAMPLES = [
     Treball en grup    :b1, after a2, 20d
     Exposicions        :b2, after b1, 5d`,
           gl: `gantt
+    accTitle: Diagrama de Gantt
+    accDescr: Calendario dun proxecto, coas tarefas de preparación e as de aula.
     title Proxecto de traballo por ámbitos
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
@@ -363,6 +409,8 @@ window.SIRENA_EXAMPLES = [
     Traballo en grupo  :b1, after a2, 20d
     Exposicións        :b2, after b1, 5d`,
           eu: `gantt
+    accTitle: Gantt diagrama
+    accDescr: Proiektu baten egutegia, prestaketa eta ikasgelako zereginekin.
     title Eremuka lan egiteko proiektua
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
@@ -373,6 +421,8 @@ window.SIRENA_EXAMPLES = [
     Taldeko lana       :b1, after a2, 20d
     Aurkezpenak        :b2, after b1, 5d`,
           en: `gantt
+    accTitle: Gantt chart
+    accDescr: Timeline of a project, with preparation and classroom tasks.
     title Cross-curricular project
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
@@ -389,6 +439,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Línea del tiempo', ca: 'Línia del temps', gl: 'Liña do tempo', eu: 'Denbora-lerroa', en: 'Timeline' },
         code: {
           es: `timeline
+    accTitle: Línea del tiempo
+    accDescr: Hitos del software libre entre 1983 y 2007.
     title Historia del software libre
     1983 : Proyecto GNU
     1991 : Primera versión de Linux
@@ -396,6 +448,8 @@ window.SIRENA_EXAMPLES = [
     2001 : Creative Commons
     2007 : Licencia AGPL v3`,
           ca: `timeline
+    accTitle: Línia del temps
+    accDescr: Fites del programari lliure entre 1983 i 2007.
     title Història del programari lliure
     1983 : Projecte GNU
     1991 : Primera versió de Linux
@@ -403,6 +457,8 @@ window.SIRENA_EXAMPLES = [
     2001 : Creative Commons
     2007 : Llicència AGPL v3`,
           gl: `timeline
+    accTitle: Liña do tempo
+    accDescr: Fitos do software libre entre 1983 e 2007.
     title Historia do software libre
     1983 : Proxecto GNU
     1991 : Primeira versión de Linux
@@ -410,6 +466,8 @@ window.SIRENA_EXAMPLES = [
     2001 : Creative Commons
     2007 : Licenza AGPL v3`,
           eu: `timeline
+    accTitle: Denbora-lerroa
+    accDescr: Software librearen mugarriak 1983 eta 2007 artean.
     title Software librearen historia
     1983 : GNU proiektua
     1991 : Linux-en lehen bertsioa
@@ -417,6 +475,8 @@ window.SIRENA_EXAMPLES = [
     2001 : Creative Commons
     2007 : AGPL v3 lizentzia`,
           en: `timeline
+    accTitle: Timeline
+    accDescr: Free software milestones between 1983 and 2007.
     title A history of free software
     1983 : GNU Project
     1991 : First release of Linux
@@ -430,6 +490,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Recorrido de usuario', ca: "Recorregut d'usuari", gl: 'Percorrido de usuario', eu: 'Erabiltzailearen ibilbidea', en: 'User journey' },
         code: {
           es: `journey
+    accTitle: Recorrido de usuario
+    accDescr: Satisfacción del alumnado en los momentos de un día de clase.
     title Un día de clase
     section Mañana
       Llegar al centro: 4: Alumnado
@@ -439,6 +501,8 @@ window.SIRENA_EXAMPLES = [
       Trabajo en grupo: 4: Alumnado
       Tareas de casa: 2: Alumnado`,
           ca: `journey
+    accTitle: Recorrido de usuario
+    accDescr: Satisfacció de l'alumnat en els moments d'un dia de classe.
     title Un dia de classe
     section Matí
       Arribar al centre: 4: Alumnat
@@ -448,6 +512,8 @@ window.SIRENA_EXAMPLES = [
       Treball en grup: 4: Alumnat
       Feina de casa: 2: Alumnat`,
           gl: `journey
+    accTitle: Percorrido de usuario
+    accDescr: Satisfacción do alumnado nos momentos dun día de clase.
     title Un día de clase
     section Mañá
       Chegar ao centro: 4: Alumnado
@@ -457,6 +523,8 @@ window.SIRENA_EXAMPLES = [
       Traballo en grupo: 4: Alumnado
       Tarefas da casa: 2: Alumnado`,
           eu: `journey
+    accTitle: Erabiltzailearen ibilbidea
+    accDescr: Ikasleen gogobetetzea klase-egun bateko uneetan.
     title Klase-egun bat
     section Goiza
       Ikastetxera iristea: 4: Ikasleak
@@ -466,6 +534,8 @@ window.SIRENA_EXAMPLES = [
       Taldeko lana: 4: Ikasleak
       Etxeko lanak: 2: Ikasleak`,
           en: `journey
+    accTitle: User journey
+    accDescr: Student satisfaction at each point of a school day.
     title A day at school
     section Morning
       Arriving at school: 4: Students
@@ -547,6 +617,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de clases', ca: 'Diagrama de classes', gl: 'Diagrama de clases', eu: 'Klase-diagrama', en: 'Class diagram' },
         code: {
           es: `classDiagram
+    accTitle: Diagrama de clases
+    accDescr: Clase Persona y las clases Estudiante y Docente que heredan de ella.
     class Persona {
       +String nombre
       +int edad
@@ -563,6 +635,8 @@ window.SIRENA_EXAMPLES = [
     Persona <|-- Estudiante
     Persona <|-- Docente`,
           ca: `classDiagram
+    accTitle: Diagrama de classes
+    accDescr: Classe Persona i les classes Estudiant i Docent que n'hereten.
     class Persona {
       +String nom
       +int edat
@@ -579,6 +653,8 @@ window.SIRENA_EXAMPLES = [
     Persona <|-- Estudiant
     Persona <|-- Docent`,
           gl: `classDiagram
+    accTitle: Diagrama de clases
+    accDescr: Clase Persoa e as clases Estudante e Docente que herdan dela.
     class Persoa {
       +String nome
       +int idade
@@ -595,6 +671,8 @@ window.SIRENA_EXAMPLES = [
     Persoa <|-- Estudante
     Persoa <|-- Docente`,
           eu: `classDiagram
+    accTitle: Klase-diagrama
+    accDescr: Pertsona klasea eta bertatik heredatzen duten Ikaslea eta Irakaslea klaseak.
     class Pertsona {
       +String izena
       +int adina
@@ -611,6 +689,8 @@ window.SIRENA_EXAMPLES = [
     Pertsona <|-- Ikaslea
     Pertsona <|-- Irakaslea`,
           en: `classDiagram
+    accTitle: Class diagram
+    accDescr: A Person class and the Student and Teacher classes inheriting from it.
     class Person {
       +String name
       +int age
@@ -633,26 +713,36 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Entidad-relación', ca: 'Entitat-relació', gl: 'Entidade-relación', eu: 'Entitate-erlazioa', en: 'Entity relationship' },
         code: {
           es: `erDiagram
+    accTitle: Entidad-relación
+    accDescr: Relaciones entre centro, grupo, alumnado, materia y actividad.
     CENTRO ||--o{ GRUPO : tiene
     GRUPO ||--o{ ALUMNADO : agrupa
     ALUMNADO }o--o{ MATERIA : cursa
     MATERIA ||--o{ ACTIVIDAD : incluye`,
           ca: `erDiagram
+    accTitle: Entitat-relació
+    accDescr: Relacions entre centre, grup, alumnat, matèria i activitat.
     CENTRE ||--o{ GRUP : te
     GRUP ||--o{ ALUMNAT : agrupa
     ALUMNAT }o--o{ MATERIA : cursa
     MATERIA ||--o{ ACTIVITAT : inclou`,
           gl: `erDiagram
+    accTitle: Entidade-relación
+    accDescr: Relacións entre centro, grupo, alumnado, materia e actividade.
     CENTRO ||--o{ GRUPO : ten
     GRUPO ||--o{ ALUMNADO : agrupa
     ALUMNADO }o--o{ MATERIA : cursa
     MATERIA ||--o{ ACTIVIDADE : inclúe`,
           eu: `erDiagram
+    accTitle: Entitate-erlazioa
+    accDescr: Ikastetxea, taldea, ikasleak, irakasgaia eta jarduera arteko erlazioak.
     IKASTETXEA ||--o{ TALDEA : dauka
     TALDEA ||--o{ IKASLEAK : biltzen ditu
     IKASLEAK }o--o{ IRAKASGAIA : ikasten du
     IRAKASGAIA ||--o{ JARDUERA : barne hartzen du`,
           en: `erDiagram
+    accTitle: Entity relationship
+    accDescr: Relations between school, group, student, subject and activity.
     SCHOOL ||--o{ GROUP : has
     GROUP ||--o{ STUDENT : contains
     STUDENT }o--o{ SUBJECT : takes
@@ -664,6 +754,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Mapa de árbol', ca: "Mapa d'arbre", gl: 'Mapa de árbore', eu: 'Zuhaitz-mapa', en: 'Treemap' },
         code: {
           es: `treemap-beta
+    accTitle: Mapa de árbol
+    accDescr: Reparto de las horas semanales por ámbitos y materias.
 "Horario semanal"
     "Científico"
         "Matemáticas": 4
@@ -675,6 +767,8 @@ window.SIRENA_EXAMPLES = [
         "Digitalización": 2
         "Educación física": 2`,
           ca: `treemap-beta
+    accTitle: Mapa de árbol
+    accDescr: Repartiment de les hores setmanals per àmbits i matèries.
 "Horari setmanal"
     "Científic"
         "Matemàtiques": 4
@@ -686,6 +780,8 @@ window.SIRENA_EXAMPLES = [
         "Digitalització": 2
         "Educació física": 2`,
           gl: `treemap-beta
+    accTitle: Mapa de árbore
+    accDescr: Repartición das horas semanais por ámbitos e materias.
 "Horario semanal"
     "Científico"
         "Matemáticas": 4
@@ -697,6 +793,8 @@ window.SIRENA_EXAMPLES = [
         "Dixitalización": 2
         "Educación física": 2`,
           eu: `treemap-beta
+    accTitle: Zuhaitz-mapa
+    accDescr: Asteko orduen banaketa eremuka eta irakasgaika.
 "Asteko ordutegia"
     "Zientifikoa"
         "Matematika": 4
@@ -708,6 +806,8 @@ window.SIRENA_EXAMPLES = [
         "Digitalizazioa": 2
         "Gorputz hezkuntza": 2`,
           en: `treemap-beta
+    accTitle: Treemap
+    accDescr: Weekly hours split by area and subject.
 "Weekly timetable"
     "Science"
         "Maths": 4
@@ -730,26 +830,36 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de sectores', ca: 'Diagrama de sectors', gl: 'Diagrama de sectores', eu: 'Sektore-diagrama', en: 'Pie chart' },
         code: {
           es: `pie title Dispositivos del alumnado
+    accTitle: Diagrama de sectores
+    accDescr: Reparto de los dispositivos que tiene el alumnado.
     "Móvil" : 62
     "Portátil" : 21
     "Tableta" : 12
     "Sin dispositivo" : 5`,
           ca: `pie title Dispositius de l'alumnat
+    accTitle: Diagrama de sectors
+    accDescr: Repartiment dels dispositius que té l'alumnat.
     "Mòbil" : 62
     "Portàtil" : 21
     "Tauleta" : 12
     "Sense dispositiu" : 5`,
           gl: `pie title Dispositivos do alumnado
+    accTitle: Diagrama de sectores
+    accDescr: Repartición dos dispositivos que ten o alumnado.
     "Móbil" : 62
     "Portátil" : 21
     "Tableta" : 12
     "Sen dispositivo" : 5`,
           eu: `pie title Ikasleen gailuak
+    accTitle: Sektore-diagrama
+    accDescr: Ikasleek dituzten gailuen banaketa.
     "Mugikorra" : 62
     "Eramangarria" : 21
     "Tableta" : 12
     "Gailurik gabe" : 5`,
           en: `pie title Devices students own
+    accTitle: Pie chart
+    accDescr: Breakdown of the devices students own.
     "Phone" : 62
     "Laptop" : 21
     "Tablet" : 12
@@ -761,30 +871,40 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Gráfico de ejes', ca: "Gràfic d'eixos", gl: 'Gráfico de eixes', eu: 'Ardatz-grafikoa', en: 'XY chart' },
         code: {
           es: `xychart-beta
+    accTitle: Gráfico de ejes
+    accDescr: Evolución de la nota media a lo largo de los tres trimestres.
     title "Notas medias por trimestre"
     x-axis [1r, 2o, 3r]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,
           ca: `xychart-beta
+    accTitle: Gráfico de ejes
+    accDescr: Evolució de la nota mitjana al llarg dels tres trimestres.
     title "Notes mitjanes per trimestre"
     x-axis [1r, 2n, 3r]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,
           gl: `xychart-beta
+    accTitle: Gráfico de eixes
+    accDescr: Evolución da nota media ao longo dos tres trimestres.
     title "Notas medias por trimestre"
     x-axis [1º, 2º, 3º]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,
           eu: `xychart-beta
+    accTitle: Ardatz-grafikoa
+    accDescr: Batez besteko notaren bilakaera hiru hiruhilekoetan.
     title "Batez besteko notak hiruhilekoka"
     x-axis [1.a, 2.a, 3.a]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,
           en: `xychart-beta
+    accTitle: XY chart
+    accDescr: Average mark across the three terms.
     title "Average marks per term"
     x-axis [1st, 2nd, 3rd]
     y-axis "Mark" 0 --> 10
@@ -797,6 +917,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Cuadrantes', ca: 'Quadrants', gl: 'Cuadrantes', eu: 'Koadranteak', en: 'Quadrant chart' },
         code: {
           es: `quadrantChart
+    accTitle: Cuadrantes
+    accDescr: Herramientas del aula situadas según su utilidad y su facilidad de uso.
     title Herramientas del aula
     x-axis "Difícil de usar" --> "Fácil de usar"
     y-axis "Poco útil" --> "Muy útil"
@@ -809,6 +931,8 @@ window.SIRENA_EXAMPLES = [
     Pizarra digital: [0.7, 0.6]
     Entorno virtual: [0.4, 0.85]`,
           ca: `quadrantChart
+    accTitle: Quadrants
+    accDescr: Eines de l'aula situades segons la seva utilitat i facilitat d'ús.
     title Eines de l'aula
     x-axis "Difícil d'usar" --> "Fàcil d'usar"
     y-axis "Poc útil" --> "Molt útil"
@@ -821,6 +945,8 @@ window.SIRENA_EXAMPLES = [
     Pissarra digital: [0.7, 0.6]
     Entorn virtual: [0.4, 0.85]`,
           gl: `quadrantChart
+    accTitle: Cuadrantes
+    accDescr: Ferramentas da aula situadas segundo a súa utilidade e facilidade de uso.
     title Ferramentas da aula
     x-axis "Difícil de usar" --> "Fácil de usar"
     y-axis "Pouco útil" --> "Moi útil"
@@ -833,6 +959,8 @@ window.SIRENA_EXAMPLES = [
     Encerado dixital: [0.7, 0.6]
     Contorno virtual: [0.4, 0.85]`,
           eu: `quadrantChart
+    accTitle: Koadranteak
+    accDescr: Ikasgelako tresnak, erabilgarritasunaren eta erabilerraztasunaren arabera kokatuta.
     title Ikasgelako tresnak
     x-axis "Erabiltzen zaila" --> "Erabiltzen erraza"
     y-axis "Gutxi erabilgarria" --> "Oso erabilgarria"
@@ -845,6 +973,8 @@ window.SIRENA_EXAMPLES = [
     Arbel digitala: [0.7, 0.6]
     Ingurune birtuala: [0.4, 0.85]`,
           en: `quadrantChart
+    accTitle: Quadrant chart
+    accDescr: Classroom tools placed by usefulness and ease of use.
     title Classroom tools
     x-axis "Hard to use" --> "Easy to use"
     y-axis "Not very useful" --> "Very useful"
@@ -904,6 +1034,8 @@ Resit,Repeat year,3`
         label: { es: 'Diagrama de secuencia', ca: 'Diagrama de seqüència', gl: 'Diagrama de secuencia', eu: 'Sekuentzia-diagrama', en: 'Sequence diagram' },
         code: {
           es: `sequenceDiagram
+    accTitle: Diagrama de secuencia
+    accDescr: Mensajes entre alumnado, plataforma y docente al entregar una actividad.
     participant A as Alumnado
     participant P as Plataforma
     participant D as Docente
@@ -913,6 +1045,8 @@ Resit,Repeat year,3`
     D->>P: Corrección y comentarios
     P-->>A: Nota disponible`,
           ca: `sequenceDiagram
+    accTitle: Diagrama de seqüència
+    accDescr: Missatges entre alumnat, plataforma i docent en lliurar una activitat.
     participant A as Alumnat
     participant P as Plataforma
     participant D as Docent
@@ -922,6 +1056,8 @@ Resit,Repeat year,3`
     D->>P: Correcció i comentaris
     P-->>A: Nota disponible`,
           gl: `sequenceDiagram
+    accTitle: Diagrama de secuencia
+    accDescr: Mensaxes entre alumnado, plataforma e docente ao entregar unha actividade.
     participant A as Alumnado
     participant P as Plataforma
     participant D as Docente
@@ -931,6 +1067,8 @@ Resit,Repeat year,3`
     D->>P: Corrección e comentarios
     P-->>A: Nota dispoñible`,
           eu: `sequenceDiagram
+    accTitle: Sekuentzia-diagrama
+    accDescr: Ikasleen, plataformaren eta irakaslearen arteko mezuak jarduera bat entregatzean.
     participant A as Ikaslea
     participant P as Plataforma
     participant D as Irakaslea
@@ -940,6 +1078,8 @@ Resit,Repeat year,3`
     D->>P: Zuzenketa eta iruzkinak
     P-->>A: Nota eskuragarri`,
           en: `sequenceDiagram
+    accTitle: Sequence diagram
+    accDescr: Messages between student, platform and teacher when handing in an activity.
     participant S as Student
     participant P as Platform
     participant T as Teacher
@@ -986,6 +1126,8 @@ Resit,Repeat year,3`
         label: { es: 'Tablero kanban', ca: 'Tauler kanban', gl: 'Taboleiro kanban', eu: 'Kanban taula', en: 'Kanban board' },
         code: {
           es: `kanban
+  accTitle: Tablero kanban
+  accDescr: Tareas repartidas entre pendiente, en curso y terminado.
   Pendiente
     tarea1[Preparar la rúbrica]
     tarea2[Reservar el aula de informática]
@@ -994,6 +1136,8 @@ Resit,Repeat year,3`
   Terminado
     tarea4[Publicar el guion del proyecto]`,
           ca: `kanban
+  accTitle: Tauler kanban
+  accDescr: Tasques repartides entre pendent, en curs i acabat.
   Pendent
     tasca1[Preparar la rúbrica]
     tasca2[Reservar l'aula d'informàtica]
@@ -1002,6 +1146,8 @@ Resit,Repeat year,3`
   Acabat
     tasca4[Publicar el guió del projecte]`,
           gl: `kanban
+  accTitle: Taboleiro kanban
+  accDescr: Tarefas repartidas entre pendente, en curso e rematado.
   Pendente
     tarefa1[Preparar a rúbrica]
     tarefa2[Reservar a aula de informática]
@@ -1010,6 +1156,8 @@ Resit,Repeat year,3`
   Rematado
     tarefa4[Publicar o guión do proxecto]`,
           eu: `kanban
+  accTitle: Kanban taula
+  accDescr: Zereginak zain, egiten eta amaituta artean banatuta.
   Zain
     zeregina1[Errubrika prestatu]
     zeregina2[Informatika gela erreserbatu]
@@ -1018,6 +1166,8 @@ Resit,Repeat year,3`
   Amaituta
     zeregina4[Proiektuaren gidoia argitaratu]`,
           en: `kanban
+  accTitle: Kanban board
+  accDescr: Tasks split between to do, in progress and done.
   To do
     task1[Draft the rubric]
     task2[Book the computer room]
@@ -1032,6 +1182,8 @@ Resit,Repeat year,3`
         label: { es: 'Arquitectura', ca: 'Arquitectura', gl: 'Arquitectura', eu: 'Arkitektura', en: 'Architecture' },
         code: {
           es: `architecture-beta
+    accTitle: Arquitectura
+    accDescr: Aula, servidor propio y copia de seguridad dentro del centro educativo.
     group centro(cloud)[Centro educativo]
 
     service aula(server)[Aula] in centro
@@ -1041,6 +1193,8 @@ Resit,Repeat year,3`
     aula:R -- L:nas
     nas:B -- T:copia`,
           ca: `architecture-beta
+    accTitle: Arquitectura
+    accDescr: Aula, servidor propi i còpia de seguretat dins del centre educatiu.
     group centre(cloud)[Centre educatiu]
 
     service aula(server)[Aula] in centre
@@ -1050,6 +1204,8 @@ Resit,Repeat year,3`
     aula:R -- L:nas
     nas:B -- T:copia`,
           gl: `architecture-beta
+    accTitle: Arquitectura
+    accDescr: Aula, servidor propio e copia de seguranza dentro do centro educativo.
     group centro(cloud)[Centro educativo]
 
     service aula(server)[Aula] in centro
@@ -1059,6 +1215,8 @@ Resit,Repeat year,3`
     aula:R -- L:nas
     nas:B -- T:copia`,
           eu: `architecture-beta
+    accTitle: Arkitektura
+    accDescr: Ikasgela, zerbitzari propioa eta segurtasun kopia ikastetxearen barruan.
     group ikastetxea(cloud)[Ikastetxea]
 
     service gela(server)[Ikasgela] in ikastetxea
@@ -1068,6 +1226,8 @@ Resit,Repeat year,3`
     gela:R -- L:nas
     nas:B -- T:kopia`,
           en: `architecture-beta
+    accTitle: Architecture
+    accDescr: Classroom, on-site server and backup inside the school.
     group school(cloud)[School]
 
     service room(server)[Classroom] in school
