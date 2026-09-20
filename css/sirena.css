@@ -49,7 +49,7 @@ body {
 
 .sprite { display: none; }
 
-svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Barra superior --- */
 
@@ -112,6 +112,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 
 .menu {
   position: absolute;
+  overflow: visible;
   right: 0;
   top: 38px;
   z-index: 30;
@@ -139,27 +140,48 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 .menu button:hover { background: var(--accent-soft); }
 .menu-ancho { min-width: 280px; }
 
-.menu-ajustes { min-width: 250px; padding: 10px; }
+.menu-ajustes {
+  min-width: 300px;
+  padding: 12px;
+  overflow: visible;
+}
 
+/* El rótulo va encima del selector: así no se parte en dos líneas y el
+   desplegable del navegador tiene todo el ancho para mostrar sus opciones. */
 .ajuste {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
+  display: block;
+  margin-bottom: 12px;
   font-size: 13px;
 }
 
+.ajuste > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
 .ajuste select {
-  flex: 0 0 130px;
-  height: 30px;
-  padding: 0 6px;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
+}
+
+.color-propio {
+  width: 100%;
+  height: 32px;
+  margin-top: 6px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
 }
 
 .ajuste-nota { margin: 0; color: var(--text-soft); font-size: 11px; }
@@ -494,6 +516,20 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-l
 /* --- Pantalla pequeña --- */
 
 @media (max-width: 900px) {
+  /* En pantalla estrecha los menús se anclan a la ventana, no al botón, para
+     que no se salgan por un lado. */
+  .menu {
+    position: fixed;
+    left: 8px;
+    right: auto;
+    top: auto;
+    min-width: 0;
+    width: calc(100vw - 16px);
+    max-width: 360px;
+    max-height: 70vh;
+    overflow: auto;
+  }
+
   .topbar { gap: 8px; padding: 8px 10px; }
   .brand-text p { display: none; }
   .toolbar { width: 100%; margin-left: 0; justify-content: flex-start; }

@@ -63,6 +63,7 @@ window.SIRENA_LANG.en = {
   layoutDagre: 'Normal',
   layoutElk: 'Compact',
   onlyFlow: 'Flowcharts only',
+  colorCustom: 'Custom colour…',
   theme: 'Diagram appearance',
   darkMode: 'Light or dark mode',
   language: 'Language',

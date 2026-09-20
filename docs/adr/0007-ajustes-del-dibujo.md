@@ -1,6 +1,6 @@
 # 7. El aspecto del dibujo se ajusta con la configuración, sin tocar el código
 
-Fecha: 2026-09-20 · Estado: aceptado
+Fecha: 2026-09-20 · Estado: sustituido por [ADR 8](0008-ajustes-escritos-en-el-codigo.md)
 
 ## Contexto
 

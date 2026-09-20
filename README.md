@@ -14,8 +14,10 @@ de la propia dirección.
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de
   aspecto, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
-  color principal y, en los diagramas de flujo, la forma de las líneas y la
-  distribución. Todo eso viaja dentro del enlace compartido.
+  color principal (de una paleta o elegido libremente) y, en los diagramas de
+  flujo, la forma de las líneas y la distribución. Cada ajuste se escribe en el
+  código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve
+  igual en cualquier editor de Mermaid.
 - Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
   como imagen.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
@@ -77,7 +79,9 @@ Las decisiones técnicas que condicionan el proyecto están en [docs/adr](docs/a
 Código bajo [AGPL v3](LICENSE.txt) y contenidos bajo
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.es).
 Mermaid es de Knut Sveidqvist y colaboradores, con licencia MIT
-([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)).
+([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)). Los iconos son de
+[Lucide](https://lucide.dev), con licencia ISC
+([vendor/lucide/LICENSE.txt](vendor/lucide/LICENSE.txt)).
 
 Sirena es un proyecto independiente y no está asociado con el proyecto Mermaid
 ni con Mermaid Chart.

@@ -63,6 +63,7 @@ window.SIRENA_LANG.ca = {
   layoutDagre: 'Normal',
   layoutElk: 'Compacta',
   onlyFlow: 'Només en diagrames de flux',
+  colorCustom: 'Color propi…',
   theme: 'Aspecte del diagrama',
   darkMode: 'Mode clar o fosc',
   language: 'Idioma',

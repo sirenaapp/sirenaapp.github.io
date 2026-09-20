@@ -63,6 +63,7 @@ window.SIRENA_LANG.es = {
   layoutDagre: 'Normal',
   layoutElk: 'Compacta',
   onlyFlow: 'Solo en diagramas de flujo',
+  colorCustom: 'Color propio…',
   theme: 'Aspecto del diagrama',
   darkMode: 'Modo claro u oscuro',
   language: 'Idioma',

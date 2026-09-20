@@ -57,7 +57,8 @@ const COLORS = [
   ['green', 'colorGreen', { primaryColor: '#d3f9d8', primaryBorderColor: '#2f9e44', lineColor: '#2f9e44' }],
   ['orange', 'colorOrange', { primaryColor: '#ffe8cc', primaryBorderColor: '#e8590c', lineColor: '#e8590c' }],
   ['purple', 'colorPurple', { primaryColor: '#e5dbff', primaryBorderColor: '#6741d9', lineColor: '#6741d9' }],
-  ['gray', 'colorGray', { primaryColor: '#e9ecef', primaryBorderColor: '#495057', lineColor: '#495057' }]
+  ['gray', 'colorGray', { primaryColor: '#e9ecef', primaryBorderColor: '#495057', lineColor: '#495057' }],
+  ['custom', 'colorCustom', null]
 ];
 const THEME_KEYS = {
   default: 'themeDefault',
@@ -96,7 +97,8 @@ const el = {
   sizeSelect: $('size-select'),
   colorSelect: $('color-select'),
   curveSelect: $('curve-select'),
-  layoutSelect: $('layout-select')
+  layoutSelect: $('layout-select'),
+  colorInput: $('color-input')
 };
 
 let lang = 'es';
@@ -295,23 +297,15 @@ function updateStatus(extra) {
 /* --- Dibujo del diagrama --- */
 
 function initMermaid() {
-  const color = COLORS.find(([valor]) => valor === el.colorSelect.value);
-  const variables = Object.assign(
-    { fontSize: (el.sizeSelect.value || '16') + 'px' },
-    color && color[2] ? color[2] : {}
-  );
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    theme: color && color[2] ? 'base' : (el.themeSelect.value || defaultMermaidTheme()),
-    look: el.lookSelect.value || 'classic',
-    layout: el.layoutSelect.value || 'dagre',
-    themeVariables: variables,
+    theme: el.themeSelect.value || defaultMermaidTheme(),
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
     htmlLabels: false,
-    flowchart: { useMaxWidth: false, htmlLabels: false, curve: el.curveSelect.value || 'basis' },
+    flowchart: { useMaxWidth: false, htmlLabels: false },
     sequence: { useMaxWidth: false },
     gantt: { useMaxWidth: false },
     er: { useMaxWidth: false },
@@ -513,6 +507,94 @@ function setupPan() {
     event.preventDefault();
     zoomBy(event.deltaY < 0 ? 1.12 : 1 / 1.12, { x: event.clientX, y: event.clientY });
   }, { passive: false });
+}
+
+// En pantalla estrecha el menú se coloca justo debajo de la barra de botones.
+function placeMenu(menu, boton) {
+  if (window.innerWidth > 900) {
+    menu.style.top = '';
+    return;
+  }
+  const r = boton.getBoundingClientRect();
+  menu.style.top = Math.round(r.bottom + 6) + 'px';
+}
+
+/* --- Ajustes del dibujo escritos en el propio código --- */
+
+const INIT_RE = /^\s*%%\{\s*init\s*:\s*(\{[\s\S]*\})\s*\}%%[ \t]*\n?/;
+
+function colorVariables(valor) {
+  if (!valor) return null;
+  if (valor.startsWith('#')) {
+    return { primaryColor: valor, primaryBorderColor: darken(valor, 0.45), lineColor: darken(valor, 0.45) };
+  }
+  const encontrado = COLORS.find(([nombre]) => nombre === valor);
+  return encontrado ? encontrado[2] : null;
+}
+
+// Oscurece un color para el borde y las líneas, a partir del color de relleno.
+function darken(hex, factor) {
+  const n = parseInt(hex.slice(1), 16);
+  const canal = (desplazamiento) => Math.round(((n >> desplazamiento) & 255) * (1 - factor));
+  return '#' + [canal(16), canal(8), canal(0)].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+// Devuelve la configuración elegida, solo con lo que se aparta de lo normal.
+function appearanceConfig() {
+  const config = {};
+  const variables = {};
+  if (el.lookSelect.value && el.lookSelect.value !== 'classic') config.look = el.lookSelect.value;
+  if (el.layoutSelect.value && el.layoutSelect.value !== 'dagre') config.layout = el.layoutSelect.value;
+  if (el.sizeSelect.value && el.sizeSelect.value !== '16') variables.fontSize = el.sizeSelect.value + 'px';
+  const color = colorVariables(el.colorSelect.value === 'custom' ? el.colorInput.value : el.colorSelect.value);
+  if (color) {
+    Object.assign(variables, color);
+    config.theme = 'base';
+  }
+  if (Object.keys(variables).length) config.themeVariables = variables;
+  if (el.curveSelect.value && el.curveSelect.value !== 'basis') config.flowchart = { curve: el.curveSelect.value };
+  return config;
+}
+
+// Escribe (o quita) la cabecera de configuración al principio del código.
+function writeAppearance() {
+  const config = appearanceConfig();
+  const cuerpo = el.editor.value.replace(INIT_RE, '');
+  const cabecera = Object.keys(config).length
+    ? '%%{init: ' + JSON.stringify(config) + '}%%\n'
+    : '';
+  el.editor.value = cabecera + cuerpo;
+  render();
+}
+
+// Lee la cabecera que ya tenga el código y coloca los selectores en su sitio.
+function readAppearance() {
+  const encontrado = INIT_RE.exec(el.editor.value);
+  let config = {};
+  if (encontrado) {
+    try { config = JSON.parse(encontrado[1]); } catch (_) { config = {}; }
+  }
+  const variables = config.themeVariables || {};
+  el.lookSelect.value = config.look || 'classic';
+  el.layoutSelect.value = config.layout || 'dagre';
+  el.curveSelect.value = (config.flowchart && config.flowchart.curve) || 'basis';
+  el.sizeSelect.value = variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16';
+
+  const primario = variables.primaryColor || '';
+  const conocido = COLORS.find(([, , vars]) => vars && vars.primaryColor === primario);
+  if (conocido) {
+    el.colorSelect.value = conocido[0];
+  } else if (primario) {
+    el.colorSelect.value = 'custom';
+    el.colorInput.value = primario;
+  } else {
+    el.colorSelect.value = '';
+  }
+  updateColorInput();
+}
+
+function updateColorInput() {
+  el.colorInput.hidden = el.colorSelect.value !== 'custom';
 }
 
 /* --- Chuleta de sintaxis --- */
@@ -802,15 +884,6 @@ async function buildLink(extra) {
   const params = new URLSearchParams();
   params.set(deflated ? 'z' : 'd', toBase64Url(raw));
   params.set('t', el.themeSelect.value);
-  // Los ajustes del dibujo viajan con el enlace: así quien lo abre, o la página
-  // donde se incrusta, ve el diagrama tal como se dejó.
-  const ajustes = { l: el.lookSelect.value, s: el.sizeSelect.value, c: el.colorSelect.value,
-                    cv: el.curveSelect.value, ly: el.layoutSelect.value };
-  Object.entries(ajustes).forEach(([clave, valor]) => {
-    if (valor && valor !== 'classic' && valor !== '16' && valor !== 'basis' && valor !== 'dagre') {
-      params.set(clave, valor);
-    }
-  });
   if (extra) Object.entries(extra).forEach(([key, value]) => params.set(key, value));
   return location.origin + location.pathname + '#' + params.toString();
 }
@@ -946,11 +1019,13 @@ function setupToolbar() {
     if (!file) return;
     el.editor.value = await file.text();
     el.fileInput.value = '';
+    readAppearance();
     render();
   });
 
   $('btn-download').addEventListener('click', (event) => {
     event.stopPropagation();
+    placeMenu(el.downloadMenu, $('btn-download'));
     el.downloadMenu.hidden = !el.downloadMenu.hidden;
     el.langMenu.hidden = true;
   });
@@ -991,6 +1066,7 @@ function setupToolbar() {
 
   $('btn-lang').addEventListener('click', (event) => {
     event.stopPropagation();
+    placeMenu(el.langMenu, $('btn-lang'));
     el.langMenu.hidden = !el.langMenu.hidden;
   });
 
@@ -1031,12 +1107,14 @@ function setupToolbar() {
     const found = findExample(el.exampleSelect.value);
     if (!found) return;
     el.editor.value = exampleCode(found);
+    readAppearance();
     render();
   });
 
   $('btn-appearance').addEventListener('click', (event) => {
     event.stopPropagation();
     updateAppearanceVisibility();
+    placeMenu(el.appearanceMenu, $('btn-appearance'));
     el.appearanceMenu.hidden = !el.appearanceMenu.hidden;
     el.downloadMenu.hidden = true;
     el.langMenu.hidden = true;
@@ -1048,10 +1126,12 @@ function setupToolbar() {
    [el.curveSelect, STORE.curve], [el.layoutSelect, STORE.layout]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
       localStorage.setItem(clave, select.value);
-      initMermaid();
-      render();
+      updateColorInput();
+      writeAppearance();
     });
   });
+
+  el.colorInput.addEventListener('input', () => writeAppearance());
 
   el.themeSelect.addEventListener('change', () => {
     localStorage.setItem(STORE.theme, el.themeSelect.value);
@@ -1129,7 +1209,7 @@ async function start() {
   }
 
   initMermaid();
-  el.editor.addEventListener('input', () => { updateStatus(); renderGutter(); scheduleRender(); });
+  el.editor.addEventListener('input', () => { updateStatus(); renderGutter(); readAppearance(); scheduleRender(); });
   el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });
   el.errorBox.addEventListener('click', () => { if (errorLine) goToLine(errorLine); });
 
@@ -1137,6 +1217,7 @@ async function start() {
   // direcciones, por ejemplo), se carga igualmente el diagrama que trae.
   window.addEventListener('hashchange', async () => {
     if (await loadFromHash()) {
+      readAppearance();
       initMermaid();
       render();
     }
@@ -1145,6 +1226,7 @@ async function start() {
   document.body.dataset.pane = 'editor';
 
   renderGutter();
+  readAppearance();
   await render();
 }
 

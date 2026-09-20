@@ -63,6 +63,7 @@ window.SIRENA_LANG.eu = {
   layoutDagre: 'Normala',
   layoutElk: 'Trinkoa',
   onlyFlow: 'Fluxu-diagrametan bakarrik',
+  colorCustom: 'Kolore propioa…',
   theme: 'Diagramaren itxura',
   darkMode: 'Modu argia edo iluna',
   language: 'Hizkuntza',

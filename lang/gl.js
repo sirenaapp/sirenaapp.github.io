@@ -63,6 +63,7 @@ window.SIRENA_LANG.gl = {
   layoutDagre: 'Normal',
   layoutElk: 'Compacta',
   onlyFlow: 'Só en diagramas de fluxo',
+  colorCustom: 'Cor propia…',
   theme: 'Aspecto do diagrama',
   darkMode: 'Modo claro ou escuro',
   language: 'Idioma',
