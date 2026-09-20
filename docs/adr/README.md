@@ -18,6 +18,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [10](0010-sugerencia-de-orientacion.md) | La página propone la dirección en lugar de maquillar el resultado | descartado |
 | [11](0011-biblioteca-en-el-navegador.md) | Los diagramas se guardan en el propio navegador | aceptado |
 | [12](0012-motor-de-distribucion-escrito-en-la-cabecera.md) | El motor de distribución es elk por defecto y se escribe en la cabecera | aceptado |
+| [13](0013-la-biblioteca-no-pierde-un-diagrama-al-sustituir-el-texto.md) | Sustituir el texto abre un diagrama nuevo, y la biblioteca tiene un máximo | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

@@ -347,6 +347,19 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .lista-docs li:hover { background: var(--surface-2); }
 .lista-docs li[aria-current="true"] { background: var(--accent-soft); }
 
+/* El máximo de diagramas guardados, al pie de la lista. */
+#ajuste-limite {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+#ajuste-limite > span { margin: 0; }
+#ajuste-limite select { width: auto; margin-left: auto; }
+
 .doc-abrir {
   flex: 1;
   min-width: 0;

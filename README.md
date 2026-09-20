@@ -28,7 +28,9 @@ de la propia dirección.
   ventana de ayuda, e insertar los fragmentos con una pulsación.
 - Abrir y guardar archivos `.mmd`.
 - Guardar los diagramas en el propio navegador, con nombre, y volver a abrirlos
-  otro día: al entrar aparece el último en el que se estaba trabajando.
+  otro día: al entrar aparece el último en el que se estaba trabajando. Sustituir
+  todo el texto abre un diagrama nuevo y conserva el anterior, y la biblioteca
+  tiene un máximo de diagramas guardados que se puede cambiar.
 - Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio.
 - Incrustar el diagrama en un blog o en un material de eXeLearning, con el botón
   que copia el código listo para pegar.

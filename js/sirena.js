@@ -15,7 +15,8 @@ const STORE = {
   layout: 'sirena.layout',
   width: 'sirena.editorWidth',
   docs: 'sirena.docs',
-  docActivo: 'sirena.docActivo'
+  docActivo: 'sirena.docActivo',
+  limite: 'sirena.limite'
 };
 
 const DEFAULT_CODE = {
@@ -59,6 +60,9 @@ const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
 const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
+// Máximo de diagramas en la biblioteca. Al llegar se borran los más antiguos.
+const LIMITES = [10, 25, 50, 100];
+const LIMITE_POR_DEFECTO = 50;
 const COLORS = [
   ['', 'colorDefault', null],
   ['blue', 'colorBlue', { primaryColor: '#d0ebff', primaryBorderColor: '#1971c2', lineColor: '#1971c2' }],
@@ -117,6 +121,7 @@ const el = {
   showDataSelect: $('showdata-select'),
   libraryModal: $('library-modal'),
   listaDocs: $('lista-docs'),
+  limitSelect: $('limit-select'),
   docName: $('doc-name')
 
 };
@@ -135,6 +140,9 @@ const view = { scale: 1, x: 0, y: 0 };
 
 let docActivo = null;
 let guardadoTimer = null;
+// Última versión conocida del código, para distinguir una edición de una
+// sustitución completa del texto.
+let codigoPrevio = '';
 
 function leerDocs() {
   try {
@@ -145,11 +153,30 @@ function leerDocs() {
   }
 }
 
+function limiteDocs() {
+  const guardado = parseInt(localStorage.getItem(STORE.limite), 10);
+  return LIMITES.includes(guardado) ? guardado : LIMITE_POR_DEFECTO;
+}
+
+// Al llegar al máximo se borran los más antiguos, contando desde la última vez
+// que se modificaron. El diagrama abierto no se borra nunca, aunque sea el más
+// antiguo de todos: se está trabajando con él.
+function recortarAlLimite(docs) {
+  const limite = limiteDocs();
+  if (docs.length <= limite) return docs;
+  const recientes = docs.slice().sort((a, b) => b.modificado - a.modificado);
+  const abierto = recientes.filter((d) => d.id === docActivo);
+  const resto = recientes.filter((d) => d.id !== docActivo);
+  return abierto.concat(resto).slice(0, limite);
+}
+
 function escribirDocs(docs) {
+  const conservados = recortarAlLimite(docs);
   try {
-    localStorage.setItem(STORE.docs, JSON.stringify(docs));
+    localStorage.setItem(STORE.docs, JSON.stringify(conservados));
+    if (conservados.length < docs.length) toast(t('limitTrimmed'));
   } catch (_) {
-    toast(t('copyFailed'));
+    toast(t('storageFailed'));
   }
 }
 
@@ -198,6 +225,30 @@ function crearDoc(codigo, nombre) {
   return doc;
 }
 
+// Un cambio que se lleva por delante casi todo el texto no es una edición, sino
+// otro diagrama: pegar sobre todo lo seleccionado, o seleccionar todo y borrar.
+// Editar o borrar a golpe de tecla son muchos cambios pequeños y no cuentan.
+function esOtroDiagrama(anterior, actual) {
+  if (anterior.trim().length < 12) return false;
+  let ini = 0;
+  const corto = Math.min(anterior.length, actual.length);
+  while (ini < corto && anterior[ini] === actual[ini]) ini += 1;
+  let fin = 0;
+  while (fin < corto - ini && anterior[anterior.length - 1 - fin] === actual[actual.length - 1 - fin]) fin += 1;
+  return ini + fin < anterior.length * 0.2;
+}
+
+// Deja de trabajar sobre el diagrama abierto sin tocarlo: se queda en la
+// biblioteca tal como estaba, y lo que se escriba a partir de ahora nacerá como
+// un diagrama nuevo.
+function soltarDocActivo() {
+  clearTimeout(guardadoTimer);
+  docActivo = null;
+  localStorage.removeItem(STORE.docActivo);
+  updateDocName();
+  buildLibrary();
+}
+
 // Cada cambio se guarda solo en el diagrama abierto, sin botón de guardar.
 function guardarDocActivo() {
   clearTimeout(guardadoTimer);
@@ -206,6 +257,12 @@ function guardarDocActivo() {
     const doc = docs.find((d) => d.id === docActivo);
     if (!doc) {
       if (el.editor.value.trim()) crearDoc(el.editor.value);
+      return;
+    }
+    // Vaciar el editor no borra lo guardado: el diagrama anterior se conserva y
+    // lo que se escriba después empieza otro.
+    if (!el.editor.value.trim() && doc.codigo.trim()) {
+      soltarDocActivo();
       return;
     }
     doc.codigo = el.editor.value;
@@ -406,7 +463,8 @@ function fillSelect(select, opciones, guardado, predeterminado) {
   const porDefecto = predeterminado !== undefined ? predeterminado : opciones[0][0];
   const actual = select.value || guardado || porDefecto;
   select.innerHTML = '';
-  opciones.forEach(([valor, clave]) => select.appendChild(new Option(t(clave), valor)));
+  // Una opción cuyo texto es un número se deja tal cual; las demás se traducen.
+  opciones.forEach(([valor, clave]) => select.appendChild(new Option(/^\d+$/.test(clave) ? clave : t(clave), valor)));
   select.value = opciones.some(([v]) => v === actual) ? actual : porDefecto;
 }
 
@@ -571,6 +629,7 @@ function render() {
 
 async function renderOnce() {
   const code = el.editor.value.trim();
+  codigoPrevio = el.editor.value;
   localStorage.setItem(STORE.code, el.editor.value);
   guardarDocActivo();
   updateStatus();
@@ -1394,6 +1453,20 @@ function setupToolbar() {
     el.libraryModal.hidden = false;
   });
 
+  fillSelect(el.limitSelect, LIMITES.map((n) => [String(n), String(n)]),
+             String(limiteDocs()), String(LIMITE_POR_DEFECTO));
+  el.limitSelect.addEventListener('change', () => {
+    const nuevo = Number(el.limitSelect.value);
+    const sobran = leerDocs().length - nuevo;
+    if (sobran > 0 && !confirm(t('limitConfirm').replace('{n}', nuevo))) {
+      el.limitSelect.value = String(limiteDocs());
+      return;
+    }
+    localStorage.setItem(STORE.limite, String(nuevo));
+    escribirDocs(leerDocs());
+    buildLibrary();
+  });
+
   $('library-close').addEventListener('click', () => { el.libraryModal.hidden = true; });
   el.libraryModal.addEventListener('click', (event) => {
     if (event.target === el.libraryModal) el.libraryModal.hidden = true;
@@ -1653,6 +1726,8 @@ async function start() {
 
   initMermaid();
   el.editor.addEventListener('input', () => {
+    if (esOtroDiagrama(codigoPrevio, el.editor.value)) soltarDocActivo();
+    codigoPrevio = el.editor.value;
     updateStatus();
     renderGutter();
     readAppearance();
