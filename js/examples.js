@@ -51,6 +51,192 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'flowchart-cajas',
+        label: { es: 'Proceso largo en cajas', ca: 'Procés llarg en caixes', gl: 'Proceso longo en caixas', eu: 'Prozesu luzea kutxetan', en: 'Long process in boxes' },
+        code: {
+          es: `flowchart LR
+    subgraph S1[1. Elegir a la persona]
+        direction TB
+        A([Inicio: quiero hacer un amigo]) --> B[Elegir una persona]
+        V3([3]) --> B
+        B --> C{¿Conozco sus intereses?}
+        C -- No --> D[Preguntarle qué le gusta]
+        C -- Sí --> X1([1])
+        D --> X1
+    end
+
+    subgraph S2[2. Buscar un interés común]
+        direction TB
+        Y1([1]) --> E[Buscar un interés común]
+        E --> F{¿Tenemos algún interés común?}
+        F -- No --> H[Preguntar por otro interés]
+        H --> E
+        F -- Sí --> X2([2])
+    end
+
+    subgraph S3[3. Quedar y valorar]
+        direction TB
+        Y2([2]) --> G[Invitarle a hacer una actividad]
+        G --> I{¿Acepta la invitación?}
+        I -- No --> K[Proponer otra actividad]
+        K --> I
+        I -- Sí --> J[Realizar la actividad juntos]
+        J --> L{¿La interacción ha ido bien?}
+        L -- Sí --> M[Repetir actividades]
+        M --> O([Amistad establecida])
+        L -- No --> N[Elegir otra persona]
+        N --> X3([3])
+    end
+
+    S1 ~~~ S2
+    S2 ~~~ S3`,
+          ca: `flowchart LR
+    subgraph S1[1. Triar la persona]
+        direction TB
+        A([Inici: vull fer un amic]) --> B[Triar una persona]
+        V3([3]) --> B
+        B --> C{Conec els seus interessos?}
+        C -- No --> D[Preguntar-li què li agrada]
+        C -- Sí --> X1([1])
+        D --> X1
+    end
+
+    subgraph S2[2. Buscar un interès comú]
+        direction TB
+        Y1([1]) --> E[Buscar un interès comú]
+        E --> F{Tenim algun interès comú?}
+        F -- No --> H[Preguntar per un altre interès]
+        H --> E
+        F -- Sí --> X2([2])
+    end
+
+    subgraph S3[3. Quedar i valorar]
+        direction TB
+        Y2([2]) --> G[Convidar-lo a fer una activitat]
+        G --> I{Accepta la invitació?}
+        I -- No --> K[Proposar una altra activitat]
+        K --> I
+        I -- Sí --> J[Fer l'activitat junts]
+        J --> L{La interacció ha anat bé?}
+        L -- Sí --> M[Repetir activitats]
+        M --> O([Amistat establerta])
+        L -- No --> N[Triar una altra persona]
+        N --> X3([3])
+    end
+
+    S1 ~~~ S2
+    S2 ~~~ S3`,
+          gl: `flowchart LR
+    subgraph S1[1. Escoller a persoa]
+        direction TB
+        A([Inicio: quero facer un amigo]) --> B[Escoller unha persoa]
+        V3([3]) --> B
+        B --> C{Coñezo os seus intereses?}
+        C -- Non --> D[Preguntarlle que lle gusta]
+        C -- Si --> X1([1])
+        D --> X1
+    end
+
+    subgraph S2[2. Buscar un interese común]
+        direction TB
+        Y1([1]) --> E[Buscar un interese común]
+        E --> F{Temos algún interese común?}
+        F -- Non --> H[Preguntar por outro interese]
+        H --> E
+        F -- Si --> X2([2])
+    end
+
+    subgraph S3[3. Quedar e valorar]
+        direction TB
+        Y2([2]) --> G[Convidalo a facer unha actividade]
+        G --> I{Acepta a invitación?}
+        I -- Non --> K[Propoñer outra actividade]
+        K --> I
+        I -- Si --> J[Facer a actividade xuntos]
+        J --> L{A interacción foi ben?}
+        L -- Si --> M[Repetir actividades]
+        M --> O([Amizade establecida])
+        L -- Non --> N[Escoller outra persoa]
+        N --> X3([3])
+    end
+
+    S1 ~~~ S2
+    S2 ~~~ S3`,
+          eu: `flowchart LR
+    subgraph S1[1. Pertsona aukeratu]
+        direction TB
+        A([Hasiera: lagun bat egin nahi dut]) --> B[Pertsona bat aukeratu]
+        V3([3]) --> B
+        B --> C{Bere interesak ezagutzen ditut?}
+        C -- Ez --> D[Zer gustatzen zaion galdetu]
+        C -- Bai --> X1([1])
+        D --> X1
+    end
+
+    subgraph S2[2. Interes komun bat bilatu]
+        direction TB
+        Y1([1]) --> E[Interes komun bat bilatu]
+        E --> F{Interes komunik dugu?}
+        F -- Ez --> H[Beste interes batez galdetu]
+        H --> E
+        F -- Bai --> X2([2])
+    end
+
+    subgraph S3[3. Elkartu eta balioetsi]
+        direction TB
+        Y2([2]) --> G[Jarduera bat egitera gonbidatu]
+        G --> I{Gonbidapena onartzen du?}
+        I -- Ez --> K[Beste jarduera bat proposatu]
+        K --> I
+        I -- Bai --> J[Jarduera elkarrekin egin]
+        J --> L{Ondo joan da?}
+        L -- Bai --> M[Jarduerak errepikatu]
+        M --> O([Adiskidetasuna sortuta])
+        L -- Ez --> N[Beste pertsona bat aukeratu]
+        N --> X3([3])
+    end
+
+    S1 ~~~ S2
+    S2 ~~~ S3`,
+          en: `flowchart LR
+    subgraph S1[1. Choose the person]
+        direction TB
+        A([Start: I want to make a friend]) --> B[Choose a person]
+        V3([3]) --> B
+        B --> C{Do I know their interests?}
+        C -- No --> D[Ask what they like]
+        C -- Yes --> X1([1])
+        D --> X1
+    end
+
+    subgraph S2[2. Find a shared interest]
+        direction TB
+        Y1([1]) --> E[Look for a shared interest]
+        E --> F{Any shared interest?}
+        F -- No --> H[Ask about another interest]
+        H --> E
+        F -- Yes --> X2([2])
+    end
+
+    subgraph S3[3. Meet up and reflect]
+        direction TB
+        Y2([2]) --> G[Invite them to an activity]
+        G --> I{Do they accept?}
+        I -- No --> K[Suggest another activity]
+        K --> I
+        I -- Yes --> J[Do the activity together]
+        J --> L{Did it go well?}
+        L -- Yes --> M[Repeat activities]
+        M --> O([Friendship established])
+        L -- No --> N[Choose another person]
+        N --> X3([3])
+    end
+
+    S1 ~~~ S2
+    S2 ~~~ S3`
+        }
+      },
+      {
         id: 'state',
         label: { es: 'Diagrama de estados', ca: "Diagrama d'estats", gl: 'Diagrama de estados', eu: 'Egoera-diagrama', en: 'State diagram' },
         code: {
