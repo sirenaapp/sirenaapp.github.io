@@ -27,6 +27,28 @@ pequeño.
   es del usuario y no se toca sin pedirlo; el menú de aspecto tiene el control
   de dirección para quien lo quiera.
 
+## Lo que se probó antes
+
+Se midieron los otros motores de trazado que Mermaid 12 trae de serie, sobre un
+diagrama de flujo de veinte pasos (476 × 1949 con el trazado normal):
+
+| Trazado | Tamaño | Resultado |
+|---|---|---|
+| dagre (normal) | 476 × 1949 | columna estrecha y muy alta |
+| elk | 476 × 1949 | igual que dagre |
+| elk.mrtree | 558 × 1490 | algo menos alto, rótulos de flecha descolocados |
+| elk.stress | 911 × 631 | compacto, pero los pasos se solapan |
+| elk.rectpacking | 728 × 464 | entra entero, pero el orden se pierde |
+
+Ninguno sirve para un diagrama de flujo educativo, porque reordenan los pasos y
+se deja de seguir la secuencia. También se probó el paquete
+`@mermaid-js/layout-elk` y se descartó: Mermaid 12 ya trae esos algoritmos, así
+que no aportaba nada y añadía 2,5 MB al repositorio.
+
+Lo que sí reparte bien el diagrama es la dirección: el mismo código en
+horizontal pasa de 476 × 1949 a 2838 × 334, conservando el orden de lectura. Por
+eso la página propone ese cambio en lugar de tocar el motor de trazado.
+
 ## Consecuencias
 
 Un diagrama largo ya no se ve entero de un vistazo al abrirlo. El botón del

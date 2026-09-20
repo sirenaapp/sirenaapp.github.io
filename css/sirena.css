@@ -394,6 +394,39 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   text-align: center;
 }
 
+.sugerencia {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+  padding: 8px 10px 8px 14px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.btn-pequeno { padding: 5px 12px; font-size: 12.5px; border-radius: 999px; }
+
+.sugerencia-cerrar {
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 620px) {
+  .sugerencia { flex-direction: column; border-radius: var(--radius); text-align: center; }
+}
+
 .error-box {
   max-height: 34%;
   overflow: auto;
@@ -558,7 +591,40 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 }
 
 @media print {
-  .topbar, .tabs, .preview-tools, .footer, .splitter, .pane-editor, .error-box { display: none !important; }
+  .topbar, .tabs, .preview-tools, .footer, .splitter, .pane-editor, .sugerencia {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+  padding: 8px 10px 8px 14px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.btn-pequeno { padding: 5px 12px; font-size: 12.5px; border-radius: 999px; }
+
+.sugerencia-cerrar {
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 620px) {
+  .sugerencia { flex-direction: column; border-radius: var(--radius); text-align: center; }
+}
+
+.error-box { display: none !important; }
   .pane-preview { border: 0; box-shadow: none; }
   .preview-viewport { overflow: visible; background: none; }
 }

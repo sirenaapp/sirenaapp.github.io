@@ -24,6 +24,8 @@ de la propia dirección.
   como imagen.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla.
+- Recibir un aviso cuando el diagrama sale desproporcionado, con un botón que lo
+  pone en horizontal (o en vertical) escribiéndolo en el propio código.
 - Consultar la sintaxis del tipo de diagrama que se está escribiendo, en la
   ventana de ayuda, e insertar los fragmentos con una pulsación.
 - Abrir y guardar archivos `.mmd`.
