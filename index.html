@@ -68,10 +68,17 @@
         <label class="ajuste"><span data-i18n="look"></span><select id="look-select"></select></label>
         <label class="ajuste"><span data-i18n="fontSize"></span><select id="size-select"></select></label>
         <label class="ajuste"><span data-i18n="color"></span><select id="color-select"></select>
-          <input type="color" id="color-input" value="#d0ebff" class="color-propio" hidden></label>
+        </label>
+        <div class="colores-propios" id="colores-propios" hidden>
+          <label class="color-fila"><span data-i18n="colorFill"></span><input type="color" id="color-fill" value="#d0ebff"></label>
+          <label class="color-fila"><span data-i18n="colorBorder"></span><input type="color" id="color-border" value="#1971c2"></label>
+          <label class="color-fila"><span data-i18n="colorLine"></span><input type="color" id="color-line" value="#1971c2"></label>
+          <label class="color-fila"><span data-i18n="colorText"></span><input type="color" id="color-text" value="#17262b"></label>
+          <p class="ajuste-nota" data-i18n="colorHint"></p>
+        </div>
         <label class="ajuste" id="ajuste-curve"><span data-i18n="curve"></span><select id="curve-select"></select></label>
         <label class="ajuste" id="ajuste-layout"><span data-i18n="layout"></span><select id="layout-select"></select></label>
-        <p class="ajuste-nota" data-i18n="onlyFlow"></p>
+        <p class="ajuste-nota" id="nota-flujo" data-i18n="onlyFlow"></p>
       </div>
     </div>
     <span class="tb-sep"></span>

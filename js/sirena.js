@@ -98,7 +98,11 @@ const el = {
   colorSelect: $('color-select'),
   curveSelect: $('curve-select'),
   layoutSelect: $('layout-select'),
-  colorInput: $('color-input')
+  coloresPropios: $('colores-propios'),
+  colorFill: $('color-fill'),
+  colorBorder: $('color-border'),
+  colorLine: $('color-line'),
+  colorText: $('color-text')
 };
 
 let lang = 'es';
@@ -108,6 +112,7 @@ let renderToken = 0;
 let currentSvg = '';
 let viewer = false;
 let errorLine = 0;
+const coloresTocados = new Set();
 const view = { scale: 1, x: 0, y: 0 };
 
 /* --- Idioma --- */
@@ -207,7 +212,7 @@ function updateAppearanceVisibility() {
   const esFlujo = /^\s*(flowchart|graph)\b/m.test(el.editor.value);
   $('ajuste-curve').hidden = !esFlujo;
   $('ajuste-layout').hidden = !esFlujo;
-  document.querySelector('.ajuste-nota').hidden = esFlujo;
+  $('nota-flujo').hidden = esFlujo;
 }
 
 function buildThemeSelect() {
@@ -322,7 +327,14 @@ function scheduleRender(delay = 350) {
   renderTimer = setTimeout(render, delay);
 }
 
-async function render() {
+let renderChain = Promise.resolve();
+
+function render() {
+  renderChain = renderChain.then(renderOnce, renderOnce);
+  return renderChain;
+}
+
+async function renderOnce() {
   const code = el.editor.value.trim();
   localStorage.setItem(STORE.code, el.editor.value);
   updateStatus();
@@ -524,9 +536,13 @@ function placeMenu(menu, boton) {
 const INIT_RE = /^\s*%%\{\s*init\s*:\s*(\{[\s\S]*\})\s*\}%%[ \t]*\n?/;
 
 function colorVariables(valor) {
-  if (!valor) return null;
-  if (valor.startsWith('#')) {
-    return { primaryColor: valor, primaryBorderColor: darken(valor, 0.45), lineColor: darken(valor, 0.45) };
+  if (valor === 'custom') {
+    return {
+      primaryColor: el.colorFill.value,
+      primaryBorderColor: el.colorBorder.value,
+      lineColor: el.colorLine.value,
+      primaryTextColor: el.colorText.value
+    };
   }
   const encontrado = COLORS.find(([nombre]) => nombre === valor);
   return encontrado ? encontrado[2] : null;
@@ -546,7 +562,7 @@ function appearanceConfig() {
   if (el.lookSelect.value && el.lookSelect.value !== 'classic') config.look = el.lookSelect.value;
   if (el.layoutSelect.value && el.layoutSelect.value !== 'dagre') config.layout = el.layoutSelect.value;
   if (el.sizeSelect.value && el.sizeSelect.value !== '16') variables.fontSize = el.sizeSelect.value + 'px';
-  const color = colorVariables(el.colorSelect.value === 'custom' ? el.colorInput.value : el.colorSelect.value);
+  const color = colorVariables(el.colorSelect.value);
   if (color) {
     Object.assign(variables, color);
     config.theme = 'base';
@@ -586,7 +602,10 @@ function readAppearance() {
     el.colorSelect.value = conocido[0];
   } else if (primario) {
     el.colorSelect.value = 'custom';
-    el.colorInput.value = primario;
+    el.colorFill.value = primario;
+    if (variables.primaryBorderColor) el.colorBorder.value = variables.primaryBorderColor;
+    if (variables.lineColor) el.colorLine.value = variables.lineColor;
+    if (variables.primaryTextColor) el.colorText.value = variables.primaryTextColor;
   } else {
     el.colorSelect.value = '';
   }
@@ -594,10 +613,18 @@ function readAppearance() {
 }
 
 function updateColorInput() {
-  el.colorInput.hidden = el.colorSelect.value !== 'custom';
+  const propio = el.colorSelect.value === 'custom';
+  el.coloresPropios.hidden = !propio;
 }
 
-/* --- Chuleta de sintaxis --- */
+// Al cambiar el relleno, el resto se recalcula mientras no se haya tocado a mano.
+function deriveColors() {
+  if (!coloresTocados.has('border')) el.colorBorder.value = darken(el.colorFill.value, 0.45);
+  if (!coloresTocados.has('line')) el.colorLine.value = darken(el.colorFill.value, 0.45);
+  if (!coloresTocados.has('text')) el.colorText.value = darken(el.colorFill.value, 0.75);
+}
+
+/* --- Chuleta de sintaxis --- *//* --- Chuleta de sintaxis --- */
 
 function currentSyntax() {
   const code = el.editor.value;
@@ -1126,12 +1153,26 @@ function setupToolbar() {
    [el.curveSelect, STORE.curve], [el.layoutSelect, STORE.layout]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
       localStorage.setItem(clave, select.value);
+      if (select === el.colorSelect && select.value === 'custom') {
+        coloresTocados.clear();
+        deriveColors();
+      }
       updateColorInput();
       writeAppearance();
     });
   });
 
-  el.colorInput.addEventListener('input', () => writeAppearance());
+  el.colorFill.addEventListener('input', () => {
+    deriveColors();
+    writeAppearance();
+  });
+
+  [['border', el.colorBorder], ['line', el.colorLine], ['text', el.colorText]].forEach(([clave, input]) => {
+    input.addEventListener('input', () => {
+      coloresTocados.add(clave);
+      writeAppearance();
+    });
+  });
 
   el.themeSelect.addEventListener('change', () => {
     localStorage.setItem(STORE.theme, el.themeSelect.value);

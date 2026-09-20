@@ -14,7 +14,9 @@ de la propia dirección.
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de
   aspecto, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
-  color principal (de una paleta o elegido libremente) y, en los diagramas de
+  color principal (una paleta de cinco colores, o uno propio con selector
+  independiente para el relleno, el borde, las líneas y el texto) y, en los
+  diagramas de
   flujo, la forma de las líneas y la distribución. Cada ajuste se escribe en el
   código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve
   igual en cualquier editor de Mermaid.

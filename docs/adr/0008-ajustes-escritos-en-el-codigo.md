@@ -24,8 +24,11 @@ la configuración vive en el código, el enlace compartido ya no necesita
 repetirla; los enlaces antiguos, que sí la llevaban en parámetros aparte, se
 siguen entendiendo.
 
-Se añade además un color propio, elegido con el selector del sistema, del que se
-deriva el borde y el color de las líneas.
+Se añade además «Color propio», que abre un selector para cada elemento del
+dibujo: relleno, borde, líneas y texto, que son las variables `primaryColor`,
+`primaryBorderColor`, `lineColor` y `primaryTextColor` de Mermaid. Al cambiar el
+relleno, los otros tres se recalculan solos mientras no se hayan tocado a mano;
+en cuanto se elige uno, ese se respeta.
 
 ## Alternativas descartadas
 
