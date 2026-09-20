@@ -61,6 +61,117 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'amistad',
+        label: { es: 'Algoritmo de la amistad', ca: "Algorisme de l'amistat", gl: 'Algoritmo da amizade', eu: 'Adiskidetasunaren algoritmoa', en: 'Friendship algorithm' },
+        code: {
+          es: `flowchart TD
+    accTitle: Algoritmo de la amistad
+    accDescr: Pasos para hacer un amigo, con un contador que impide quedarse dando vueltas al proponer actividades.
+    A([Inicio]) --> B[Elegir a la persona]
+    B --> C[Averiguar sus intereses]
+    C --> D{¿Hay algún interés común?}
+    D -- No --> E[Preguntar por otro interés]
+    E --> D
+    D -- Sí --> F[/Intentos = 0/]
+    F --> G[Proponer una actividad sobre ese interés]
+    G --> H{¿Acepta la invitación?}
+    H -- No --> I[/Intentos = Intentos + 1/]
+    I --> J{¿Intentos menor que 3?}
+    J -- Sí --> K[Proponer otra actividad]
+    K --> H
+    J -- No --> L([Abandonar el intento])
+    H -- Sí --> M[Compartir la actividad]
+    M --> N{¿Ha resultado agradable?}
+    N -- No --> B
+    N -- Sí --> O[Repetir la actividad]
+    O --> P([Amistad establecida])`,
+          ca: `flowchart TD
+    accTitle: Algorisme de l'amistat
+    accDescr: Passos per fer un amic, amb un comptador que impedeix quedar-se donant voltes en proposar activitats.
+    A([Inici]) --> B[Triar la persona]
+    B --> C[Esbrinar els seus interessos]
+    C --> D{Hi ha algun interès comú?}
+    D -- No --> E[Preguntar per un altre interès]
+    E --> D
+    D -- Sí --> F[/Intents = 0/]
+    F --> G[Proposar una activitat sobre aquest interès]
+    G --> H{Accepta la invitació?}
+    H -- No --> I[/Intents = Intents + 1/]
+    I --> J{Intents menor que 3?}
+    J -- Sí --> K[Proposar una altra activitat]
+    K --> H
+    J -- No --> L([Abandonar l'intent])
+    H -- Sí --> M[Compartir l'activitat]
+    M --> N{Ha resultat agradable?}
+    N -- No --> B
+    N -- Sí --> O[Repetir l'activitat]
+    O --> P([Amistat establerta])`,
+          gl: `flowchart TD
+    accTitle: Algoritmo da amizade
+    accDescr: Pasos para facer un amigo, cun contador que impide quedar dando voltas ao propoñer actividades.
+    A([Inicio]) --> B[Escoller a persoa]
+    B --> C[Averiguar os seus intereses]
+    C --> D{Hai algún interese común?}
+    D -- Non --> E[Preguntar por outro interese]
+    E --> D
+    D -- Si --> F[/Intentos = 0/]
+    F --> G[Propoñer unha actividade sobre ese interese]
+    G --> H{Acepta a invitación?}
+    H -- Non --> I[/Intentos = Intentos + 1/]
+    I --> J{Intentos menor que 3?}
+    J -- Si --> K[Propoñer outra actividade]
+    K --> H
+    J -- Non --> L([Abandonar o intento])
+    H -- Si --> M[Compartir a actividade]
+    M --> N{Resultou agradable?}
+    N -- Non --> B
+    N -- Si --> O[Repetir a actividade]
+    O --> P([Amizade establecida])`,
+          eu: `flowchart TD
+    accTitle: Adiskidetasunaren algoritmoa
+    accDescr: Lagun bat egiteko urratsak, jarduerak proposatzean bueltaka ez geratzeko kontagailu batekin.
+    A([Hasiera]) --> B[Pertsona aukeratu]
+    B --> C[Bere interesak jakin]
+    C --> D{Interes komunik dago?}
+    D -- Ez --> E[Beste interes batez galdetu]
+    E --> D
+    D -- Bai --> F[/Saiakerak = 0/]
+    F --> G[Interes horri buruzko jarduera bat proposatu]
+    G --> H{Gonbidapena onartzen du?}
+    H -- Ez --> I[/Saiakerak = Saiakerak + 1/]
+    I --> J{Saiakerak 3 baino gutxiago?}
+    J -- Bai --> K[Beste jarduera bat proposatu]
+    K --> H
+    J -- Ez --> L([Saiakera utzi])
+    H -- Bai --> M[Jarduera partekatu]
+    M --> N{Atsegina izan da?}
+    N -- Ez --> B
+    N -- Bai --> O[Jarduera errepikatu]
+    O --> P([Adiskidetasuna sortuta])`,
+          en: `flowchart TD
+    accTitle: Friendship algorithm
+    accDescr: Steps to make a friend, with a counter that stops the loop when activities are turned down.
+    A([Start]) --> B[Choose the person]
+    B --> C[Find out their interests]
+    C --> D{Any shared interest?}
+    D -- No --> E[Ask about another interest]
+    E --> D
+    D -- Yes --> F[/Attempts = 0/]
+    F --> G[Suggest an activity about that interest]
+    G --> H{Do they accept?}
+    H -- No --> I[/Attempts = Attempts + 1/]
+    I --> J{Attempts fewer than 3?}
+    J -- Yes --> K[Suggest another activity]
+    K --> H
+    J -- No --> L([Give up])
+    H -- Yes --> M[Share the activity]
+    M --> N{Was it enjoyable?}
+    N -- No --> B
+    N -- Yes --> O[Repeat the activity]
+    O --> P([Friendship established])`
+        }
+      },
+      {
         id: 'flowchart-cajas',
         label: { es: 'Proceso largo en cajas', ca: 'Procés llarg en caixes', gl: 'Proceso longo en caixas', eu: 'Prozesu luzea kutxetan', en: 'Long process in boxes' },
         code: {
