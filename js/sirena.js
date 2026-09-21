@@ -112,6 +112,7 @@ const el = {
   a11yDescr: $('a11y-descr'),
   syntaxBox: $('syntax-box'),
   downloadMenu: $('download-menu'),
+  shareMenu: $('share-menu'),
   appearanceMenu: $('appearance-menu'),
   lookSelect: $('look-select'),
   sizeSelect: $('size-select'),
@@ -1522,6 +1523,12 @@ async function shareLink() {
   await copyText(await buildLink(), t('linkCopied'));
 }
 
+// Mismo enlace, pero abierto en el modo visor: solo el diagrama, ocupando toda
+// la ventana. Es el mismo parámetro que usa el marco para incrustar.
+async function shareViewerLink() {
+  await copyText(await buildLink({ v: '1' }), t('linkCopied'));
+}
+
 // Código listo para pegar en un blog o en un material de eXeLearning. El
 // diagrama viaja dentro de la dirección y el guion ajusta la altura del marco.
 async function embedCode() {
@@ -1728,6 +1735,7 @@ function setupToolbar() {
     placeMenu(el.downloadMenu, $('btn-download'));
     el.downloadMenu.hidden = !el.downloadMenu.hidden;
     el.langMenu.hidden = true;
+    el.shareMenu.hidden = true;
   });
 
   el.downloadMenu.querySelectorAll('button[data-formato]').forEach((boton) => {
@@ -1759,8 +1767,22 @@ function setupToolbar() {
     }
   });
 
-  $('btn-share').addEventListener('click', shareLink);
-  $('btn-embed').addEventListener('click', embedCode);
+  $('btn-share').addEventListener('click', (event) => {
+    event.stopPropagation();
+    placeMenu(el.shareMenu, $('btn-share'));
+    el.shareMenu.hidden = !el.shareMenu.hidden;
+    el.langMenu.hidden = true;
+    el.downloadMenu.hidden = true;
+  });
+
+  el.shareMenu.querySelectorAll('button[data-compartir]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      el.shareMenu.hidden = true;
+      if (boton.dataset.compartir === 'viewer') shareViewerLink();
+      else if (boton.dataset.compartir === 'embed') embedCode();
+      else shareLink();
+    });
+  });
 
   $('btn-dark').addEventListener('click', () => {
     const dark = !isDark();
@@ -1781,6 +1803,7 @@ function setupToolbar() {
   document.addEventListener('click', () => {
     el.langMenu.hidden = true;
     el.downloadMenu.hidden = true;
+    el.shareMenu.hidden = true;
     el.appearanceMenu.hidden = true;
   });
 
@@ -1828,6 +1851,7 @@ function setupToolbar() {
     el.appearanceMenu.hidden = !el.appearanceMenu.hidden;
     el.downloadMenu.hidden = true;
     el.langMenu.hidden = true;
+    el.shareMenu.hidden = true;
   });
 
   el.appearanceMenu.addEventListener('click', (event) => event.stopPropagation());

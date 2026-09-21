@@ -39,9 +39,11 @@ propia dirección.
 - Sacar una copia de seguridad de la biblioteca en un archivo `.json` y volver a
   importarla, para llevar los diagramas a otro navegador o recuperarlos si se
   borran los datos de este.
-- Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio.
-- Incrustar el diagrama en un blog o en un material de eXeLearning, con el botón
-  que copia el código listo para pegar.
+- Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio: al
+  editor, para que quien lo reciba siga trabajando con el código, o a pantalla
+  completa, con el diagrama solo ocupando toda la ventana.
+- Incrustar el diagrama en un blog o en un material de eXeLearning, con la
+  opción que copia el código listo para pegar.
 - Trabajar en castellano, catalán, gallego, euskera o inglés, con los ejemplos y
   la ayuda también traducidos.
 - Usarlo en móvil y tableta: el diagrama se arrastra con un dedo y se amplía
@@ -50,8 +52,8 @@ propia dirección.
 
 ## Incrustar un diagrama en otra página
 
-El botón de incrustar copia un código como este, que se pega en el HTML del
-material. El diagrama viaja dentro de la dirección, así que la página incrustada
+La opción «Código para incrustar», dentro del botón de compartir, copia un
+código como este, que se pega en el HTML del material. El diagrama viaja dentro de la dirección, así que la página incrustada
 tampoco depende de ningún servidor:
 
 ```html
@@ -69,7 +71,9 @@ addEventListener('message', function (e) {
 
 El parámetro `v=1` deja la página con el diagrama solo, sin editor ni barra de
 herramientas, y con un enlace discreto para abrirlo y editarlo. El guion es
-opcional: sirve para que el marco se ajuste solo al alto del diagrama.
+opcional: sirve para que el marco se ajuste solo al alto del diagrama. Ese mismo
+parámetro lo lleva el enlace a pantalla completa, que se copia desde el botón de
+compartir y se envía tal cual a quien solo tiene que ver el diagrama.
 
 ## Cómo funciona por dentro
 

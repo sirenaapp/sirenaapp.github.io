@@ -23,6 +23,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [15](0015-ajustes-del-png-al-descargar.md) | El PNG se descarga con la resolución y el fondo que se elijan | aceptado |
 | [16](0016-copia-de-seguridad-de-la-biblioteca.md) | La biblioteca se exporta e importa en un archivo .json | aceptado |
 | [17](0017-arrastrar-un-archivo-lo-abre.md) | Arrastrar un archivo sobre la ventana lo abre | aceptado |
+| [18](0018-compartir-en-tres-formas.md) | Compartir ofrece tres formas y el visor se comparte tal cual | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca
