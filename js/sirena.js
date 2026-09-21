@@ -727,6 +727,21 @@ function render() {
   return renderChain;
 }
 
+// Mermaid pinta el fondo de los rótulos de las flechas con «opacity: 0.5», de
+// modo que la línea se transparenta y cruza el texto. Con rótulos en HTML el
+// recuadro tapa la línea, pero Sirena los dibuja como texto SVG (ver ADR 3) y
+// ahí se nota. Se reutiliza el color del tema, ya sin transparencia, así que el
+// aspecto no cambia más que en eso.
+function opaqueEdgeLabels(svg, id) {
+  const regla = svg.match(/\.edgeLabel rect\s*\{[^}]*\}/);
+  if (!regla) return svg;
+  const fill = regla[0].match(/fill:\s*([^;}]+)/);
+  if (!fill) return svg;
+  const color = fill[1].trim().replace(/^rgba\(([^)]+?),[^,)]+\)$/, 'rgb($1)');
+  const extra = `#${id} .edgeLabel rect.background{opacity:1;fill:${color};}`;
+  return svg.replace('</style>', extra + '</style>');
+}
+
 async function renderOnce() {
   const code = el.editor.value.trim();
   codigoPrevio = el.editor.value;
@@ -745,10 +760,11 @@ async function renderOnce() {
 
   const token = ++renderToken;
   try {
-    const { svg } = await mermaid.render('sirena-diagram-' + token, code);
+    const id = 'sirena-diagram-' + token;
+    const { svg } = await mermaid.render(id, code);
     if (token !== renderToken) return;
-    currentSvg = svg;
-    el.canvas.innerHTML = svg;
+    currentSvg = opaqueEdgeLabels(svg, id);
+    el.canvas.innerHTML = currentSvg;
     hideEmpty();
     hideError();
     fitToWindow();
