@@ -201,6 +201,16 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 }
 
 .ajuste-nota { margin: 0; color: var(--text-soft); font-size: 11px; }
+
+/* Los ajustes del PNG van al pie del menú de descargas, separados de los
+   formatos para que no parezcan una opción más de la lista. */
+.menu-ajustes-pie {
+  margin-top: 6px;
+  padding: 10px 10px 2px;
+  border-top: 1px solid var(--border);
+}
+
+.menu-ajustes-pie .ajuste { margin-bottom: 10px; }
 .menu-ancho button { padding: 8px 10px; }
 .menu-ancho strong { display: block; font-size: 13.5px; font-weight: 600; }
 .menu-ancho small { display: block; color: var(--text-soft); font-size: 11.5px; line-height: 1.35; }
@@ -570,6 +580,13 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 }
 .modal a { color: var(--accent); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.modal-actions-repartidas { justify-content: space-between; }
+.acciones-izq { display: flex; flex-wrap: wrap; gap: 8px; }
+
+@media (max-width: 620px) {
+  .modal-actions-repartidas { flex-direction: column; align-items: stretch; }
+  .acciones-izq > .btn { flex: 1; }
+}
 .modal-help { color: var(--text-soft); font-size: 13px; }
 
 .campo { display: block; margin-top: 14px; }
@@ -586,8 +603,6 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   resize: vertical;
 }
 
-.btn-secundario { background: transparent; color: var(--text); }
-
 .btn {
   padding: 8px 16px;
   border: 1px solid var(--border);
@@ -597,6 +612,9 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   font: inherit;
   cursor: pointer;
 }
+
+/* Va después de .btn: si no, el fondo del botón principal lo pisa. */
+.btn-secundario { background: transparent; color: var(--text); }
 
 /* --- Aviso emergente --- */
 
@@ -689,3 +707,7 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 }
 
 .viewer-link:hover { opacity: 1; color: var(--accent); }
+
+/* Al arrastrar un archivo sobre la ventana se marca el editor, que es donde va
+   a caer el contenido. */
+.arrastrando .editor-wrap { outline: 2px dashed var(--accent); outline-offset: -3px; }

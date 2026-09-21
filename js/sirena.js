@@ -16,7 +16,9 @@ const STORE = {
   width: 'sirena.editorWidth',
   docs: 'sirena.docs',
   docActivo: 'sirena.docActivo',
-  limite: 'sirena.limite'
+  limite: 'sirena.limite',
+  pngEscala: 'sirena.pngEscala',
+  pngFondo: 'sirena.pngFondo'
 };
 
 const DEFAULT_CODE = {
@@ -48,6 +50,12 @@ const DEFAULT_CODE = {
 };
 
 const MERMAID_THEMES = ['default', 'neutral', 'forest', 'dark', 'base'];
+
+// Ajustes del PNG. La escala multiplica el tamaño del dibujo en pantalla, y el
+// fondo evita que un diagrama hecho en modo oscuro salga con fondo oscuro al
+// pegarlo en un documento claro.
+const PNG_ESCALAS = [['1', 'pngScale1'], ['2', 'pngScale2'], ['4', 'pngScale4']];
+const PNG_FONDOS = [['tema', 'bgTheme'], ['blanco', 'bgWhite'], ['transparente', 'bgTransparent']];
 
 // Ajustes del dibujo: cada uno es un valor de configuración de Mermaid.
 const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
@@ -122,7 +130,10 @@ const el = {
   libraryModal: $('library-modal'),
   listaDocs: $('lista-docs'),
   limitSelect: $('limit-select'),
-  docName: $('doc-name')
+  docName: $('doc-name'),
+  pngScale: $('png-scale'),
+  pngBg: $('png-bg'),
+  backupInput: $('backup-input')
 
 };
 
@@ -384,6 +395,76 @@ function buildLibrary() {
   });
 }
 
+/* --- Copia de seguridad de la biblioteca --- */
+
+// Los diagramas viven en este navegador: si se borran los datos de navegación
+// se pierden. La copia es un archivo .json que también sirve para llevarlos a
+// otro equipo.
+function exportarBiblioteca() {
+  const docs = leerDocs();
+  if (!docs.length) {
+    toast(t('backupNone'));
+    return;
+  }
+  const copia = { app: 'sirena', formato: 1, fecha: new Date().toISOString(), diagramas: docs };
+  const dia = new Date().toISOString().slice(0, 10);
+  download(new Blob([JSON.stringify(copia, null, 2)], { type: 'application/json;charset=utf-8' }),
+    'sirena-diagramas-' + dia + '.json');
+}
+
+async function importarBiblioteca(file) {
+  let copia = null;
+  try {
+    copia = JSON.parse(await file.text());
+  } catch (_) {
+    copia = null;
+  }
+  const entrantes = copia && Array.isArray(copia.diagramas) ? copia.diagramas : null;
+  if (!entrantes) {
+    toast(t('backupFailed'));
+    return;
+  }
+  const docs = leerDocs();
+  const porId = new Map(docs.map((d) => [d.id, d]));
+  let cambios = 0;
+  entrantes.forEach((entra) => {
+    if (!entra || typeof entra.codigo !== 'string' || !entra.codigo.trim()) return;
+    const doc = {
+      id: typeof entra.id === 'string' && entra.id ? entra.id : 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      nombre: typeof entra.nombre === 'string' && entra.nombre.trim() ? entra.nombre.trim().slice(0, 60) : nombreSugerido(entra.codigo),
+      nombrePropio: Boolean(entra.nombrePropio),
+      codigo: entra.codigo,
+      modificado: Number(entra.modificado) || Date.now()
+    };
+    const actual = porId.get(doc.id);
+    // Un diagrama que ya está solo se sustituye si la copia lo trae más nuevo.
+    if (actual) {
+      if (doc.codigo !== actual.codigo && doc.modificado > actual.modificado) {
+        Object.assign(actual, doc);
+        cambios += 1;
+      }
+      return;
+    }
+    porId.set(doc.id, doc);
+    docs.push(doc);
+    cambios += 1;
+  });
+  escribirDocs(docs);
+  buildLibrary();
+  updateDocName();
+  if (docActivo) {
+    const abierto = leerDocs().find((d) => d.id === docActivo);
+    if (abierto && abierto.codigo !== el.editor.value) {
+      el.editor.value = abierto.codigo;
+      renderGutter();
+      render();
+    }
+  }
+  // Si la biblioteca se ha recortado por el máximo, el aviso ya lo ha dado
+  // escribirDocs y no se pisa con este.
+  if (leerDocs().length >= docs.length) toast(t('backupDone').replace('{n}', cambios));
+}
+
 /* --- Idioma --- */
 
 function detectLang() {
@@ -421,6 +502,7 @@ function applyLang(code) {
   buildExampleSelect();
   buildThemeSelect();
   buildAppearanceSelects();
+  buildExportSelects();
   buildLangMenu();
   updateStatus();
 }
@@ -478,6 +560,23 @@ function buildAppearanceSelects() {
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
   fillSelect(el.showDataSelect, YESNO, null, 'no');
+}
+
+function buildExportSelects() {
+  fillSelect(el.pngScale, PNG_ESCALAS, localStorage.getItem(STORE.pngEscala), '2');
+  fillSelect(el.pngBg, PNG_FONDOS, localStorage.getItem(STORE.pngFondo), 'tema');
+}
+
+function pngEscala() {
+  const valor = parseInt(el.pngScale.value, 10);
+  return [1, 2, 4].includes(valor) ? valor : 2;
+}
+
+function pngFondo() {
+  const valor = el.pngBg.value;
+  if (valor === 'blanco') return '#ffffff';
+  if (valor === 'transparente') return null;
+  return isDark() ? '#172227' : '#ffffff';
 }
 
 // La forma de las líneas y la distribución solo tienen sentido en los
@@ -1115,6 +1214,26 @@ function writeAccessibility(titulo, descr) {
 
 /* --- Archivos e imágenes --- */
 
+function esArchivoDeTexto(file) {
+  return /\.(mmd|mermaid|md|markdown|txt)$/i.test(file.name) || (file.type || '').startsWith('text/');
+}
+
+function llevaArchivo(event) {
+  // En modo visor la página es solo el diagrama y no se abre nada.
+  if (viewer) return false;
+  const tipos = event.dataTransfer && event.dataTransfer.types;
+  return Boolean(tipos && Array.prototype.includes.call(tipos, 'Files'));
+}
+
+// El nombre del archivo pasa a ser el del diagrama en la biblioteca.
+async function abrirArchivo(file) {
+  el.editor.value = await file.text();
+  crearDoc(el.editor.value, file.name.replace(/\.[^.]+$/, ''));
+  readAppearance();
+  renderGutter();
+  render();
+}
+
 function download(blob, filename) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -1195,7 +1314,9 @@ function svgForExport() {
   return { markup: new XMLSerializer().serializeToString(copy), width, height };
 }
 
-async function svgToCanvas(scale = 2) {
+async function svgToCanvas(scale, fondo) {
+  const escala = scale || pngEscala();
+  const relleno = fondo === undefined ? pngFondo() : fondo;
   const data = svgForExport();
   if (!data) return null;
   const url = URL.createObjectURL(new Blob([data.markup], { type: 'image/svg+xml;charset=utf-8' }));
@@ -1207,11 +1328,14 @@ async function svgToCanvas(scale = 2) {
       img.src = url;
     });
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(data.width * scale));
-    canvas.height = Math.max(1, Math.round(data.height * scale));
+    canvas.width = Math.max(1, Math.round(data.width * escala));
+    canvas.height = Math.max(1, Math.round(data.height * escala));
     const context = canvas.getContext('2d');
-    context.fillStyle = isDark() ? '#172227' : '#ffffff';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    // Sin relleno el PNG queda con fondo transparente.
+    if (relleno) {
+      context.fillStyle = relleno;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     return canvas;
   } finally {
@@ -1273,7 +1397,7 @@ async function downloadAs(formato) {
     if (pagina) download(new Blob([pagina], { type: 'text/html;charset=utf-8' }), nombre + '.html');
     return;
   }
-  const canvas = await svgToCanvas(2);
+  const canvas = await svgToCanvas();
   if (canvas) canvas.toBlob((blob) => blob && download(blob, nombre + '.png'), 'image/png');
 }
 
@@ -1552,12 +1676,51 @@ function setupToolbar() {
   el.fileInput.addEventListener('change', async () => {
     const file = el.fileInput.files && el.fileInput.files[0];
     if (!file) return;
-    el.editor.value = await file.text();
     el.fileInput.value = '';
-    crearDoc(el.editor.value, file.name.replace(/\.[^.]+$/, ''));
-    readAppearance();
-    renderGutter();
-    render();
+    await abrirArchivo(file);
+  });
+
+  $('backup-export').addEventListener('click', exportarBiblioteca);
+  $('backup-import').addEventListener('click', () => el.backupInput.click());
+  el.backupInput.addEventListener('change', async () => {
+    const file = el.backupInput.files && el.backupInput.files[0];
+    if (!file) return;
+    el.backupInput.value = '';
+    await importarBiblioteca(file);
+  });
+
+  // Arrastrar un archivo sobre la ventana equivale a abrirlo con el botón.
+  let arrastres = 0;
+  document.addEventListener('dragenter', (event) => {
+    if (!llevaArchivo(event)) return;
+    arrastres += 1;
+    document.body.classList.add('arrastrando');
+  });
+  document.addEventListener('dragover', (event) => {
+    if (!llevaArchivo(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  });
+  document.addEventListener('dragleave', () => {
+    arrastres = Math.max(0, arrastres - 1);
+    if (!arrastres) document.body.classList.remove('arrastrando');
+  });
+  document.addEventListener('drop', async (event) => {
+    if (!llevaArchivo(event)) return;
+    event.preventDefault();
+    arrastres = 0;
+    document.body.classList.remove('arrastrando');
+    const file = event.dataTransfer.files && event.dataTransfer.files[0];
+    if (!file) return;
+    if (/\.json$/i.test(file.name)) {
+      await importarBiblioteca(file);
+      return;
+    }
+    if (!esArchivoDeTexto(file)) {
+      toast(t('dropUnsupported'));
+      return;
+    }
+    await abrirArchivo(file);
   });
 
   $('btn-download').addEventListener('click', (event) => {
@@ -1574,13 +1737,19 @@ function setupToolbar() {
     });
   });
 
+  // Tocar los ajustes del PNG no cierra el menú.
+  el.downloadMenu.querySelector('.menu-ajustes-pie').addEventListener('click', (event) => event.stopPropagation());
+
+  el.pngScale.addEventListener('change', () => localStorage.setItem(STORE.pngEscala, el.pngScale.value));
+  el.pngBg.addEventListener('change', () => localStorage.setItem(STORE.pngFondo, el.pngBg.value));
+
   $('btn-print').addEventListener('click', () => printDiagram());
 
   $('btn-copy-code').addEventListener('click', () => copyText(el.editor.value, t('copied')));
 
   $('btn-copy-image').addEventListener('click', async () => {
     try {
-      const canvas = await svgToCanvas(2);
+      const canvas = await svgToCanvas();
       if (!canvas) return;
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);

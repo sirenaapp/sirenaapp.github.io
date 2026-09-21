@@ -62,6 +62,11 @@
         <button type="button" data-formato="svg"><strong data-i18n="dlSvg"></strong><small data-i18n="dlSvgD"></small></button>
         <button type="button" data-formato="html"><strong data-i18n="dlHtml"></strong><small data-i18n="dlHtmlD"></small></button>
         <button type="button" data-formato="mmd"><strong data-i18n="dlMmd"></strong><small data-i18n="dlMmdD"></small></button>
+        <div class="menu-ajustes-pie">
+          <label class="ajuste"><span data-i18n="pngScale"></span><select id="png-scale"></select></label>
+          <label class="ajuste"><span data-i18n="pngBg"></span><select id="png-bg"></select></label>
+          <p class="ajuste-nota" data-i18n="pngNote"></p>
+        </div>
       </div>
     </div>
     <button type="button" id="btn-print" class="tb" data-i18n-title="print"><svg><use href="#i-print"></use></svg></button>
@@ -191,7 +196,13 @@
     <p class="modal-help" data-i18n="libraryHelp"></p>
     <ul class="lista-docs" id="lista-docs"></ul>
     <label class="ajuste" id="ajuste-limite" data-i18n-title="docLimitHelp"><span data-i18n="docLimit"></span><select id="limit-select"></select></label>
-    <div class="modal-actions">
+    <p class="modal-help" data-i18n="backupHelp"></p>
+    <input type="file" id="backup-input" accept=".json,application/json" hidden>
+    <div class="modal-actions modal-actions-repartidas">
+      <div class="acciones-izq">
+        <button type="button" id="backup-export" class="btn btn-secundario" data-i18n="backupExport">Exportar copia</button>
+        <button type="button" id="backup-import" class="btn btn-secundario" data-i18n="backupImport">Importar copia</button>
+      </div>
       <button type="button" id="library-close" class="btn" data-i18n="helpClose">Cerrar</button>
     </div>
   </div>

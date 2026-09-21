@@ -23,18 +23,22 @@ propia dirección.
   código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve
   igual en cualquier editor de Mermaid.
 - Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
-  como imagen.
+  como imagen. El PNG se puede pedir a 1×, 2× o 4× del tamaño de pantalla y con
+  fondo blanco, transparente o el del editor.
 - Imprimir el diagrama o guardarlo en PDF, en una hoja A4 que toma la
   orientación de la forma del diagrama.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla.
 - Consultar la sintaxis del tipo de diagrama que se está escribiendo, en la
   ventana de ayuda, e insertar los fragmentos con una pulsación.
-- Abrir y guardar archivos `.mmd`.
+- Abrir y guardar archivos `.mmd`, también arrastrándolos sobre la ventana.
 - Guardar los diagramas en el propio navegador, con nombre, y volver a abrirlos
   otro día: al entrar aparece el último en el que se estaba trabajando. Sustituir
   todo el texto abre un diagrama nuevo y conserva el anterior, y la biblioteca
   tiene un máximo de diagramas guardados que se puede cambiar.
+- Sacar una copia de seguridad de la biblioteca en un archivo `.json` y volver a
+  importarla, para llevar los diagramas a otro navegador o recuperarlos si se
+  borran los datos de este.
 - Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio.
 - Incrustar el diagrama en un blog o en un material de eXeLearning, con el botón
   que copia el código listo para pegar.
