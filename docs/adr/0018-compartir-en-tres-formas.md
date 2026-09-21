@@ -23,7 +23,10 @@ diagrama, cada una con la descripción de lo que hace:
 
 Cada opción lleva su icono de Lucide —el lápiz para el editor, el marco
 abierto para la pantalla completa y `</>` para el código—, porque las tres
-descripciones empiezan igual y el icono las distingue antes de leerlas.
+descripciones empiezan igual y el icono las distingue antes de leerlas. El
+menú de descargas, que tiene la misma forma, lleva iconos por la misma razón:
+imagen para el PNG, pluma de trazado para el SVG, globo para la página HTML y
+documento de texto para el `.mmd`.
 
 El modo visor no se toca: las direcciones con `v=1` compartidas hasta hoy
 siguen funcionando igual, dentro de un marco o abiertas directamente.
