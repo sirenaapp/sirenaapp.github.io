@@ -21,7 +21,7 @@ window.SIRENA_LANG.en = {
   shareViewer: 'Full-screen link',
   shareViewerD: 'Opens the diagram alone, filling the whole window',
   shareEmbed: 'Embed code',
-  shareEmbedD: 'A frame ready to paste into a blog or an eXeLearning resource',
+  shareEmbedD: 'A frame ready to paste into any web page: a blog, a personal site or a teaching resource',
   embedCopied: 'Embed code copied to the clipboard',
   openInSirena: 'Edit in Sirena',
   a11y: 'Title and description for accessibility',

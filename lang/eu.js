@@ -21,7 +21,7 @@ window.SIRENA_LANG.eu = {
   shareViewer: 'Pantaila osorako esteka',
   shareViewerD: 'Diagrama bakarrik irekitzen da, leiho osoa hartuta',
   shareEmbed: 'Txertatzeko kodea',
-  shareEmbedD: 'Blog batean edo eXeLearning material batean itsasteko prest dagoen markoa',
+  shareEmbedD: 'Edozein web-orritan itsasteko prest dagoen markoa: blog bat, norberaren weba edo ikasmaterial bat',
   embedCopied: 'Txertatzeko kodea arbelera kopiatu da',
   openInSirena: 'Editatu Sirenan',
   a11y: 'Irisgarritasunerako izenburua eta deskribapena',

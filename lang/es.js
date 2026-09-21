@@ -21,7 +21,7 @@ window.SIRENA_LANG.es = {
   shareViewer: 'Enlace a pantalla completa',
   shareViewerD: 'Se abre solo el diagrama, ocupando toda la ventana',
   shareEmbed: 'Código para incrustar',
-  shareEmbedD: 'Un marco listo para pegar en un blog o en un material de eXeLearning',
+  shareEmbedD: 'Un marco listo para pegar en cualquier página web: un blog, una web propia o un material didáctico',
   embedCopied: 'Código de incrustación copiado al portapapeles',
   openInSirena: 'Editar en Sirena',
   a11y: 'Título y descripción para accesibilidad',

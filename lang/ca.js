@@ -21,7 +21,7 @@ window.SIRENA_LANG.ca = {
   shareViewer: 'Enllaç a pantalla completa',
   shareViewerD: "S'obre només el diagrama, ocupant tota la finestra",
   shareEmbed: 'Codi per incrustar',
-  shareEmbedD: "Un marc a punt per enganxar en un blog o en un material d'eXeLearning",
+  shareEmbedD: 'Un marc a punt per enganxar en qualsevol pàgina web: un blog, un web propi o un material didàctic',
   embedCopied: "Codi d'incrustació copiat al porta-retalls",
   openInSirena: 'Editar a Sirena',
   a11y: 'Títol i descripció per a accessibilitat',

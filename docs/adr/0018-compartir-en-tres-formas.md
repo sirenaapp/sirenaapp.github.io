@@ -21,6 +21,10 @@ diagrama, cada una con la descripción de lo que hace:
   visor, pero para enviarla tal cual;
 - código para incrustar, que antes era un botón aparte de la barra.
 
+Cada opción lleva su icono de Lucide —el lápiz para el editor, el marco
+abierto para la pantalla completa y `</>` para el código—, porque las tres
+descripciones empiezan igual y el icono las distingue antes de leerlas.
+
 El modo visor no se toca: las direcciones con `v=1` compartidas hasta hoy
 siguen funcionando igual, dentro de un marco o abiertas directamente.
 

@@ -42,8 +42,8 @@ propia dirección.
 - Compartir un enlace que contiene el diagrama, sin subirlo a ningún sitio: al
   editor, para que quien lo reciba siga trabajando con el código, o a pantalla
   completa, con el diagrama solo ocupando toda la ventana.
-- Incrustar el diagrama en un blog o en un material de eXeLearning, con la
-  opción que copia el código listo para pegar.
+- Incrustar el diagrama en cualquier página web —un blog, una web propia o un
+  material didáctico—, con la opción que copia el código listo para pegar.
 - Trabajar en castellano, catalán, gallego, euskera o inglés, con los ejemplos y
   la ayuda también traducidos.
 - Usarlo en móvil y tableta: el diagrama se arrastra con un dedo y se amplía
@@ -53,7 +53,7 @@ propia dirección.
 ## Incrustar un diagrama en otra página
 
 La opción «Código para incrustar», dentro del botón de compartir, copia un
-código como este, que se pega en el HTML del material. El diagrama viaja dentro de la dirección, así que la página incrustada
+código como este, que se pega en el HTML de cualquier página. El diagrama viaja dentro de la dirección, así que la página incrustada
 tampoco depende de ningún servidor:
 
 ```html
