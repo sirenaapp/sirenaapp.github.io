@@ -47,7 +47,10 @@ por quién hace cada cosa: alumnado y profesorado en el ejemplo) y **árbol**
 (`treeView-beta`, una jerarquía por sangría: la estructura de un trabajo de
 investigación en el ejemplo, con notas y un elemento resaltado). Los dos
 admiten título y descripción accesibles (comprobado), así que no van como
-comentario. Quedan fuera, por ser de ingeniería o consultoría, `requirement`,
+comentario. El árbol dibuja siempre una raíz «/» encima del primer nivel: la
+pinta Mermaid 12.0.0 tanto con la raíz sangrada como sin sangrar, con barra
+o sin ella, y su configuración no tiene forma de ocultarla; como es de
+Mermaid, se deja para que el código salga igual en cualquier editor. Quedan fuera, por ser de ingeniería o consultoría, `requirement`,
 `C4`, `packet`, `agentflow`, `eventmodeling`, `wardley`, `cynefin`,
 `railroad` y `usecase`.
 
