@@ -466,6 +466,16 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .color-elemento[data-sin-objetivo="true"] .swatch-propio,
 .color-elemento[data-sin-objetivo="true"] > button { display: none; }
 
+/* Para medir el diagrama, Mermaid lo dibuja antes en un elemento temporal que
+   añade al final de la página. Se saca del flujo para que no empuje el
+   contenido durante las décimas de segundo que tarda en retirarlo. */
+body > div[id^="dsirena-diagram-"] {
+  position: absolute !important;
+  left: -10000px;
+  top: 0;
+  pointer-events: none;
+}
+
 /* --- Pestañas en pantalla pequeña --- */
 
 .tabs { display: none; background: var(--surface); border-bottom: 1px solid var(--border); }
