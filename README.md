@@ -130,6 +130,11 @@ node scripts/generar-formas-iconos.mjs # y rehacer las miniaturas del menú de f
 Una acción programada avisa cada lunes, abriendo una incidencia, cuando Mermaid
 publica una versión nueva.
 
+Los archivos propios de CSS y JavaScript se enlazan con una huella de su
+contenido (`js/sirena.js?v=…`), para que el navegador no siga sirviendo una
+versión guardada. Al tocar uno de ellos se pasa `scripts/sellar-version.sh`
+antes de confirmar los cambios.
+
 Las decisiones técnicas que condicionan el proyecto están en [docs/adr](docs/adr).
 
 ## Licencias

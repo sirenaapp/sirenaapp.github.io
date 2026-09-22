@@ -28,6 +28,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md) | Una barra encima del código para empezar, orientar y colorear | aceptado |
 | [21](0021-el-boton-derecho-sobre-el-diagrama-abre-las-opciones-del-objeto.md) | El botón derecho sobre el diagrama abre las opciones del objeto | aceptado |
 | [22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md) | Las fórmulas se escriben con LaTeX y se editan con Edicuatex | aceptado |
+| [23](0023-los-archivos-propios-se-sirven-con-una-huella-en-la-direccion.md) | Los archivos propios se sirven con una huella en la dirección | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca
