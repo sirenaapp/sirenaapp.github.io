@@ -176,200 +176,195 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Proceso largo en cajas', ca: 'Procés llarg en caixes', gl: 'Proceso longo en caixas', eu: 'Prozesu luzea kutxetan', en: 'Long process in boxes' },
         code: {
           es: `flowchart LR
-    accTitle: Algoritmo de la amistad en cajas, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: El mismo algoritmo de la serie The Big Bang Theory, plegado en tres cajas unidas por conectores numerados.
-    subgraph S1[1. Elegir a la persona]
+    accTitle: Trabajo de investigación del alumnado, plegado en cajas
+    accDescr: Proceso de un trabajo de investigación escolar, desde la elección del tema hasta su publicación, plegado en tres cajas unidas por conectores numerados.
+    subgraph S1[1. Planificar el trabajo]
         direction TB
-        A([Inicio]) --> B[Elegir a la persona]
+        A([Inicio]) --> B[Elegir el tema]
         V3([3]) --> B
-        B --> C[Averiguar sus intereses]
-        C --> F[/Intentos = 0/]
+        B --> C[Delimitar la pregunta de partida]
+        C --> F[/Fuentes = 0/]
         F --> X1([1])
     end
 
-    subgraph S2[2. Buscar un interés común]
+    subgraph S2[2. Buscar y contrastar las fuentes]
         direction TB
-        Y1([1]) --> D{¿Hay algún interés común?}
-        Y4([4]) --> I
-        D -- No --> I[/Intentos = Intentos + 1/]
-        I --> J{¿Intentos menor que 3?}
-        J -- Sí --> E[Preguntar por otro interés]
-        E --> D
-        J -- No --> L[Quedarse con la actividad menos desagradable]
-        L --> X2([2])
-        D -- Sí --> X2
+        Y1([1]) --> D[Buscar una fuente]
+        Y4([4]) --> D
+        D --> E{¿La fuente es fiable?}
+        E -- No --> D
+        E -- Sí --> I[/Fuentes = Fuentes + 1/]
+        I --> J{¿Fuentes menor que 3?}
+        J -- Sí --> D
+        J -- No --> X2([2])
     end
 
-    subgraph S3[3. Quedar y valorar]
+    subgraph S3[3. Redactar y publicar]
         direction TB
-        Y2([2]) --> G[Proponer compartir esa actividad]
-        G --> H{¿Acepta la invitación?}
+        Y2([2]) --> G[Redactar el borrador]
+        G --> H{¿Están citadas todas las fuentes?}
         H -- No --> X4([4])
-        H -- Sí --> M[Compartir la actividad]
-        M --> N{¿Ha resultado agradable?}
-        N -- Sí --> O[Repetir la actividad]
-        O --> P([Amistad establecida])
-        N -- No --> Q[Elegir otra persona]
+        H -- Sí --> M[Entregar el trabajo]
+        M --> N{¿Supera la revisión?}
+        N -- Sí --> O[Publicar en el blog de aula]
+        O --> P([Trabajo terminado])
+        N -- No --> Q[Replantear el enfoque]
         Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           ca: `flowchart LR
-    accTitle: Algorisme de l'amistat en caixes, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: El mateix algorisme de la sèrie The Big Bang Theory, plegat en tres caixes unides per connectors numerats.
-    subgraph S1[1. Triar la persona]
+    accTitle: Treball de recerca de l'alumnat, plegat en caixes
+    accDescr: Procés d'un treball de recerca escolar, des de la tria del tema fins a la publicació, plegat en tres caixes unides per connectors numerats.
+    subgraph S1[1. Planificar el treball]
         direction TB
-        A([Inici]) --> B[Triar la persona]
+        A([Inici]) --> B[Triar el tema]
         V3([3]) --> B
-        B --> C[Esbrinar els seus interessos]
-        C --> F[/Intents = 0/]
+        B --> C[Delimitar la pregunta de partida]
+        C --> F[/Fonts = 0/]
         F --> X1([1])
     end
 
-    subgraph S2[2. Buscar un interès comú]
+    subgraph S2[2. Cercar i contrastar les fonts]
         direction TB
-        Y1([1]) --> D{Hi ha algun interès comú?}
-        Y4([4]) --> I
-        D -- No --> I[/Intents = Intents + 1/]
-        I --> J{Intents menor que 3?}
-        J -- Sí --> E[Preguntar per un altre interès]
-        E --> D
-        J -- No --> L[Quedar-se amb l'activitat menys desagradable]
-        L --> X2([2])
-        D -- Sí --> X2
+        Y1([1]) --> D[Cercar una font]
+        Y4([4]) --> D
+        D --> E{La font és fiable?}
+        E -- No --> D
+        E -- Sí --> I[/Fonts = Fonts + 1/]
+        I --> J{Fonts menor que 3?}
+        J -- Sí --> D
+        J -- No --> X2([2])
     end
 
-    subgraph S3[3. Quedar i valorar]
+    subgraph S3[3. Redactar i publicar]
         direction TB
-        Y2([2]) --> G[Proposar compartir aquesta activitat]
-        G --> H{Accepta la invitació?}
+        Y2([2]) --> G[Redactar l'esborrany]
+        G --> H{Totes les fonts estan citades?}
         H -- No --> X4([4])
-        H -- Sí --> M[Compartir l'activitat]
-        M --> N{Ha resultat agradable?}
-        N -- Sí --> O[Repetir l'activitat]
-        O --> P([Amistat establerta])
-        N -- No --> Q[Triar una altra persona]
+        H -- Sí --> M[Lliurar el treball]
+        M --> N{Supera la revisió?}
+        N -- Sí --> O[Publicar al blog d'aula]
+        O --> P([Treball acabat])
+        N -- No --> Q[Replantejar l'enfocament]
         Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           gl: `flowchart LR
-    accTitle: Algoritmo da amizade en caixas, de Sheldon Cooper (The Big Bang Theory)
-    accDescr: O mesmo algoritmo da serie The Big Bang Theory, dobrado en tres caixas unidas por conectores numerados.
-    subgraph S1[1. Escoller a persoa]
+    accTitle: Traballo de investigación do alumnado, dobrado en caixas
+    accDescr: Proceso dun traballo de investigación escolar, desde a escolla do tema ata a súa publicación, dobrado en tres caixas unidas por conectores numerados.
+    subgraph S1[1. Planificar o traballo]
         direction TB
-        A([Inicio]) --> B[Escoller a persoa]
+        A([Inicio]) --> B[Escoller o tema]
         V3([3]) --> B
-        B --> C[Averiguar os seus intereses]
-        C --> F[/Intentos = 0/]
+        B --> C[Delimitar a pregunta de partida]
+        C --> F[/Fontes = 0/]
         F --> X1([1])
     end
 
-    subgraph S2[2. Buscar un interese común]
+    subgraph S2[2. Buscar e contrastar as fontes]
         direction TB
-        Y1([1]) --> D{Hai algún interese común?}
-        Y4([4]) --> I
-        D -- Non --> I[/Intentos = Intentos + 1/]
-        I --> J{Intentos menor que 3?}
-        J -- Si --> E[Preguntar por outro interese]
-        E --> D
-        J -- Non --> L[Quedar coa actividade menos desagradable]
-        L --> X2([2])
-        D -- Si --> X2
+        Y1([1]) --> D[Buscar unha fonte]
+        Y4([4]) --> D
+        D --> E{A fonte é fiable?}
+        E -- Non --> D
+        E -- Si --> I[/Fontes = Fontes + 1/]
+        I --> J{Fontes menor que 3?}
+        J -- Si --> D
+        J -- Non --> X2([2])
     end
 
-    subgraph S3[3. Quedar e valorar]
+    subgraph S3[3. Redactar e publicar]
         direction TB
-        Y2([2]) --> G[Propoñer compartir esa actividade]
-        G --> H{Acepta a invitación?}
+        Y2([2]) --> G[Redactar o borrador]
+        G --> H{Están citadas todas as fontes?}
         H -- Non --> X4([4])
-        H -- Si --> M[Compartir a actividade]
-        M --> N{Resultou agradable?}
-        N -- Si --> O[Repetir a actividade]
-        O --> P([Amizade establecida])
-        N -- Non --> Q[Escoller outra persoa]
+        H -- Si --> M[Entregar o traballo]
+        M --> N{Supera a revisión?}
+        N -- Si --> O[Publicar no blog de aula]
+        O --> P([Traballo rematado])
+        N -- Non --> Q[Reformular o enfoque]
         Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           eu: `flowchart LR
-    accTitle: Adiskidetasunaren algoritmoa kutxetan, Sheldon Cooperrena (The Big Bang Theory)
-    accDescr: The Big Bang Theory telesaileko algoritmo bera, hiru kutxatan tolestuta eta zenbakitutako konektoreekin lotuta.
-    subgraph S1[1. Pertsona aukeratu]
+    accTitle: Ikasleen ikerketa-lana, kutxetan tolestuta
+    accDescr: Eskolako ikerketa-lan baten prozesua, gaia aukeratzetik argitaratzeraino, hiru kutxatan tolestuta eta zenbakitutako konektoreekin lotuta.
+    subgraph S1[1. Lana planifikatu]
         direction TB
-        A([Hasiera]) --> B[Pertsona aukeratu]
+        A([Hasiera]) --> B[Gaia aukeratu]
         V3([3]) --> B
-        B --> C[Bere interesak jakin]
-        C --> F[/Saiakerak = 0/]
+        B --> C[Abiapuntuko galdera zehaztu]
+        C --> F[/Iturriak = 0/]
         F --> X1([1])
     end
 
-    subgraph S2[2. Interes komun bat bilatu]
+    subgraph S2[2. Iturriak bilatu eta kontrastatu]
         direction TB
-        Y1([1]) --> D{Interes komunik dago?}
-        Y4([4]) --> I
-        D -- Ez --> I[/Saiakerak = Saiakerak + 1/]
-        I --> J{Saiakerak 3 baino gutxiago?}
-        J -- Bai --> E[Beste interes batez galdetu]
-        E --> D
-        J -- Ez --> L[Jarduerarik desatseginena aukeratu]
-        L --> X2([2])
-        D -- Bai --> X2
+        Y1([1]) --> D[Iturri bat bilatu]
+        Y4([4]) --> D
+        D --> E{Iturria fidagarria da?}
+        E -- Ez --> D
+        E -- Bai --> I[/Iturriak = Iturriak + 1/]
+        I --> J{Iturriak 3 baino gutxiago?}
+        J -- Bai --> D
+        J -- Ez --> X2([2])
     end
 
-    subgraph S3[3. Elkartu eta balioetsi]
+    subgraph S3[3. Idatzi eta argitaratu]
         direction TB
-        Y2([2]) --> G[Jarduera hori partekatzea proposatu]
-        G --> H{Gonbidapena onartzen du?}
+        Y2([2]) --> G[Zirriborroa idatzi]
+        G --> H{Iturri guztiak aipatuta daude?}
         H -- Ez --> X4([4])
-        H -- Bai --> M[Jarduera partekatu]
-        M --> N{Atsegina izan da?}
-        N -- Bai --> O[Jarduera errepikatu]
-        O --> P([Adiskidetasuna sortuta])
-        N -- Ez --> Q[Beste pertsona bat aukeratu]
+        H -- Bai --> M[Lana entregatu]
+        M --> N{Berrikuspena gainditzen du?}
+        N -- Bai --> O[Ikasgelako blogean argitaratu]
+        O --> P([Lana amaituta])
+        N -- Ez --> Q[Ikuspegia birplanteatu]
         Q --> X3([3])
     end
 
     S1 ~~~ S2
     S2 ~~~ S3`,
           en: `flowchart LR
-    accTitle: Friendship algorithm in boxes, by Sheldon Cooper (The Big Bang Theory)
-    accDescr: The same algorithm from The Big Bang Theory, folded into three boxes joined by numbered connectors.
-    subgraph S1[1. Choose the person]
+    accTitle: A student research project, folded into boxes
+    accDescr: The process of a school research project, from choosing the topic to publishing it, folded into three boxes joined by numbered connectors.
+    subgraph S1[1. Plan the project]
         direction TB
-        A([Start]) --> B[Choose the person]
+        A([Start]) --> B[Choose the topic]
         V3([3]) --> B
-        B --> C[Find out their interests]
-        C --> F[/Attempts = 0/]
+        B --> C[Narrow down the guiding question]
+        C --> F[/Sources = 0/]
         F --> X1([1])
     end
 
-    subgraph S2[2. Find a shared interest]
+    subgraph S2[2. Find and check the sources]
         direction TB
-        Y1([1]) --> D{Any shared interest?}
-        Y4([4]) --> I
-        D -- No --> I[/Attempts = Attempts + 1/]
-        I --> J{Attempts fewer than 3?}
-        J -- Yes --> E[Ask about another interest]
-        E --> D
-        J -- No --> L[Settle for the least objectionable activity]
-        L --> X2([2])
-        D -- Yes --> X2
+        Y1([1]) --> D[Look for a source]
+        Y4([4]) --> D
+        D --> E{Is the source reliable?}
+        E -- No --> D
+        E -- Yes --> I[/Sources = Sources + 1/]
+        I --> J{Fewer than 3 sources?}
+        J -- Yes --> D
+        J -- No --> X2([2])
     end
 
-    subgraph S3[3. Meet up and reflect]
+    subgraph S3[3. Write it up and publish]
         direction TB
-        Y2([2]) --> G[Suggest sharing that activity]
-        G --> H{Do they accept?}
+        Y2([2]) --> G[Write the draft]
+        G --> H{Are all sources cited?}
         H -- No --> X4([4])
-        H -- Yes --> M[Share the activity]
-        M --> N{Was it enjoyable?}
-        N -- Yes --> O[Repeat the activity]
-        O --> P([Friendship established])
-        N -- No --> Q[Choose another person]
+        H -- Yes --> M[Hand in the project]
+        M --> N{Does it pass the review?}
+        N -- Yes --> O[Publish on the class blog]
+        O --> P([Project finished])
+        N -- No --> Q[Rethink the approach]
         Q --> X3([3])
     end
 
