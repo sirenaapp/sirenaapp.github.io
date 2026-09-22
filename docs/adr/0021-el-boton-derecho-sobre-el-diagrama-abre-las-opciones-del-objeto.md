@@ -61,11 +61,14 @@ pulsación larga. En el modo visor ([ADR 5](0005-modo-visor-para-incrustar.md))
 no aparece, porque ahí no se edita.
 
 Como un menú contextual no se ve, sobre el lienzo aparece un aviso flotante
-que lo cuenta (con el texto de la pulsación larga en pantalla táctil). Se
-retira al usar el menú o al cerrarlo a mano, pero solo durante esa visita: al
-volver a entrar o al recargar vuelve a salir, porque no se guarda nada en el
-navegador. Así lo pidió el autor, para que un menú que no se ve no se olvide.
-No aparece en el modo visor.
+que lo cuenta, junto con el doble clic para escribir (con los gestos de la
+pantalla táctil cuando no hay ratón). Dice desde la primera palabra que vale
+en los diagramas de flujo y los mapas conceptuales, y solo sale cuando el
+diagrama cargado es de esos: con otro tipo se retira, y vuelve si se pasa a
+uno de flujo sin haberlo cerrado. Se retira al usar el menú o al cerrarlo a
+mano, pero solo durante esa visita: al volver a entrar o al recargar vuelve a
+salir, porque no se guarda nada en el navegador. Así lo pidió el autor, para
+que un menú que no se ve no se olvide. No aparece en el modo visor.
 
 ## Alternativas descartadas
 

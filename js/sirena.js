@@ -1123,6 +1123,7 @@ async function renderOnce() {
     hideError();
     fitToWindow();
     reportHeight();
+    mostrarPista();
   } catch (error) {
     if (token !== renderToken) return;
     showError(error);
@@ -3963,7 +3964,7 @@ function abrirContextual(event) {
   const objeto = objetoDelDiagrama(event);
   if (objeto.tipo !== 'fondo') irAlObjeto(objeto);
   event.preventDefault();
-  ocultarPista();
+  ocultarPista(true);
   cerrarMenusEditor();
   cerrarContextual();
   construirContextual(objeto);
@@ -3983,8 +3984,13 @@ function abrirContextual(event) {
 
 // Se enseña al entrar y se retira al usar el menú contextual o al cerrarla a
 // mano. Solo dura esa visita: al volver a la página vuelve a salir, porque no
-// se guarda nada en el navegador.
-function ocultarPista() {
+// se guarda nada en el navegador. Como lo que cuenta solo vale en los
+// diagramas de flujo (y el mapa conceptual, que lo es), con otro tipo cargado
+// no sale, y vuelve a salir si se pasa a uno de flujo sin haberla cerrado.
+let pistaDescartada = false;
+
+function ocultarPista(descartar) {
+  if (descartar) pistaDescartada = true;
   const pista = el.pistaFormato;
   if (pista.hidden) return;
   pista.classList.add('saliendo');
@@ -3992,7 +3998,9 @@ function ocultarPista() {
 }
 
 function mostrarPista() {
-  if (viewer) return;
+  if (viewer || pistaDescartada) return;
+  if (diagramKind() !== 'flowchart') { ocultarPista(false); return; }
+  if (!el.pistaFormato.hidden) return;
   // Hubo una versión que la daba por vista para siempre: se limpia el rastro.
   localStorage.removeItem('sirena.pistaFormato');
   // En pantalla táctil no hay botón derecho: ahí es la pulsación larga.
@@ -4005,7 +4013,7 @@ function setupContextual() {
   el.viewport.addEventListener('contextmenu', abrirContextual);
   $('pista-formato-cerrar').addEventListener('click', (event) => {
     event.stopPropagation();
-    ocultarPista();
+    ocultarPista(true);
   });
   [el.contextMenu, el.contextSubmenu].forEach((caja) => {
     caja.addEventListener('click', (event) => event.stopPropagation());

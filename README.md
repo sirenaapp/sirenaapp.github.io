@@ -40,7 +40,8 @@ propia dirección.
   clic en el lienzo vacío añade una caja, y desde el menú se borra una caja
   (con sus flechas) o una flecha suelta. En pantalla táctil, la pulsación larga; con Mayús se deja
   pasar el menú del navegador. Un aviso flotante sobre el lienzo lo
-  cuenta al entrar, y se retira al usarlo o al cerrarlo.
+  cuenta al entrar, solo cuando el diagrama es de flujo o un mapa conceptual,
+  y se retira al usarlo o al cerrarlo.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
