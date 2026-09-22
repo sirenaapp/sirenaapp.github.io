@@ -1187,10 +1187,7 @@ function colorVariables(valor) {
       primaryColor: el.colorFill.value,
       primaryBorderColor: el.colorBorder.value,
       lineColor: el.colorLine.value,
-      primaryTextColor: el.colorText.value,
-      // El fondo de los rótulos de flecha solo se escribe si se ha elegido:
-      // si no, sigue el gris del tema, como en cualquier editor de Mermaid.
-      ...(coloresTocados.has('labelbg') ? { edgeLabelBackground: el.colorLabelBg.value } : {})
+      primaryTextColor: el.colorText.value
     };
   }
   const encontrado = COLORS.find(([nombre]) => nombre === valor);
@@ -1217,6 +1214,9 @@ function appearanceConfig() {
   } else if (el.themeSelect.value && el.themeSelect.value !== 'default') {
     config.theme = el.themeSelect.value;
   }
+  // El fondo de los rótulos de flecha vale con cualquier tema, así que se
+  // escribe aparte y solo si se ha elegido; si no, sigue el gris del tema.
+  if (coloresTocados.has('labelbg')) variables.edgeLabelBackground = el.colorLabelBg.value;
   if (Object.keys(variables).length) config.themeVariables = variables;
   const flowchart = {};
   const curva = el.curveSelect.value;
@@ -1942,7 +1942,13 @@ function currentShape(id) {
 // Alcance del cambio de forma: la caja del cursor o todas las del diagrama.
 let formaAlcance = 'esta';
 
-function abrirFormas() {
+// «alcance» fija si se cambia la caja del cursor o todas; sin él (desde el
+// botón de la barra) se puede elegir en la propia ventana.
+let formaAlcanceFijado = false;
+
+function abrirFormas(alcance) {
+  formaAlcanceFijado = Boolean(alcance);
+  if (alcance) formaAlcance = alcance;
   cerrarMenusEditor();
   cerrarContextual();
   buildShapeMenu();
@@ -1958,17 +1964,19 @@ function buildShapeMenu(destino) {
   const enCursor = targetNodes();
   const ids = formaAlcance === 'todas' ? nodosConFormaGeneral() : enCursor;
   caja.innerHTML = '';
-  const alcance = document.createElement('div');
-  alcance.className = 'segmentos segmentos-menu';
-  [['esta', 'shapeThis'], ['todas', 'shapeAll']].forEach(([valor, clave]) => {
-    const boton = document.createElement('button');
-    boton.type = 'button';
-    boton.textContent = t(clave);
-    boton.setAttribute('aria-current', valor === formaAlcance ? 'true' : 'false');
-    boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(caja); });
-    alcance.appendChild(boton);
-  });
-  caja.appendChild(alcance);
+  if (!formaAlcanceFijado) {
+    const alcance = document.createElement('div');
+    alcance.className = 'segmentos segmentos-menu';
+    [['esta', 'shapeThis'], ['todas', 'shapeAll']].forEach(([valor, clave]) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.textContent = t(clave);
+      boton.setAttribute('aria-current', valor === formaAlcance ? 'true' : 'false');
+      boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(caja); });
+      alcance.appendChild(boton);
+    });
+    caja.appendChild(alcance);
+  }
   const titulo = document.createElement('p');
   titulo.className = 'menu-titulo';
   if (!ids.length) {
@@ -2372,7 +2380,7 @@ function setupEditorTools() {
   });
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();
-    abrirFormas();
+    abrirFormas(null);
   });
   $('shape-close').addEventListener('click', cerrarFormas);
   el.shapeModal.addEventListener('click', (event) => {
@@ -2640,8 +2648,59 @@ function prestarMenu(nodo, destino) {
   vigilante.observe(nodo, { attributes: true, attributeFilter: ['hidden'] });
 }
 
-// Submenús disponibles: cada uno presta el menú de la barra que le toca.
+// Panel con solo el fondo de los rótulos de flecha: la paleta, un color
+// propio y la vuelta al del tema.
+function construirFondoRotulos(caja) {
+  const actual = coloresTocados.has('labelbg') ? el.colorLabelBg.value : null;
+  const aplicar = (color) => {
+    if (color) {
+      coloresTocados.add('labelbg');
+      el.colorLabelBg.value = color;
+    } else {
+      coloresTocados.delete('labelbg');
+    }
+    writeAppearance();
+    cerrarSubmenu();
+  };
+  const muestras = document.createElement('div');
+  muestras.className = 'swatches';
+  COLORS.filter(([, , vars]) => vars).forEach(([, clave, vars]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.title = t(clave);
+    boton.setAttribute('aria-label', t(clave));
+    boton.style.background = vars.primaryColor;
+    boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
+    boton.setAttribute('aria-current', actual === vars.primaryColor ? 'true' : 'false');
+    boton.addEventListener('click', () => aplicar(vars.primaryColor));
+    muestras.appendChild(boton);
+  });
+  caja.appendChild(muestras);
+  const propio = document.createElement('label');
+  propio.className = 'swatch-propio';
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = actual || el.colorLabelBg.value;
+  input.addEventListener('change', () => aplicar(input.value));
+  const texto = document.createElement('span');
+  texto.textContent = t('nodeColorCustom');
+  propio.append(input, texto);
+  caja.appendChild(propio);
+  const quitar = document.createElement('button');
+  quitar.type = 'button';
+  quitar.className = 'accion-menu';
+  quitar.innerHTML = '<svg aria-hidden="true"><use href="#i-trash"></use></svg>';
+  const span = document.createElement('span');
+  span.textContent = t('labelBgTheme');
+  quitar.appendChild(span);
+  quitar.addEventListener('click', () => aplicar(null));
+  caja.appendChild(quitar);
+}
+
+// Submenús disponibles: cada uno presta el menú de la barra que le toca, o
+// construye su propio contenido.
 const SUBMENUS = {
+  fondoRotulos: { titulo: 'colorLabelBg', icono: 'i-palette', construir: construirFondoRotulos },
   colores: { titulo: 'colorMenu', icono: 'i-palette', boton: 'btn-color', menu: () => el.colorMenu, preparar: buildNodeColorSection },
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
@@ -2682,8 +2741,11 @@ function abrirSubmenuCascada(clave, boton) {
   nombre.textContent = t(submenu.titulo);
   cabecera.appendChild(nombre);
   caja.appendChild(cabecera);
-  if (submenu.preparar) submenu.preparar();
-  prestarMenu(submenu.menu(), caja);
+  if (submenu.construir) submenu.construir(caja);
+  else {
+    if (submenu.preparar) submenu.preparar();
+    prestarMenu(submenu.menu(), caja);
+  }
   boton.setAttribute('aria-expanded', 'true');
   caja.style.left = '0px';
   caja.style.top = '0px';
@@ -2705,9 +2767,11 @@ function grosorDeBorde(ids) {
 // Entrada que abre un submenú dentro del propio menú contextual.
 function entradaSubmenu(contenedor, objeto, clave, texto) {
   const submenu = SUBMENUS[clave];
-  const boton = $(submenu.boton);
-  const wrap = boton && boton.closest('.menu-wrap');
-  if (!boton || (wrap && wrap.hidden) || boton.hidden) return;
+  if (submenu.boton) {
+    const boton = $(submenu.boton);
+    const wrap = boton && boton.closest('.menu-wrap');
+    if (!boton || (wrap && wrap.hidden) || boton.hidden) return;
+  }
   const entrada = accionContextual(contenedor, texto || t(submenu.titulo), submenu.icono, () => {
     if (submenuEnCascada()) abrirSubmenuCascada(clave, entrada);
     else construirContextual({ ...objeto, submenu: clave });
@@ -2741,8 +2805,11 @@ function construirContextual(objeto) {
     nombre.textContent = t(submenu.titulo);
     cabecera.append(volver, nombre);
     menu.appendChild(cabecera);
-    if (submenu.preparar) submenu.preparar();
-    prestarMenu(submenu.menu(), menu);
+    if (submenu.construir) submenu.construir(menu);
+    else {
+      if (submenu.preparar) submenu.preparar();
+      prestarMenu(submenu.menu(), menu);
+    }
     return;
   }
 
@@ -2779,7 +2846,7 @@ function construirContextual(objeto) {
       cerrarContextual();
       escribirGrosor('borde', ids, [], valor);
     });
-    accionContextual(menu, t('ctxShape'), 'i-square', abrirFormas);
+    accionContextual(menu, t('ctxShape'), 'i-square', () => abrirFormas('esta'));
     return;
   }
 
@@ -2793,7 +2860,7 @@ function construirContextual(objeto) {
     accionContextual(menu, t('ctxTextClear'), 'i-trash', () => applyLinkColor(flechas, null, true));
     menu.appendChild(document.createElement('hr'));
     // El fondo del rótulo solo se puede cambiar para todos a la vez.
-    entradaSubmenu(menu, objeto, 'colores', t('colorLabelBg'));
+    entradaSubmenu(menu, objeto, 'fondoRotulos');
     accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
       construirContextual({ tipo: 'flecha', indice: objeto.indice });
     }, true);
@@ -2830,7 +2897,7 @@ function construirContextual(objeto) {
   titulo.textContent = t('ctxAll');
   entradaSubmenu(menu, objeto, 'colores');
   entradaSubmenu(menu, objeto, 'lineas');
-  if (!$('wrap-shape').hidden) accionContextual(menu, t('shapeAll'), 'i-square', abrirFormas);
+  if (!$('wrap-shape').hidden) accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
   entradaSubmenu(menu, objeto, 'trazo');
   entradaSubmenu(menu, objeto, 'tamano');
   entradaSubmenu(menu, objeto, 'motor');
@@ -2841,6 +2908,7 @@ function construirContextual(objeto) {
     });
   }
   entradaSubmenu(menu, objeto, 'direccion');
+  accionContextual(menu, t('a11y'), 'i-a11y', abrirAccesibilidad);
 }
 
 function abrirContextual(event) {
@@ -2922,6 +2990,15 @@ const ACC_COMENTARIO = ['mindmap', 'kanban', 'timeline', 'block', 'sankey', 'ven
 
 function accEsComentario() {
   return ACC_COMENTARIO.includes(editorType());
+}
+
+function abrirAccesibilidad() {
+  const actual = readAccessibility();
+  el.a11yTitle.value = actual.titulo;
+  el.a11yDescr.value = actual.descr;
+  el.a11yCommentNote.hidden = !accEsComentario();
+  el.a11yModal.hidden = false;
+  el.a11yTitle.focus();
 }
 
 function readAccessibility() {
@@ -3552,14 +3629,7 @@ function setupToolbar() {
     cerrarMenusEditor();
   });
 
-  $('btn-a11y').addEventListener('click', () => {
-    const actual = readAccessibility();
-    el.a11yTitle.value = actual.titulo;
-    el.a11yDescr.value = actual.descr;
-    el.a11yCommentNote.hidden = !accEsComentario();
-    el.a11yModal.hidden = false;
-    el.a11yTitle.focus();
-  });
+  $('btn-a11y').addEventListener('click', abrirAccesibilidad);
 
   $('a11y-apply').addEventListener('click', () => {
     writeAccessibility(el.a11yTitle.value, el.a11yDescr.value);

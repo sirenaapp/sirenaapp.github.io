@@ -27,7 +27,15 @@ que los botones de la barra pasan a actuar sobre él.
   líneas, forma de todas las cajas, trazo, tamaño del texto, motor, unir las
   flechas que van al mismo sitio y orientación). «Unir flechas» aparece como
   interruptor, con su marca cuando está puesto, igual que su botón de la
-  barra.
+  barra. También está ahí el título y la descripción accesibles.
+
+La forma de la caja se abre con el alcance que corresponde al sitio desde el
+que se pide (la caja señalada o todas), sin ofrecer el otro, para no cambiar
+sin querer lo que no se quería; los dos alcances solo se eligen desde el
+botón de la barra. El fondo de los rótulos de flecha tiene un submenú propio,
+con su paleta y su vuelta al color del tema, en vez de llevar al menú de
+colores entero, y se escribe como `edgeLabelBackground` con cualquier tema
+(comprobado), no solo con colores propios.
 
 Las opciones que no caben en una pulsación se abren como submenú propio, y no
 llevando al menú de la barra, que el autor consideró poco profesional

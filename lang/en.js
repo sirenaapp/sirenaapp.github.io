@@ -74,6 +74,7 @@ window.SIRENA_LANG.en = {
   colorFill: 'Fill',
   colorBorder: 'Border',
   colorLine: 'Lines',
+  labelBgTheme: 'The theme\'s',
   colorLabelBg: 'Arrow label background',
   colorText: 'Text',
   colorHint: 'Changing the fill adjusts border, lines and text on its own until they are set by hand.',

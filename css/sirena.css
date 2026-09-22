@@ -317,6 +317,9 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 /* El submenú cuelga al lado de su opción, como en cualquier menú de escritorio. */
 .menu-cascada { min-width: 240px; max-width: min(380px, 92vw); }
 .menu-cascada .submenu-cabecera { margin-bottom: 8px; }
+.menu-cascada .swatches { margin-bottom: 10px; }
+.menu-cascada .swatch-propio { margin: 0 2px 8px; }
+.menu-cascada .swatches button[aria-current="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
 .menu-contextual .accion-menu .marca { margin-left: auto; color: var(--accent); display: inline-flex; }
 .menu-contextual .accion-menu .marca svg { width: 15px; height: 15px; color: var(--accent); }
 .menu-contextual .accion-menu[aria-pressed="true"] { color: var(--accent); font-weight: 600; }

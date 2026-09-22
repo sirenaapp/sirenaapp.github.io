@@ -74,6 +74,7 @@ window.SIRENA_LANG.ca = {
   colorFill: 'Farciment',
   colorBorder: 'Vora',
   colorLine: 'Línies',
+  labelBgTheme: 'El del tema',
   colorLabelBg: 'Fons dels rètols de fletxa',
   colorText: 'Text',
   colorHint: "En canviar el farciment, la vora, les línies i el text s'ajusten sols mentre no es toquin.",
