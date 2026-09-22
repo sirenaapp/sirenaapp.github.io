@@ -944,7 +944,7 @@ window.SIRENA_EXAMPLES = [
         id: 'ecuacion',
         label: { es: 'Ecuación de segundo grado (mapa conceptual con fórmulas)', ca: 'Equació de segon grau (mapa conceptual amb fórmules)', gl: 'Ecuación de segundo grao (mapa conceptual con fórmulas)', eu: 'Bigarren mailako ekuazioa (kontzeptu-mapa formulekin)', en: 'Quadratic equation (concept map with formulas)' },
         code: {
-          es: `%%{init: {"layout": "elk"}}%%
+          es: `%%{init: {"theme":"base","themeVariables":{"primaryColor":"#d0ebff","primaryBorderColor":"#1971c2","lineColor":"#1971c2","edgeLabelBackground":"#ffffff"},"layout":"elk"}}%%
 flowchart TD
     accTitle: Mapa conceptual de la ecuación de segundo grado
     accDescr: Qué es una ecuación de segundo grado, cómo se resuelve según sea completa o incompleta, y cómo el discriminante decide cuántas soluciones tiene.
@@ -971,8 +971,13 @@ flowchart TD
     D -- "$$\\Delta=0$$" --> S1
     D -- "$$\\Delta \\lt 0$$" --> S0
     S2 -- "cumplen la" --> V
-    S1 -- "cumple la" --> V`,
-          ca: `%%{init: {"layout": "elk"}}%%
+    S1 -- "cumple la" --> V
+    style D fill:#ffe8cc,stroke:#e8590c,color:#403a33
+    style S2 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S1 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S0 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style V fill:#e5dbff,stroke:#6741d9,color:#393740`,
+          ca: `%%{init: {"theme":"base","themeVariables":{"primaryColor":"#d0ebff","primaryBorderColor":"#1971c2","lineColor":"#1971c2","edgeLabelBackground":"#ffffff"},"layout":"elk"}}%%
 flowchart TD
     accTitle: Mapa conceptual de l'equació de segon grau
     accDescr: Què és una equació de segon grau, com es resol segons sigui completa o incompleta, i com el discriminant decideix quantes solucions té.
@@ -999,8 +1004,13 @@ flowchart TD
     D -- "$$\\Delta=0$$" --> S1
     D -- "$$\\Delta \\lt 0$$" --> S0
     S2 -- "compleixen la" --> V
-    S1 -- "compleix la" --> V`,
-          gl: `%%{init: {"layout": "elk"}}%%
+    S1 -- "compleix la" --> V
+    style D fill:#ffe8cc,stroke:#e8590c,color:#403a33
+    style S2 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S1 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S0 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style V fill:#e5dbff,stroke:#6741d9,color:#393740`,
+          gl: `%%{init: {"theme":"base","themeVariables":{"primaryColor":"#d0ebff","primaryBorderColor":"#1971c2","lineColor":"#1971c2","edgeLabelBackground":"#ffffff"},"layout":"elk"}}%%
 flowchart TD
     accTitle: Mapa conceptual da ecuación de segundo grao
     accDescr: Que é unha ecuación de segundo grao, como se resolve segundo sexa completa ou incompleta, e como o discriminante decide cantas solucións ten.
@@ -1027,8 +1037,13 @@ flowchart TD
     D -- "$$\\Delta=0$$" --> S1
     D -- "$$\\Delta \\lt 0$$" --> S0
     S2 -- "cumpren a" --> V
-    S1 -- "cumpre a" --> V`,
-          eu: `%%{init: {"layout": "elk"}}%%
+    S1 -- "cumpre a" --> V
+    style D fill:#ffe8cc,stroke:#e8590c,color:#403a33
+    style S2 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S1 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S0 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style V fill:#e5dbff,stroke:#6741d9,color:#393740`,
+          eu: `%%{init: {"theme":"base","themeVariables":{"primaryColor":"#d0ebff","primaryBorderColor":"#1971c2","lineColor":"#1971c2","edgeLabelBackground":"#ffffff"},"layout":"elk"}}%%
 flowchart TD
     accTitle: Bigarren mailako ekuazioaren kontzeptu-mapa
     accDescr: Zer den bigarren mailako ekuazio bat, nola ebazten den osoa edo osatugabea izan, eta diskriminatzaileak nola erabakitzen duen zenbat soluzio dituen.
@@ -1055,8 +1070,13 @@ flowchart TD
     D -- "$$\\Delta=0$$" --> S1
     D -- "$$\\Delta \\lt 0$$" --> S0
     S2 -- "hau betetzen dute" --> V
-    S1 -- "hau betetzen du" --> V`,
-          en: `%%{init: {"layout": "elk"}}%%
+    S1 -- "hau betetzen du" --> V
+    style D fill:#ffe8cc,stroke:#e8590c,color:#403a33
+    style S2 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S1 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S0 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style V fill:#e5dbff,stroke:#6741d9,color:#393740`,
+          en: `%%{init: {"theme":"base","themeVariables":{"primaryColor":"#d0ebff","primaryBorderColor":"#1971c2","lineColor":"#1971c2","edgeLabelBackground":"#ffffff"},"layout":"elk"}}%%
 flowchart TD
     accTitle: Concept map of the quadratic equation
     accDescr: What a quadratic equation is, how it is solved depending on whether it is complete or incomplete, and how the discriminant decides how many solutions it has.
@@ -1083,7 +1103,12 @@ flowchart TD
     D -- "$$\\Delta=0$$" --> S1
     D -- "$$\\Delta \\lt 0$$" --> S0
     S2 -- "satisfy the" --> V
-    S1 -- "satisfies the" --> V`
+    S1 -- "satisfies the" --> V
+    style D fill:#ffe8cc,stroke:#e8590c,color:#403a33
+    style S2 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S1 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style S0 fill:#d3f9d8,stroke:#2f9e44,color:#353e36
+    style V fill:#e5dbff,stroke:#6741d9,color:#393740`
         }
       },
       {
