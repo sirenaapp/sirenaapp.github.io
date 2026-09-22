@@ -75,6 +75,9 @@ const ENGINES = [
 const ENGINES_SIN_DIRECCION = ['elk.stress', 'elk.force', 'elk.box', 'elk.rectpacking'];
 const CON_MOTOR = ['flowchart', 'state', 'class', 'er'];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
+// Grosores en píxeles; el vacío es el de serie de Mermaid (2 en flechas, 1 en bordes).
+const ARROW_WIDTHS = [['1', 'widthThin'], ['', 'widthNormal'], ['3', 'widthThick'], ['5', 'widthXThick']];
+const BORDER_WIDTHS = [['', 'widthNormal'], ['2', 'widthThick'], ['4', 'widthXThick']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
 const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
@@ -126,6 +129,13 @@ const el = {
   colorMenu: $('color-menu'),
   strokeMenu: $('stroke-menu'),
   engineSelect: $('engine-select'),
+  arrowWidthSelect: $('arrow-width-select'),
+  borderWidthSelect: $('border-width-select'),
+  linesMenu: $('lines-menu'),
+  lineTargetBox: $('line-target-box'),
+  lineTarget: $('line-target'),
+  linePartes: $('line-partes'),
+  lineWidths: $('line-widths'),
   mergeSelect: $('merge-select'),
   engineMenu: $('menu-engine'),
   a11yCommentNote: $('a11y-comment-note'),
@@ -586,6 +596,8 @@ function buildAppearanceSelects() {
   fillSelect(el.engineSelect, ENGINES.map(([v, k]) => [v, k]), localStorage.getItem(STORE.layout), 'elk');
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'basis');
   fillSelect(el.mergeSelect, YESNO, null, 'no');
+  fillSelect(el.arrowWidthSelect, ARROW_WIDTHS, null, '');
+  fillSelect(el.borderWidthSelect, BORDER_WIDTHS, null, '');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
@@ -632,7 +644,7 @@ function updateAppearanceVisibility() {
   const motor = el.engineSelect.value || 'elk';
   const visibles = {
     engine: conMotor,
-    curve: esFlujo && motor === 'dagre',
+    lines: esFlujo,
     spacing: esFlujo && motor === 'dagre',
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
@@ -640,6 +652,7 @@ function updateAppearanceVisibility() {
     showdata: tipo === 'pie'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  $('ajuste-curve').hidden = motor !== 'dagre';
   $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
   readShowData();
 }
@@ -1233,6 +1246,7 @@ function readAppearance() {
   el.engineSelect.value = ENGINES.some(([v]) => v === motor) ? motor : (motor === 'elk.layered' ? 'elk' : 'elk');
   el.curveSelect.value = CURVES.some(([v]) => v === flujo.curve) ? flujo.curve : 'basis';
   el.mergeSelect.value = config.elk && config.elk.mergeEdges ? 'yes' : 'no';
+  readLineWidths();
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
@@ -1539,11 +1553,11 @@ function targetLinks() {
 // Colorea unas flechas (línea y texto del rótulo) con linkStyle; la línea
 // anterior para esas mismas flechas se sustituye.
 function applyLinkColor(indices, color) {
-  const lista = indices.join(',');
-  let lineas = el.editor.value.replace(/\s+$/, '').split('\n');
-  const sangria = (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
-  lineas = lineas.filter((l) => !new RegExp(`^\\s*linkStyle\\s+${lista.replace(/,/g, ',')}\\s`).test(l));
-  if (color) lineas.push(`${sangria}linkStyle ${lista} stroke:${color},color:${color}`);
+  const cabeza = 'linkStyle ' + indices.join(',');
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  setPropLine(lineas, cabeza, 'stroke', color, sangria);
+  setPropLine(lineas, cabeza, 'color', color, sangria);
   el.editor.value = lineas.join('\n') + '\n';
   renderGutter();
   render();
@@ -1599,20 +1613,109 @@ function stripNodeColor(lineas, ids) {
 // juego), solo el texto o solo el borde.
 let colorParte = 'todo';
 
-// Cambia una propiedad de la línea style de un elemento, creándola si no la
-// tiene y quitando la línea si se queda sin propiedades.
-function setStyleProp(lineas, id, prop, valor, sangria) {
-  const re = new RegExp(`^(\\s*)style\\s+${id}\\s+(.*)$`);
+// Cambia una propiedad de una línea de estilo («style A», «linkStyle 2»,
+// «linkStyle default», «classDef default»…), creándola si no existe y
+// quitando la línea si se queda sin propiedades.
+function setPropLine(lineas, cabeza, prop, valor, sangria) {
+  const re = new RegExp(`^(\\s*)${cabeza.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(.*)$`);
   const i = lineas.findIndex((l) => re.test(l));
   if (i >= 0) {
     const m = re.exec(lineas[i]);
     const props = m[2].split(',').map((x) => x.trim()).filter((x) => x && !x.startsWith(prop + ':'));
     if (valor) props.push(`${prop}:${valor}`);
-    if (props.length) lineas[i] = `${m[1]}style ${id} ${props.join(',')}`;
+    if (props.length) lineas[i] = `${m[1]}${cabeza} ${props.join(',')}`;
     else lineas.splice(i, 1);
   } else if (valor) {
-    lineas.push(`${sangria}style ${id} ${prop}:${valor}`);
+    lineas.push(`${sangria}${cabeza} ${prop}:${valor}`);
   }
+}
+
+function setStyleProp(lineas, id, prop, valor, sangria) {
+  setPropLine(lineas, 'style ' + id, prop, valor, sangria);
+}
+
+// Lee una propiedad de una línea de estilo, o '' si no está.
+function getPropLine(cabeza, prop) {
+  const re = new RegExp(`^\\s*${cabeza.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(.*)$`, 'm');
+  const m = re.exec(el.editor.value);
+  if (!m) return '';
+  const p = m[1].split(',').map((x) => x.trim()).find((x) => x.startsWith(prop + ':'));
+  return p ? p.slice(prop.length + 1).trim() : '';
+}
+
+function sangriaDelCodigo(lineas) {
+  return (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
+}
+
+/* --- Grosor de las líneas --- */
+
+// De todas: linkStyle default para las flechas y classDef default para los
+// bordes, que Mermaid aplica a todo el diagrama de flujo.
+function readLineWidths() {
+  const flecha = getPropLine('linkStyle default', 'stroke-width').replace('px', '');
+  const borde = getPropLine('classDef default', 'stroke-width').replace('px', '');
+  el.arrowWidthSelect.value = ARROW_WIDTHS.some(([v]) => v === flecha) ? flecha : '';
+  el.borderWidthSelect.value = BORDER_WIDTHS.some(([v]) => v === borde) ? borde : '';
+}
+
+function writeLineWidths() {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const flecha = el.arrowWidthSelect.value;
+  const borde = el.borderWidthSelect.value;
+  setPropLine(lineas, 'linkStyle default', 'stroke-width', flecha ? flecha + 'px' : null, sangria);
+  setPropLine(lineas, 'classDef default', 'stroke-width', borde ? borde + 'px' : null, sangria);
+  el.editor.value = lineas.join('\n') + '\n';
+  renderGutter();
+  render();
+}
+
+// De una en particular: la flecha o el borde del elemento de la línea del cursor.
+let lineaParte = 'flecha';
+
+function buildLineTargetSection() {
+  const ids = targetNodes();
+  const flechas = targetLinks();
+  const caja = el.lineTargetBox;
+  if (lineaParte === 'flecha' && !flechas.length && ids.length) lineaParte = 'borde';
+  if (lineaParte === 'borde' && !ids.length && flechas.length) lineaParte = 'flecha';
+  caja.dataset.sinObjetivo = ids.length || flechas.length ? 'false' : 'true';
+  el.linePartes.querySelectorAll('button').forEach((boton) => {
+    boton.setAttribute('aria-current', boton.dataset.parte === lineaParte ? 'true' : 'false');
+    boton.hidden = boton.dataset.parte === 'flecha' ? !flechas.length : !ids.length;
+  });
+  el.lineTarget.innerHTML = '';
+  const cabeza = lineaParte === 'flecha' ? 'linkStyle ' + flechas.join(',') : ids.map((id) => 'style ' + id);
+  if (!ids.length && !flechas.length) {
+    el.lineTarget.textContent = t('lineNone');
+  } else {
+    el.lineTarget.textContent = t(lineaParte === 'flecha' ? 'lineTargetArrow' : 'lineTargetBorder') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = lineaParte === 'flecha' ? cabeza : ids.join(', ');
+    el.lineTarget.appendChild(codigo);
+  }
+  const actual = lineaParte === 'flecha'
+    ? getPropLine('linkStyle ' + flechas.join(','), 'stroke-width').replace('px', '')
+    : (ids.length ? getPropLine('style ' + ids[0], 'stroke-width').replace('px', '') : '');
+  el.lineWidths.innerHTML = '';
+  (lineaParte === 'flecha' ? ARROW_WIDTHS : BORDER_WIDTHS).forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = t(clave);
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      el.linesMenu.hidden = true;
+      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+      const sangria = sangriaDelCodigo(lineas);
+      const px = valor ? valor + 'px' : null;
+      if (lineaParte === 'flecha') setPropLine(lineas, 'linkStyle ' + flechas.join(','), 'stroke-width', px, sangria);
+      else ids.forEach((id) => setStyleProp(lineas, id, 'stroke-width', px, sangria));
+      el.editor.value = lineas.join('\n') + '\n';
+      renderGutter();
+      render();
+    });
+    el.lineWidths.appendChild(boton);
+  });
 }
 
 function applyNodeColor(ids, relleno, borde, nombre) {
@@ -1703,7 +1806,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -1806,6 +1909,19 @@ function setupEditorTools() {
     event.stopPropagation();
     alternarMenuEditor(el.engineMenu, $('btn-engine'), buildEngineMenu);
   });
+  $('btn-lines').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.linesMenu, $('btn-lines'), () => { updateAppearanceVisibility(); buildLineTargetSection(); });
+  });
+  el.linePartes.querySelectorAll('button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      lineaParte = boton.dataset.parte;
+      buildLineTargetSection();
+    });
+  });
+  [el.arrowWidthSelect, el.borderWidthSelect].forEach((select) => {
+    select.addEventListener('change', () => writeLineWidths());
+  });
   el.engineMenu.addEventListener('click', (event) => event.stopPropagation());
 
   MENUS_EDITOR.forEach((clave) => {
@@ -1839,7 +1955,7 @@ function setupEditorTools() {
   // Al mover el cursor cambia qué elemento se colorearía: si el menú de color
   // está abierto, se cierra para no colorear otra cosa sin querer.
   ['keyup', 'click'].forEach((evento) => {
-    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; });
+    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; el.linesMenu.hidden = true; });
   });
 }
 

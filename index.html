@@ -179,9 +179,23 @@
         </div>
       </div>
       <span class="tb-sep" id="sep-ajustes" hidden></span>
-      <div class="menu-wrap" id="wrap-curve" hidden>
-        <button type="button" id="btn-curve" class="tb" data-i18n-title="curve"><svg><use href="#i-spline"></use></svg></button>
-        <div class="menu menu-izq menu-opciones" id="menu-curve" data-select="curve-select" hidden></div>
+      <div class="menu-wrap" id="wrap-lines" hidden>
+        <button type="button" id="btn-lines" class="tb" data-i18n-title="lines"><svg><use href="#i-spline"></use></svg></button>
+        <div class="menu menu-izq menu-ajustes" id="lines-menu" hidden>
+          <p class="menu-seccion" data-i18n="linesAll"></p>
+          <label class="ajuste" id="ajuste-curve"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="curve"></span><select id="curve-select"></select></label>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-arrow-right"></use></svg><span data-i18n="arrowWidth"></span><select id="arrow-width-select"></select></label>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="borderWidth"></span><select id="border-width-select"></select></label>
+          <div class="color-elemento" id="line-target-box">
+            <p class="menu-seccion" data-i18n="linesHere"></p>
+            <p class="menu-titulo" id="line-target"></p>
+            <div class="segmentos" id="line-partes">
+              <button type="button" data-parte="flecha" data-i18n="nodeColorLink"></button>
+              <button type="button" data-parte="borde" data-i18n="lineBorder"></button>
+            </div>
+            <div class="segmentos" id="line-widths"></div>
+          </div>
+        </div>
       </div>
       <div class="menu-wrap" id="wrap-spacing" hidden>
         <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>
@@ -210,7 +224,6 @@
       <button type="button" id="btn-redo" class="tb" data-i18n-title="redo" disabled><svg><use href="#i-redo"></use></svg></button>
       <div hidden>
         <select id="engine-select"></select>
-        <select id="curve-select"></select>
         <select id="spacing-select"></select>
         <select id="padding-select"></select>
         <select id="merge-select"></select>

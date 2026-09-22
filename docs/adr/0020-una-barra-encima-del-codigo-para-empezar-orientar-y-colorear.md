@@ -64,7 +64,11 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
 - **Un botón por ajuste.** El resto del antiguo menú de aspecto de la barra
   superior, a petición del autor, con un botón por ajuste que solo aparece
   cuando el tipo de diagrama y el motor lo atienden, comprobado uno a uno:
-  forma de las líneas y separación solo con dagre; unir las flechas que van
+  «Líneas» en flujo, con dos secciones como el de colores: para todas, la
+  forma (solo con dagre) y el grosor de las flechas (`linkStyle default
+  stroke-width`) y de los bordes (`classDef default stroke-width`); y para la
+  flecha o el elemento de la línea del cursor, su grosor en su `linkStyle N`
+  o `style A`, fundido con el color que ya tengan; separación solo con dagre; unir las flechas que van
   al mismo sitio (`elk.mergeEdges`) solo con ELK por capas; márgenes en flujo
   con cualquier motor; numeración en secuencia; valores en sectores. La
   orientación se oculta con los motores que no la atienden (tensión, fuerzas,

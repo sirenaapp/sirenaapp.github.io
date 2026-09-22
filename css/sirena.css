@@ -351,6 +351,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .swatch-propio input { width: 30px; height: 30px; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: none; cursor: pointer; }
 .color-elemento > button { color: var(--text-soft); font-size: 12.5px; }
 .color-elemento[data-sin-objetivo="true"] .segmentos,
+.color-elemento[data-sin-objetivo="true"] #line-widths,
 .color-elemento[data-sin-objetivo="true"] .swatches,
 .color-elemento[data-sin-objetivo="true"] .swatch-propio,
 .color-elemento[data-sin-objetivo="true"] > button { display: none; }
