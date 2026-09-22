@@ -955,28 +955,54 @@ function anchoDeMedida() {
 }
 
 // Con los rótulos en HTML (los diagramas con fórmulas), Mermaid 12 deja el
-// hueco del texto en 120 píxeles fijos aunque la caja sea mayor, y el texto
-// se corta. El tamaño de la caja sí lo calcula bien, así que el rótulo se
-// estira hasta ahí y se vuelve a centrar.
+// hueco del texto en 120 píxeles fijos aunque la caja sea mayor, y además lo
+// dibuja como tabla, de modo que el texto largo ni se parte ni cabe: se sale
+// por el lado. El tamaño de la caja sí lo calcula bien, así que el rótulo se
+// estira hasta ahí y se deja que el texto se reparta en líneas.
 function ajustarRotulosHtml() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;
   let ajustado = false;
-  svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
-    const nodo = hueco.closest('g.node') || hueco.parentElement;
+  svg.querySelectorAll('foreignObject').forEach((hueco) => {
+    const nodo = hueco.closest('g.node') || hueco.closest('g[class*="node"]');
     const forma = nodo && nodo.querySelector('rect, polygon, ellipse, circle, path');
     const dentro = hueco.firstElementChild;
     if (!forma || !dentro || !forma.getBBox) return;
     const caja = forma.getBBox();
+    // Un rombo aprovecha menos anchura que un rectángulo, porque los lados
+    // se cierran hacia arriba y hacia abajo.
+    const rombo = forma.tagName === 'polygon' && forma.points && forma.points.length === 4;
+    const margen = rombo ? caja.width * 0.28 : 14;
+    const disponible = Math.floor(caja.width - margen);
+    if (disponible < 40) return;
     const ancho = parseFloat(hueco.getAttribute('width')) || 0;
-    // Se deja un margen para que el texto no toque el borde.
-    const necesario = Math.floor(caja.width - 12);
-    if (!necesario || necesario <= ancho + 1) return;
+    const alto = parseFloat(hueco.getAttribute('height')) || 0;
     const x = parseFloat(hueco.getAttribute('x')) || 0;
-    hueco.setAttribute('width', necesario);
-    hueco.setAttribute('x', x - (necesario - ancho) / 2);
-    dentro.style.width = necesario + 'px';
-    dentro.style.maxWidth = necesario + 'px';
+    const y = parseFloat(hueco.getAttribute('y')) || 0;
+    // En bloque, el ancho manda y el texto se reparte en líneas; como tabla
+    // crecía a lo ancho y se salía.
+    dentro.style.display = 'block';
+    dentro.style.width = disponible + 'px';
+    dentro.style.maxWidth = disponible + 'px';
+    dentro.style.overflowWrap = 'break-word';
+    if (disponible !== ancho) {
+      hueco.setAttribute('width', disponible);
+      hueco.setAttribute('x', x + (ancho - disponible) / 2);
+    }
+    // Si aun así no cabe (una fórmula no se parte en dos líneas), se encoge
+    // un poco la letra antes que cortar el texto.
+    dentro.style.transform = '';
+    const sobra = dentro.scrollWidth - disponible;
+    if (sobra > 1) {
+      const encoge = Math.max(0.7, disponible / dentro.scrollWidth);
+      dentro.style.transformOrigin = 'center center';
+      dentro.style.transform = 'scale(' + encoge.toFixed(3) + ')';
+    }
+    const altoNuevo = Math.ceil(dentro.scrollHeight);
+    if (altoNuevo > alto + 1) {
+      hueco.setAttribute('height', altoNuevo);
+      hueco.setAttribute('y', y - (altoNuevo - alto) / 2);
+    }
     ajustado = true;
   });
   if (!ajustado) return;

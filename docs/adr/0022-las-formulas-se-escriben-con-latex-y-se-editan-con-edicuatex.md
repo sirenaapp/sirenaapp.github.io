@@ -41,10 +41,14 @@ flujo (y mapa conceptual), estados, clases, secuencia, bloques, kanban y
 entidad-relación. En los demás el `$$…$$` saldría tal cual.
 
 Con los rótulos en HTML, Mermaid 12 deja el hueco del texto en 120 píxeles
-fijos aunque la caja sea mayor, y los textos largos salen cortados (medido el
-22-09-2026, también fuera de Sirena, así que es cosa suya). El tamaño de la
-caja sí lo calcula bien, de modo que después de dibujar se estira cada rótulo
-hasta el ancho de su caja, menos un margen, y se vuelve a centrar.
+fijos aunque la caja sea mayor, y lo dibuja como tabla, de modo que el texto
+largo ni se parte en líneas ni cabe: se sale por el lado y queda cortado
+(medido el 22-09-2026, también fuera de Sirena, así que es cosa suya). El
+tamaño de la caja sí lo calcula bien, de modo que después de dibujar se estira
+cada rótulo hasta el ancho de su caja (menos un margen, mayor en los rombos,
+que se cierran por arriba y por abajo), se dibuja en bloque para que el texto
+se reparta en líneas y, si aun así no cabe porque lleva una fórmula, que no se
+puede partir, se encoge un poco la letra antes que cortar nada.
 
 ## Alternativas descartadas
 
