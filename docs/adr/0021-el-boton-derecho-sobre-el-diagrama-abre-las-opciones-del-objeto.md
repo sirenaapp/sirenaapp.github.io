@@ -138,6 +138,28 @@ que el código siga leyéndose, y las flechas se escriben junto a las demás,
 antes del bloque de estilos; como van al final, no alteran la numeración de
 los `linkStyle` existentes.
 
+## Enlace en una caja (22-09-2026)
+
+En los diagramas de flujo, el botón derecho sobre una caja ofrece «Poner un
+enlace» (o «Cambiar el enlace» si ya lo tiene): una ventana con la dirección
+y un texto emergente opcional, que se escribe como `click A "https://…"
+"texto"` al final del código, y se quita borrando la línea; al borrar la caja
+se borra también. Es el punto 3 del inventario de lo que Mermaid permite
+(22-09-2026).
+
+Sirena dibuja con el nivel de seguridad estricto de Mermaid y así se queda:
+el enlace se genera igual (comprobado con los cuatro niveles), pero Mermaid
+retira el `_blank`, así que después de dibujar se pone `target="_blank"` y
+`rel="noopener noreferrer"` a cada enlace del dibujo, como pide el criterio
+de que lo externo se abra en una pestaña nueva.
+
+El clic no llega nunca al `<a>`, porque el lienzo captura el puntero para
+poder arrastrar: se atiende al soltar, si no hubo desplazamiento y debajo hay
+un enlace. En el modo visor lo abre un clic; en el editor hace falta Ctrl (o
+Cmd) y clic, y un clic simple avisa de ello, para que el clic normal siga
+sirviendo para mover, seleccionar y editar. El SVG y el HTML exportados
+conservan el enlace; en el PNG no existe.
+
 ## Consecuencias
 
 Se puede dar formato mirando el dibujo, sin buscar la línea en el código, y

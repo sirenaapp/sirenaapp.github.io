@@ -12,6 +12,7 @@ window.SIRENA_SYNTAX = [
       { c: 'A --> B', t: { es: 'Flecha entre dos elementos', ca: 'Fletxa entre dos elements', gl: 'Frecha entre dous elementos', eu: 'Gezia bi elementuren artean', en: 'Arrow between two items' } },
       { c: 'A -- Sí --> B', t: { es: 'Flecha con texto', ca: 'Fletxa amb text', gl: 'Frecha con texto', eu: 'Testudun gezia', en: 'Arrow with a label' } },
       { c: 'subgraph Bloque\n  A --> B\nend', t: { es: 'Agrupar elementos en un bloque', ca: 'Agrupar elements en un bloc', gl: 'Agrupar elementos nun bloque', eu: 'Elementuak bloke batean taldekatu', en: 'Group items in a block' } },
+      { c: 'click A "https://ejemplo.org" "Ver el recurso"', t: { es: 'Enlace que se abre al pulsar la caja (en el editor, con Ctrl y clic)', ca: 'Enllaç que s\'obre en prémer la caixa (a l\'editor, amb Ctrl i clic)', gl: 'Ligazón que se abre ao premer a caixa (no editor, con Ctrl e clic)', eu: 'Kutxa sakatzean irekitzen den esteka (editorean, Ctrl eta klik)', en: 'Link opened by clicking the box (in the editor, with Ctrl and click)' } },
       { c: 'A["$$x=\\dfrac{a}{b}$$"]', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },

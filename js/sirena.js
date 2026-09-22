@@ -139,6 +139,9 @@ const el = {
   viewerLink: $('viewer-link'),
   gutter: $('gutter'),
   a11yModal: $('a11y-modal'),
+  linkModal: $('link-modal'),
+  linkUrl: $('link-url'),
+  linkTitle: $('link-title'),
   a11yTitle: $('a11y-title'),
   a11yDescr: $('a11y-descr'),
   syntaxBox: $('syntax-box'),
@@ -1217,6 +1220,7 @@ async function renderOnce() {
     if (currentSvg.includes('<foreignObject')) {
       ajustarRotulosHtml();
     }
+    prepararEnlaces();
     ocultarAnclas();
     hideEmpty();
     hideError();
@@ -1377,9 +1381,11 @@ function setupPan() {
     };
   };
 
+  let pulsacion = null;
   el.viewport.addEventListener('pointerdown', (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     event.preventDefault();
+    pulsacion = { id: event.pointerId, x: event.clientX, y: event.clientY };
     punteros.set(event.pointerId, { x: event.clientX, y: event.clientY });
     el.viewport.setPointerCapture(event.pointerId);
     el.viewport.classList.add('dragging');
@@ -1415,7 +1421,14 @@ function setupPan() {
     else {
       inicio = null;
       el.viewport.classList.remove('dragging');
+      // Una pulsación sin arrastre sobre una caja con enlace lo abre. Como el
+      // lienzo captura el puntero, el clic no llega al <a>: se atiende aquí.
+      if (event.type === 'pointerup' && pulsacion && pulsacion.id === event.pointerId
+          && Math.hypot(event.clientX - pulsacion.x, event.clientY - pulsacion.y) < 4) {
+        abrirEnlaceBajo(event);
+      }
     }
+    pulsacion = null;
   };
 
   el.viewport.addEventListener('pointerup', soltar);
@@ -1558,6 +1571,93 @@ function writeShowData() {
 
 function readShowData() {
   el.showDataSelect.value = /^[ \t]*pie[ \t]+showData\b/m.test(el.editor.value) ? 'yes' : 'no';
+}
+
+/* --- Enlace de una caja (click A "https://…" "texto") --- */
+
+// Enlace que tiene una caja, o null. Mermaid admite «click A "url"» y
+// «click A href "url"», con un texto emergente opcional detrás.
+function enlaceDeCaja(id) {
+  const re = new RegExp('^[ \\t]*click[ \\t]+' + escapaRe(id) + '[ \\t]+(?:href[ \\t]+)?"([^"]*)"(?:[ \\t]+"([^"]*)")?', 'm');
+  const m = re.exec(el.editor.value);
+  return m ? { url: m[1], titulo: m[2] || '' } : null;
+}
+
+// Escribe (o quita, sin dirección) el enlace de la caja, al final del código.
+function escribirEnlaceDeCaja(id, url, titulo) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const re = new RegExp('^[ \\t]*click[ \\t]+' + escapaRe(id) + '[ \\t]');
+  const i = lineas.findIndex((l) => re.test(l));
+  const limpio = (url || '').trim();
+  const linea = limpio
+    ? sangriaDelCodigo(lineas) + 'click ' + id + ' "' + limpio.replace(/"/g, '') + '"' + (titulo.trim() ? ' "' + titulo.trim().replace(/"/g, '') + '"' : '')
+    : null;
+  if (i >= 0) {
+    if (linea) lineas[i] = linea;
+    else lineas.splice(i, 1);
+  } else if (linea) {
+    lineas.push(linea);
+  }
+  aplicarCodigo(lineas);
+}
+
+let cajaDelEnlace = null;
+
+function abrirEnlace(id) {
+  cajaDelEnlace = id;
+  const actual = enlaceDeCaja(id);
+  el.linkUrl.value = actual ? actual.url : '';
+  el.linkTitle.value = actual ? actual.titulo : '';
+  $('link-remove').hidden = !actual;
+  el.linkModal.hidden = false;
+  el.linkUrl.focus();
+}
+
+// Los enlaces del dibujo se abren en una pestaña nueva. Mermaid quita el
+// «_blank» en el nivel de seguridad estricto, así que se pone aquí. En el
+// editor un clic simple no navega, para no estorbar al arrastre ni al doble
+// clic: ahí se abre con Ctrl (o Cmd) y clic.
+function prepararEnlaces() {
+  el.canvas.querySelectorAll('a[href], a[*|href]').forEach((a) => {
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+  });
+}
+
+// Abre el enlace de la caja que hay bajo el puntero: en el visor con un clic
+// y en el editor con Ctrl (o Cmd) y clic, avisando si se pulsa sin ellos.
+function abrirEnlaceBajo(event) {
+  const bajo = document.elementFromPoint(event.clientX, event.clientY);
+  const a = bajo && bajo.closest('a');
+  if (!a || !el.canvas.contains(a)) return;
+  const href = a.getAttribute('href') || a.getAttribute('xlink:href') || (a.href && a.href.baseVal) || '';
+  if (!href) return;
+  if (viewer || event.ctrlKey || event.metaKey) window.open(href, '_blank', 'noopener');
+  else toast(t('linkHint'));
+}
+
+function setupEnlaces() {
+  // El clic nativo del <a> no llega (el lienzo captura el puntero); si llegara,
+  // no debe navegar en la misma pestaña.
+  el.canvas.addEventListener('click', (event) => {
+    if (event.target.closest('a')) event.preventDefault();
+  });
+  $('link-apply').addEventListener('click', () => {
+    if (!cajaDelEnlace) return;
+    escribirEnlaceDeCaja(cajaDelEnlace, el.linkUrl.value, el.linkTitle.value);
+    el.linkModal.hidden = true;
+  });
+  $('link-remove').addEventListener('click', () => {
+    if (cajaDelEnlace) escribirEnlaceDeCaja(cajaDelEnlace, '', '');
+    el.linkModal.hidden = true;
+  });
+  $('link-cancel').addEventListener('click', () => { el.linkModal.hidden = true; });
+  el.linkModal.addEventListener('click', (event) => {
+    if (event.target === el.linkModal) el.linkModal.hidden = true;
+  });
+  el.linkUrl.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); $('link-apply').click(); }
+  });
 }
 
 /* --- Calendario del diagrama de Gantt --- */
@@ -2200,6 +2300,7 @@ function borrarNodo(id) {
     if (/^\s*%%/.test(linea)) { salida.push(linea); return; }
     // Los estilos y las clases de esa caja se van con ella.
     if (new RegExp(`^\\s*style\\s+${escapaRe(id)}\\s`).test(linea)) return;
+    if (new RegExp(`^\\s*click\\s+${escapaRe(id)}\\s`).test(linea)) return;
     const asigna = /^(\s*)(class|cssClass)\s+("?)([^"\s]+)\3\s+([\w-]+)\s*$/.exec(linea);
     if (asigna) {
       const resto = asigna[4].split(',').filter((x) => x !== id);
@@ -4299,6 +4400,7 @@ function construirContextual(objeto) {
         crearFlecha(objeto.id, id, '');
         editarCajaCuandoAparezca(id);
       });
+      accionContextual(menu, t(enlaceDeCaja(objeto.id) ? 'ctxLinkEdit' : 'ctxLink'), 'i-link', () => abrirEnlace(objeto.id));
       accionContextual(menu, t('ctxDeleteBox'), 'i-trash', () => borrarNodo(objeto.id));
     }
     return;
@@ -5220,6 +5322,7 @@ function setupToolbar() {
   setupContextual();
   setupEditorSitio();
   setupCrear();
+  setupEnlaces();
   setupFormulas();
 
   el.showDataSelect.addEventListener('change', () => {
@@ -5294,6 +5397,7 @@ function setupToolbar() {
     if (event.key === 'Escape') {
       el.helpModal.hidden = true;
       el.a11yModal.hidden = true;
+      el.linkModal.hidden = true;
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
       cerrarMenusEditor();

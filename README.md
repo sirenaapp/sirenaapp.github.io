@@ -39,7 +39,9 @@ propia dirección.
   texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
   flecha o el fondo abre las opciones que le corresponden (en una flecha,
-  también su tipo de línea y sus puntas, cada opción dibujada) y lleva el cursor del
+  también su tipo de línea y sus puntas, cada opción dibujada; en una caja,
+  un enlace que se abre al pulsarla en la vista a pantalla completa o en la
+  página donde se incruste, y en el editor con Ctrl y clic) y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
   flecha permite escribirlo encima del propio dibujo, con una barrita de
   botones para la negrita, la cursiva, el salto de línea y la fórmula. En los diagramas de flujo
