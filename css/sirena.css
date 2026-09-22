@@ -293,7 +293,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-formas { min-width: 400px; max-width: min(92vw, 460px); }
 .menu-formas .segmentos-menu { margin: 6px 8px 8px; }
 /* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
-.formas-rejilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 0 4px 4px; }
+.formas-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 4px 4px; }
 .menu .formas-rejilla button {
   display: flex;
   flex-direction: column;
@@ -305,7 +305,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   line-height: 1.2;
   text-align: center;
 }
-.menu .formas-rejilla .forma-nombre { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.menu .formas-rejilla .forma-nombre { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: normal; max-width: 100%; }
 .forma-icono { display: inline-flex; width: 44px; height: 26px; flex: none; align-items: center; justify-content: center; color: var(--accent); }
 .forma-icono svg { width: 44px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linejoin: round; stroke-linecap: round; }
 .forma-icono svg * { vector-effect: non-scaling-stroke; }
