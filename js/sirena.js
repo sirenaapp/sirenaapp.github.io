@@ -139,6 +139,8 @@ const el = {
   borderWidthCustom: $('border-width-custom'),
   linesMenu: $('lines-menu'),
   sizeMenu: $('size-menu'),
+  shapeMenu: $('shape-menu'),
+  widthMenu: $('width-menu'),
   shapeModal: $('shape-modal'),
   shapeGrid: $('shape-grid'),
   contextMenu: $('context-menu'),
@@ -668,7 +670,6 @@ function buildSizeMenu() {
     el.sizeOptions.appendChild(boton);
   });
   el.sizeCustom.value = actual;
-  buildWidthMenu();
 }
 
 function buildWidthMenu() {
@@ -679,7 +680,8 @@ function buildWidthMenu() {
     boton.textContent = t(clave) + ' (' + valor + ' px)';
     boton.setAttribute('aria-current', valor === anchoCajas ? 'true' : 'false');
     boton.addEventListener('click', () => {
-      el.sizeMenu.hidden = true;
+      el.widthMenu.hidden = true;
+      cerrarContextual();
       setWidthValue(valor);
     });
     el.widthOptions.appendChild(boton);
@@ -757,7 +759,6 @@ function updateAppearanceVisibility() {
     showdata: tipo === 'pie'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
-  $('ancho-cajas').hidden = !esFlujo;
   updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
   $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
@@ -2697,7 +2698,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -2918,11 +2919,20 @@ function setupEditorTools() {
   };
   el.widthCustom.addEventListener('change', aplicarAncho);
   el.widthCustom.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') { event.preventDefault(); aplicarAncho(); el.sizeMenu.hidden = true; }
+    if (event.key === 'Enter') { event.preventDefault(); aplicarAncho(); el.widthMenu.hidden = true; cerrarContextual(); }
   });
+  // El botón de cajas abre un menú con lo suyo: la forma y el ancho.
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();
-    abrirFormas(null);
+    alternarMenuEditor(el.shapeMenu, $('btn-shape'));
+  });
+  el.shapeMenu.addEventListener('click', (event) => {
+    const boton = event.target.closest('button[data-cajas]');
+    if (!boton) return;
+    event.stopPropagation();
+    cerrarMenusEditor();
+    if (boton.dataset.cajas === 'forma') abrirFormas(null);
+    else alternarMenuEditor(el.widthMenu, $('btn-shape'), buildWidthMenu);
   });
   $('shape-close').addEventListener('click', cerrarFormas);
   el.shapeModal.addEventListener('click', (event) => {
@@ -3782,6 +3792,7 @@ const SUBMENUS = {
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
   tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
+  ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu }
 };
@@ -4002,7 +4013,10 @@ function construirContextual(objeto) {
   titulo.textContent = t('ctxAll');
   entradaSubmenu(menu, objeto, 'colores');
   entradaSubmenu(menu, objeto, 'lineas');
-  if (!$('wrap-shape').hidden) accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
+  if (!$('wrap-shape').hidden) {
+    accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
+    entradaSubmenu(menu, objeto, 'ancho');
+  }
   entradaSubmenu(menu, objeto, 'trazo');
   entradaSubmenu(menu, objeto, 'tamano');
   entradaSubmenu(menu, objeto, 'motor');

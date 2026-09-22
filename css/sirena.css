@@ -292,7 +292,6 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
 .menu-tamano { min-width: 200px; }
-.menu-seccion-ancho { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 
 /* Menú del botón derecho sobre el diagrama: las opciones del objeto señalado. */
 .menu-contextual {

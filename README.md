@@ -20,15 +20,16 @@ propia dirección.
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto, solo del borde o de la flecha de esa línea, escrito en el
   código como línea `style`, clase `classDef` o `linkStyle`; el trazo; el tamaño del texto, de la lista o
-  escrito en píxeles, y en flujo el ancho de las cajas (el punto en que
-  Mermaid corta el texto, `wrappingWidth`); el motor de distribución (dagre
+  escrito en píxeles; el motor de distribución (dagre
   y los nueve algoritmos de ELK que trae Mermaid, cada uno con una línea que
   dice cómo reparte los elementos); y un botón por cada ajuste que ese motor y
   ese tipo de diagrama atienden (líneas, con la forma solo con dagre y el
   grosor de todas las flechas y bordes o de la flecha y el borde donde está el
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
-  numeración de mensajes; valores en sectores), en flujo un botón con las 52
-  formas de caja que dibuja Mermaid, para el elemento donde está el cursor, y
+  numeración de mensajes; valores en sectores), en flujo un botón de cajas con
+  dos entradas, las 52 formas que dibuja Mermaid (para el elemento donde está
+  el cursor o para todas) y el ancho de las cajas (el punto en que Mermaid
+  corta el texto, `wrappingWidth`), y
   un botón que inserta un salto de línea (`<br>`) y otros dos que ponen el
   texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una

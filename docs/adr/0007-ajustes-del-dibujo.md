@@ -35,9 +35,12 @@ donde tienen efecto.
 
 En los diagramas de flujo Mermaid corta el texto de una caja a 120 píxeles
 (`flowchart.wrappingWidth`), de modo que un texto largo sale en una columna
-estrecha y alta. El botón de tamaño del texto ofrece además el ancho de las
-cajas: estrecho (120, el de serie), medio (200), ancho (300), muy ancho (450)
-o un valor escrito a mano entre 60 y 800. Se escribe en la cabecera como
+estrecha y alta. El botón de cajas abre un menú con dos entradas, la forma
+(que lleva a la ventana de formas) y el ancho, con estrecho (120, el de
+serie), medio (200), ancho (300), muy ancho (450) o un valor escrito a mano
+entre 60 y 800. Se puso primero en el botón de tamaño del texto y el autor lo
+pasó al de cajas, por ser una propiedad de la caja y no del texto
+(22-09-2026). El menú del botón derecho sobre el fondo lo ofrece como submenú. Se escribe en la cabecera como
 `"flowchart": {"wrappingWidth": 300}` y solo cuando no es el de serie; se lee
 de ahí al cargar; y no aparece en otros tipos. Medido con un texto de veinte
 palabras: 152×117 a 120, 219×86 a 200, 317×71 a 300.

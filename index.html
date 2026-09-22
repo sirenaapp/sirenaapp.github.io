@@ -6,12 +6,12 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=9808dd4b">
-<script src="lang/es.js?v=fad4ba47"></script>
-<script src="lang/ca.js?v=e8300d84"></script>
-<script src="lang/gl.js?v=dae3264e"></script>
-<script src="lang/eu.js?v=29a3f5ae"></script>
-<script src="lang/en.js?v=c7101365"></script>
+<link rel="stylesheet" href="css/sirena.css?v=837b6c74">
+<script src="lang/es.js?v=64d136c4"></script>
+<script src="lang/ca.js?v=1d3d1adb"></script>
+<script src="lang/gl.js?v=3fb08689"></script>
+<script src="lang/eu.js?v=ad07aa50"></script>
+<script src="lang/en.js?v=99aeb6c2"></script>
 <script src="js/examples.js?v=5afa6fbc"></script>
 <script src="js/sintaxis.js?v=b9ac2a39"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -65,6 +65,7 @@
   <symbol id="i-square" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /></symbol>
   <symbol id="i-pointer" viewBox="0 0 24 24"><path d="M14 4.1 12 6" /> <path d="m5.1 8-2.9-.8" /> <path d="m6 12-1.9 2" /> <path d="M7.2 2.2 8 5.1" /> <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" /></symbol>
   <symbol id="i-salto" viewBox="0 0 24 24"><path d="M20 4v7a4 4 0 0 1-4 4H4" /> <path d="m9 10-5 5 5 5" /></symbol>
+  <symbol id="i-width" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4" /><path d="M2 12h20" /><path d="m6 8-4 4 4 4" /></symbol>
   <symbol id="i-negrita" viewBox="0 0 24 24"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" /></symbol>
   <symbol id="i-cursiva" viewBox="0 0 24 24"><line x1="19" x2="10" y1="4" y2="4" /> <line x1="14" x2="5" y1="20" y2="20" /> <line x1="15" x2="9" y1="4" y2="20" /></symbol>
   <symbol id="i-formula" viewBox="0 0 24 24"><path d="M7 12h2l2 5 2-10h4" /> <rect x="3" y="3" width="18" height="18" rx="2" /></symbol>
@@ -194,11 +195,6 @@
           <p class="menu-titulo" data-i18n="fontSize"></p>
           <div id="size-options"></div>
           <label class="tamano-propio"><span data-i18n="sizeCustom"></span><input type="number" id="size-custom" min="8" max="72" step="1" inputmode="numeric"><span>px</span></label>
-          <div id="ancho-cajas" hidden>
-            <p class="menu-seccion menu-seccion-ancho" data-i18n="boxWidth"></p>
-            <div id="width-options"></div>
-            <label class="tamano-propio"><span data-i18n="widthCustomBox"></span><input type="number" id="width-custom" min="60" max="800" step="10" inputmode="numeric"><span>px</span></label>
-          </div>
         </div>
       </div>
       <span class="tb-sep" id="sep-ajustes" hidden></span>
@@ -225,6 +221,15 @@
       </div>
       <div class="menu-wrap" id="wrap-shape" hidden>
         <button type="button" id="btn-shape" class="tb" data-i18n-title="shapeBtn"><svg><use href="#i-square"></use></svg></button>
+        <div class="menu menu-izq menu-ancho menu-iconos" id="shape-menu" hidden>
+          <button type="button" data-cajas="forma"><svg><use href="#i-square"></use></svg><span><strong data-i18n="shapeMenuForm"></strong><small data-i18n="shapeMenuFormD"></small></span></button>
+          <button type="button" data-cajas="ancho"><svg><use href="#i-width"></use></svg><span><strong data-i18n="boxWidth"></strong><small data-i18n="boxWidthD"></small></span></button>
+        </div>
+        <div class="menu menu-izq menu-opciones menu-tamano" id="width-menu" hidden>
+          <p class="menu-titulo" data-i18n="boxWidth"></p>
+          <div id="width-options"></div>
+          <label class="tamano-propio"><span data-i18n="widthCustomBox"></span><input type="number" id="width-custom" min="60" max="800" step="10" inputmode="numeric"><span>px</span></label>
+        </div>
       </div>
       <div class="menu-wrap" id="wrap-spacing" hidden>
         <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>
@@ -389,6 +394,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=e080f57b"></script>
+<script type="module" src="js/sirena.js?v=fdef5a23"></script>
 </body>
 </html>
