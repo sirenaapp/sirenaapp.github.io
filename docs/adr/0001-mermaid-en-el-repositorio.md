@@ -25,6 +25,9 @@ paquete de npm y sustituye la carpeta, y la versión queda anotada en
 `vendor/mermaid/VERSION`. Después hay que ejecutar
 `scripts/generar-formas-iconos.mjs`, que vuelve a dibujar con el Mermaid
 nuevo las miniaturas del menú de formas (ver [ADR 20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md)).
+También hay que comprobar si Mermaid ya ha corregido el rótulo de flecha
+que deja fuera de su línea y, en ese caso, quitar la corrección de Sirena
+(ver [ADR 26](0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md)).
 
 ## Alternativas descartadas
 

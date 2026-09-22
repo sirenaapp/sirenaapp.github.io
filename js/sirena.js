@@ -1258,6 +1258,49 @@ function ajustarRotulosHtml() {
   currentSvg = svg.outerHTML;
 }
 
+// Con el motor ELK, Mermaid 12 quita el escalón con que una flecha sale de una
+// caja o llega a ella desplazando el tramo largo de la línea, pero deja el
+// rótulo donde estaba, a unos píxeles de la línea (ver ADR 26). Se lleva cada
+// rótulo al punto más cercano de su línea. Ese desplazamiento no pasa nunca de
+// 16 px, así que un rótulo más alejado no se toca.
+function rotulosSobreSuLinea() {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return;
+  let movido = false;
+  svg.querySelectorAll('g.edgeLabel').forEach((rotulo) => {
+    const marca = rotulo.querySelector('[data-id]');
+    const pos = /^translate\(\s*(-?[\d.]+(?:e-?\d+)?)[\s,]+(-?[\d.]+(?:e-?\d+)?)\s*\)$/.exec(rotulo.getAttribute('transform') || '');
+    if (!marca || !pos || !rotulo.textContent.trim()) return;
+    const linea = svg.querySelector(`path[data-id="${CSS.escape(marca.getAttribute('data-id'))}"][data-points]`);
+    if (!linea) return;
+    let puntos;
+    try { puntos = JSON.parse(atob(linea.getAttribute('data-points'))); } catch (_) { return; }
+    if (!Array.isArray(puntos) || puntos.length < 2) return;
+    // El rótulo y la línea pueden estar en grupos distintos: se pasa todo a
+    // las coordenadas de la línea y se vuelve.
+    const deRotulo = rotulo.parentNode.getCTM && rotulo.parentNode.getCTM();
+    const deLinea = linea.getCTM && linea.getCTM();
+    if (!deRotulo || !deLinea) return;
+    const aLinea = deLinea.inverse().multiply(deRotulo);
+    const c = new DOMPoint(parseFloat(pos[1]), parseFloat(pos[2])).matrixTransform(aLinea);
+    let mejor = null;
+    for (let i = 0; i < puntos.length - 1; i++) {
+      const a = puntos[i], b = puntos[i + 1];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const largo = dx * dx + dy * dy;
+      const t = largo ? Math.max(0, Math.min(1, ((c.x - a.x) * dx + (c.y - a.y) * dy) / largo)) : 0;
+      const p = { x: a.x + t * dx, y: a.y + t * dy };
+      const d = Math.hypot(p.x - c.x, p.y - c.y);
+      if (!mejor || d < mejor.d) mejor = { ...p, d };
+    }
+    if (!mejor || mejor.d <= 1 || mejor.d > 16.5) return;
+    const nuevo = new DOMPoint(mejor.x, mejor.y).matrixTransform(aLinea.inverse());
+    rotulo.setAttribute('transform', `translate(${nuevo.x}, ${nuevo.y})`);
+    movido = true;
+  });
+  if (movido) currentSvg = svg.outerHTML;
+}
+
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
@@ -1289,6 +1332,7 @@ async function renderOnce() {
     if (currentSvg.includes('<foreignObject')) {
       ajustarRotulosHtml();
     }
+    rotulosSobreSuLinea();
     prepararEnlaces();
     ocultarAnclas();
     hideEmpty();
