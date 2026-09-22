@@ -1349,6 +1349,76 @@ function updateColorInput() {
 }
 
 // Al cambiar el relleno, el resto se recalcula mientras no se haya tocado a mano.
+// Pasa un color de «rgb(…)» a «#rrggbb»; devuelve null si no es un color
+// plano (por ejemplo, un degradado del trazo «moderno»).
+function colorAHex(valor) {
+  const m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec((valor || '').trim());
+  if (!m) return null;
+  return '#' + [1, 2, 3].map((i) => Number(m[i]).toString(16).padStart(2, '0')).join('');
+}
+
+// Pasa cualquier color de CSS (hsl, rgba, nombre…) a «#rrggbb», usando el
+// propio navegador para resolverlo.
+const sondaColor = document.createElement('span');
+sondaColor.style.display = 'none';
+
+function hexDeCSS(valor) {
+  if (!valor || typeof valor !== 'string') return null;
+  if (/^#[0-9a-f]{6}$/i.test(valor.trim())) return valor.trim().toLowerCase();
+  sondaColor.style.color = '';
+  sondaColor.style.color = valor;
+  if (!sondaColor.style.color) return null;
+  document.body.appendChild(sondaColor);
+  const resuelto = getComputedStyle(sondaColor).color;
+  sondaColor.remove();
+  return colorAHex(resuelto);
+}
+
+// Variables del tema que Mermaid está usando ahora.
+function variablesDelTema() {
+  try {
+    const api = mermaid.mermaidAPI || mermaid;
+    const config = api.getConfig ? api.getConfig() : null;
+    return (config && config.themeVariables) || {};
+  } catch (_) {
+    return {};
+  }
+}
+
+// Colores que el diagrama tiene ahora mismo: los de su cabecera si los lleva,
+// los que se ven dibujados y, si no, los del tema. Así al abrir «Color
+// propio…» se parte de lo que hay y solo se cambia lo que se quiera.
+function cargarColoresActuales() {
+  const encontrado = INIT_RE.exec(el.editor.value);
+  let cabecera = {};
+  if (encontrado) {
+    try { cabecera = (JSON.parse(encontrado[1]).themeVariables) || {}; } catch (_) { cabecera = {}; }
+  }
+  const tema = variablesDelTema();
+  const svg = el.canvas.querySelector('svg');
+  const delDibujo = (selector, prop) => {
+    const nodo = svg && svg.querySelector(selector);
+    return nodo ? colorAHex(getComputedStyle(nodo)[prop]) : null;
+  };
+  const FORMA = '.node rect, .node polygon, .node circle, .node ellipse, .node path';
+  const campos = [
+    [el.colorFill, 'primaryColor', () => delDibujo(FORMA, 'fill')],
+    [el.colorBorder, 'primaryBorderColor', () => delDibujo(FORMA, 'stroke')],
+    [el.colorLine, 'lineColor', () => delDibujo('.edgePaths path, path.flowchart-link, .relation, .transition', 'stroke')],
+    [el.colorText, 'primaryTextColor', () => delDibujo('.nodeLabel, .node text, .node tspan, text', 'fill')],
+    [el.colorLabelBg, 'edgeLabelBackground', () => delDibujo('.edgeLabel rect, .edgeLabel .background', 'fill')]
+  ];
+  campos.forEach(([input, clave, dibujo]) => {
+    const propio = hexDeCSS(cabecera[clave]) || dibujo();
+    const valor = propio || hexDeCSS(tema[clave]);
+    if (valor) input.value = valor;
+    // El fondo de los rótulos se fija al que ya se veía: el tema «base», que
+    // es el que admite colores propios, lo derivaría del relleno y el dibujo
+    // cambiaría solo con abrir este panel.
+    if (clave === 'edgeLabelBackground' && propio) coloresTocados.add('labelbg');
+  });
+}
+
 function deriveColors() {
   if (!coloresTocados.has('border')) el.colorBorder.value = darken(el.colorFill.value, 0.45);
   if (!coloresTocados.has('line')) el.colorLine.value = darken(el.colorFill.value, 0.45);
@@ -2939,7 +3009,7 @@ function setupToolbar() {
       localStorage.setItem(clave, select.value);
       if (select === el.colorSelect && select.value === 'custom') {
         coloresTocados.clear();
-        deriveColors();
+        cargarColoresActuales();
       }
       updateColorInput();
       updateEditorTools();

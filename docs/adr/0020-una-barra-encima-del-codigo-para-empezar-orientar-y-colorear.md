@@ -35,7 +35,10 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   principal de antes (paleta de cinco colores o colores propios de relleno,
   borde, líneas, texto y, desde el 22-09-2026, fondo de los rótulos de
   flecha, `edgeLabelBackground`, que solo se escribe si se ha tocado; el fondo
-  de un solo rótulo no lo permite Mermaid). «Color del elemento donde está el cursor», solo en
+  de un solo rótulo no lo permite Mermaid). Al elegir «Color propio…» los
+  cinco selectores toman los colores que el diagrama tiene en pantalla, leídos
+  del SVG dibujado, de modo que nada cambia hasta que se toca algo; antes
+  partían de un azul fijo y el diagrama cambiaba de golpe. «Color del elemento donde está el cursor», solo en
   flujo, estados, clases y bloques, toma el elemento de la línea del cursor
   (si hay varios, el que está bajo el cursor) o los de las líneas
   seleccionadas, y deja elegir qué se colorea: toda la caja, solo el texto o
