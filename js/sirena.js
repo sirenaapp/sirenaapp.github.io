@@ -113,7 +113,10 @@ const el = {
   syntaxBox: $('syntax-box'),
   downloadMenu: $('download-menu'),
   shareMenu: $('share-menu'),
-  appearanceMenu: $('appearance-menu'),
+  colorMenu: $('color-menu'),
+  strokeMenu: $('stroke-menu'),
+  drawMenu: $('draw-menu'),
+  drawWrap: $('draw-wrap'),
   lookSelect: $('look-select'),
   sizeSelect: $('size-select'),
   colorSelect: $('color-select'),
@@ -128,8 +131,8 @@ const el = {
   dirGroup: $('dir-group'),
   dirMenu: $('dir-menu'),
   dirIcon: $('dir-icon'),
-  colorWrap: $('color-wrap'),
-  nodeColorMenu: $('node-color-menu'),
+  nodeColorBox: $('node-color-box'),
+  colorPartes: $('color-partes'),
   nodeColorTarget: $('node-color-target'),
   swatches: $('swatches'),
   nodeColorCustom: $('node-color-custom'),
@@ -612,7 +615,7 @@ function updateAppearanceVisibility() {
   $('ajuste-padding').hidden = !esFlujo;
   $('ajuste-numbering').hidden = tipo !== 'sequence';
   $('ajuste-showdata').hidden = tipo !== 'pie';
-  $('nota-flujo').hidden = esFlujo;
+  el.drawWrap.hidden = !(esFlujo || tipo === 'sequence' || tipo === 'pie');
   readShowData();
 }
 
@@ -1319,9 +1322,8 @@ function updateEditorTools() {
   el.dirGroup.hidden = !conDireccion;
   $('dir-sep').hidden = !conDireccion;
   if (conDireccion) readDirection();
-  const conColor = COLORABLE.includes(kind);
-  el.colorWrap.hidden = !conColor;
-  $('color-sep').hidden = !conColor;
+  el.nodeColorBox.hidden = !COLORABLE.includes(kind);
+  updateAppearanceVisibility();
 }
 
 // Identificadores de los elementos que hay en las líneas donde está el cursor
@@ -1431,12 +1433,42 @@ function stripNodeColor(lineas, ids) {
 // Escribe el color de los elementos elegidos: una línea style para uno solo;
 // para varios, una clase (classDef) y su asignación, que es la forma que
 // Mermaid recomienda para colorear por categorías.
+// Qué parte del elemento se colorea: toda la caja (relleno, borde y texto a
+// juego), solo el texto o solo el borde.
+let colorParte = 'todo';
+
+// Cambia una propiedad de la línea style de un elemento, creándola si no la
+// tiene y quitando la línea si se queda sin propiedades.
+function setStyleProp(lineas, id, prop, valor, sangria) {
+  const re = new RegExp(`^(\\s*)style\\s+${id}\\s+(.*)$`);
+  const i = lineas.findIndex((l) => re.test(l));
+  if (i >= 0) {
+    const m = re.exec(lineas[i]);
+    const props = m[2].split(',').map((x) => x.trim()).filter((x) => x && !x.startsWith(prop + ':'));
+    if (valor) props.push(`${prop}:${valor}`);
+    if (props.length) lineas[i] = `${m[1]}style ${id} ${props.join(',')}`;
+    else lineas.splice(i, 1);
+  } else if (valor) {
+    lineas.push(`${sangria}style ${id} ${prop}:${valor}`);
+  }
+}
+
 function applyNodeColor(ids, relleno, borde, nombre) {
   const kind = diagramKind();
   const v = nodeColorValues(relleno, borde);
   const estilo = `fill:${v.fill},stroke:${v.stroke},color:${v.color}`;
-  let lineas = stripNodeColor(el.editor.value.replace(/\s+$/, '').split('\n'), ids);
-  const sangria = (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
+  const original = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = (original.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
+  if (colorParte !== 'todo') {
+    // Solo el texto o solo el borde: se toca esa propiedad y nada más.
+    const lineas = original.slice();
+    ids.forEach((id) => setStyleProp(lineas, id, colorParte === 'texto' ? 'color' : 'stroke', relleno, sangria));
+    el.editor.value = lineas.join('\n') + '\n';
+    renderGutter();
+    render();
+    return;
+  }
+  let lineas = stripNodeColor(original, ids);
   if (ids.length === 1 && !nombre) {
     lineas.push(`${sangria}style ${ids[0]} ${estilo}`);
   } else {
@@ -1452,16 +1484,25 @@ function applyNodeColor(ids, relleno, borde, nombre) {
 }
 
 function clearNodeColor(ids) {
-  const lineas = stripNodeColor(el.editor.value.split('\n'), ids);
+  let lineas = el.editor.value.split('\n');
+  if (colorParte !== 'todo') {
+    ids.forEach((id) => setStyleProp(lineas, id, colorParte === 'texto' ? 'color' : 'stroke', null, ''));
+  } else {
+    lineas = stripNodeColor(lineas, ids);
+  }
   el.editor.value = lineas.join('\n');
   renderGutter();
   render();
 }
 
-function openNodeColorMenu() {
+function buildNodeColorSection() {
   const ids = targetNodes();
-  const menu = el.nodeColorMenu;
-  menu.dataset.sinObjetivo = ids.length ? 'false' : 'true';
+  const caja = el.nodeColorBox;
+  caja.dataset.sinObjetivo = ids.length ? 'false' : 'true';
+  caja.dataset.ids = JSON.stringify(ids);
+  el.colorPartes.querySelectorAll('button').forEach((boton) => {
+    boton.setAttribute('aria-current', boton.dataset.parte === colorParte ? 'true' : 'false');
+  });
   el.nodeColorTarget.innerHTML = '';
   if (!ids.length) {
     el.nodeColorTarget.textContent = t('nodeColorNone');
@@ -1472,21 +1513,40 @@ function openNodeColorMenu() {
     el.nodeColorTarget.appendChild(codigo);
   }
   el.swatches.innerHTML = '';
+  // Para el texto y el borde, los colores de la paleta son los del borde,
+  // que son oscuros; el relleno claro no se leería.
   COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.title = t(clave);
     boton.setAttribute('aria-label', t(clave));
-    boton.style.background = vars.primaryColor;
+    const color = colorParte === 'todo' ? vars.primaryColor : vars.primaryBorderColor;
+    boton.style.background = color;
     boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
     boton.addEventListener('click', () => {
-      menu.hidden = true;
-      applyNodeColor(ids, vars.primaryColor, vars.primaryBorderColor, ids.length > 1 ? nombre : null);
+      el.colorMenu.hidden = true;
+      applyNodeColor(ids, color, vars.primaryBorderColor, ids.length > 1 ? nombre : null);
     });
     el.swatches.appendChild(boton);
   });
-  menu.dataset.ids = JSON.stringify(ids);
+}
+
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'drawMenu'];
+
+function cerrarMenusEditor() {
+  MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
+}
+
+// Abre un menú de la barra del editor cerrando los demás; «antes» prepara su
+// contenido cuando se va a abrir.
+function alternarMenuEditor(menu, boton, antes) {
+  const abrir = menu.hidden;
+  cerrarMenusEditor();
+  if (!abrir) return;
+  if (antes) antes();
+  placeMenu(menu, boton);
   menu.hidden = false;
+  ajustarMenuAlPanel(menu);
 }
 
 // Un menú de la barra del editor no debe salirse del panel del código: si su
@@ -1504,42 +1564,48 @@ function setupEditorTools() {
 
   $('btn-type').addEventListener('click', (event) => {
     event.stopPropagation();
-    el.nodeColorMenu.hidden = true;
-    el.dirMenu.hidden = true;
-    placeMenu(el.typeMenu, $('btn-type'));
-    el.typeMenu.hidden = !el.typeMenu.hidden;
-    if (!el.typeMenu.hidden) ajustarMenuAlPanel(el.typeMenu);
+    alternarMenuEditor(el.typeMenu, $('btn-type'));
   });
-  el.typeMenu.addEventListener('click', (event) => event.stopPropagation());
-
-  $('btn-node-color').addEventListener('click', (event) => {
+  $('btn-color').addEventListener('click', (event) => {
     event.stopPropagation();
-    el.typeMenu.hidden = true;
-    el.dirMenu.hidden = true;
-    if (!el.nodeColorMenu.hidden) { el.nodeColorMenu.hidden = true; return; }
-    placeMenu(el.nodeColorMenu, $('btn-node-color'));
-    openNodeColorMenu();
-    ajustarMenuAlPanel(el.nodeColorMenu);
+    alternarMenuEditor(el.colorMenu, $('btn-color'), buildNodeColorSection);
   });
-  el.nodeColorMenu.addEventListener('click', (event) => event.stopPropagation());
+  $('btn-stroke').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.strokeMenu, $('btn-stroke'));
+  });
+  $('btn-draw').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.drawMenu, $('btn-draw'), updateAppearanceVisibility);
+  });
+  MENUS_EDITOR.forEach((clave) => {
+    el[clave].addEventListener('click', (event) => event.stopPropagation());
+  });
+
+  el.colorPartes.querySelectorAll('button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      colorParte = boton.dataset.parte;
+      buildNodeColorSection();
+    });
+  });
 
   el.nodeColorCustom.addEventListener('change', () => {
-    const ids = JSON.parse(el.nodeColorMenu.dataset.ids || '[]');
-    el.nodeColorMenu.hidden = true;
+    const ids = JSON.parse(el.nodeColorBox.dataset.ids || '[]');
+    el.colorMenu.hidden = true;
     const valor = el.nodeColorCustom.value;
     applyNodeColor(ids, valor, null, ids.length > 1 ? nodeColorName(valor) : null);
   });
 
   $('node-color-clear').addEventListener('click', () => {
-    const ids = JSON.parse(el.nodeColorMenu.dataset.ids || '[]');
-    el.nodeColorMenu.hidden = true;
+    const ids = JSON.parse(el.nodeColorBox.dataset.ids || '[]');
+    el.colorMenu.hidden = true;
     clearNodeColor(ids);
   });
 
-  // Al mover el cursor cambia qué elemento se colorearía: si el menú está
-  // abierto, se cierra para no colorear otra cosa sin querer.
+  // Al mover el cursor cambia qué elemento se colorearía: si el menú de color
+  // está abierto, se cierra para no colorear otra cosa sin querer.
   ['keyup', 'click'].forEach((evento) => {
-    el.editor.addEventListener(evento, () => { el.nodeColorMenu.hidden = true; });
+    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; });
   });
 }
 
@@ -2160,10 +2226,7 @@ function setupToolbar() {
     el.langMenu.hidden = true;
     el.downloadMenu.hidden = true;
     el.shareMenu.hidden = true;
-    el.appearanceMenu.hidden = true;
-    el.typeMenu.hidden = true;
-    el.dirMenu.hidden = true;
-    el.nodeColorMenu.hidden = true;
+    cerrarMenusEditor();
   });
 
   $('btn-a11y').addEventListener('click', () => {
@@ -2203,18 +2266,6 @@ function setupToolbar() {
     render();
   });
 
-  $('btn-appearance').addEventListener('click', (event) => {
-    event.stopPropagation();
-    updateAppearanceVisibility();
-    placeMenu(el.appearanceMenu, $('btn-appearance'));
-    el.appearanceMenu.hidden = !el.appearanceMenu.hidden;
-    el.downloadMenu.hidden = true;
-    el.langMenu.hidden = true;
-    el.shareMenu.hidden = true;
-  });
-
-  el.appearanceMenu.addEventListener('click', (event) => event.stopPropagation());
-
   [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size], [el.colorSelect, STORE.color],
    [el.curveSelect, STORE.curve]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
@@ -2231,11 +2282,7 @@ function setupToolbar() {
 
   $('btn-dir').addEventListener('click', (event) => {
     event.stopPropagation();
-    el.typeMenu.hidden = true;
-    el.nodeColorMenu.hidden = true;
-    placeMenu(el.dirMenu, $('btn-dir'));
-    el.dirMenu.hidden = !el.dirMenu.hidden;
-    if (!el.dirMenu.hidden) ajustarMenuAlPanel(el.dirMenu);
+    alternarMenuEditor(el.dirMenu, $('btn-dir'));
   });
   el.dirMenu.addEventListener('click', (event) => event.stopPropagation());
   el.dirMenu.querySelectorAll('button').forEach((boton) => {
@@ -2309,10 +2356,7 @@ function setupToolbar() {
       el.a11yModal.hidden = true;
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
-      el.appearanceMenu.hidden = true;
-      el.typeMenu.hidden = true;
-      el.dirMenu.hidden = true;
-      el.nodeColorMenu.hidden = true;
+      cerrarMenusEditor();
       el.libraryModal.hidden = true;
     }
   });
@@ -2374,7 +2418,7 @@ async function start() {
     updateStatus();
     renderGutter();
     readAppearance();
-    if (!el.appearanceMenu.hidden) updateAppearanceVisibility();
+    if (!el.drawMenu.hidden) updateAppearanceVisibility();
     scheduleRender();
   });
   el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });

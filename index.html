@@ -91,27 +91,6 @@
     <span class="tb-sep"></span>
     <select id="example-select" class="tb-select" data-i18n-title="chooseExample"></select>
     <select id="theme-select" class="tb-select" data-i18n-title="theme"></select>
-    <div class="menu-wrap">
-      <button type="button" id="btn-appearance" class="tb" data-i18n-title="appearance"><svg><use href="#i-sliders"></use></svg></button>
-      <div class="menu menu-ajustes" id="appearance-menu" hidden>
-        <label class="ajuste"><svg aria-hidden="true"><use href="#i-brush"></use></svg><span data-i18n="look"></span><select id="look-select"></select></label>
-        <label class="ajuste"><svg aria-hidden="true"><use href="#i-text-size"></use></svg><span data-i18n="fontSize"></span><select id="size-select"></select></label>
-        <label class="ajuste"><svg aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="color"></span><select id="color-select"></select>
-        </label>
-        <div class="colores-propios" id="colores-propios" hidden>
-          <label class="color-fila"><span data-i18n="colorFill"></span><input type="color" id="color-fill" value="#d0ebff"></label>
-          <label class="color-fila"><span data-i18n="colorBorder"></span><input type="color" id="color-border" value="#1971c2"></label>
-          <label class="color-fila"><span data-i18n="colorLine"></span><input type="color" id="color-line" value="#1971c2"></label>
-          <label class="color-fila"><span data-i18n="colorText"></span><input type="color" id="color-text" value="#17262b"></label>
-          <p class="ajuste-nota" data-i18n="colorHint"></p>
-        </div>
-        <label class="ajuste" id="ajuste-curve"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="curve"></span><select id="curve-select"></select></label>
-        <label class="ajuste" id="ajuste-spacing"><svg aria-hidden="true"><use href="#i-distribute"></use></svg><span data-i18n="spacing"></span><select id="spacing-select"></select></label>
-        <label class="ajuste" id="ajuste-padding"><svg aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="padding"></span><select id="padding-select"></select></label>
-        <label class="ajuste" id="ajuste-numbering"><svg aria-hidden="true"><use href="#i-list-ordered"></use></svg><span data-i18n="numbering"></span><select id="numbering-select"></select></label>
-        <label class="ajuste" id="ajuste-showdata"><svg aria-hidden="true"><use href="#i-hash"></use></svg><span data-i18n="showData"></span><select id="showdata-select"></select></label>
-        <p class="ajuste-nota" id="nota-flujo" data-i18n="onlyFlow"></p>
-      </div>
     </div>
     <span class="tb-sep"></span>
     <button type="button" id="btn-copy-code" class="tb" data-i18n-title="copyCode"><svg><use href="#i-copy"></use></svg></button>
@@ -158,14 +137,48 @@
           <button type="button" data-dir="RL"><svg><use href="#i-arrow-left"></use></svg><span data-i18n="dirRL"></span></button>
         </div>
       </div>
-      <span class="tb-sep" id="color-sep" hidden></span>
-      <div class="menu-wrap" id="color-wrap" hidden>
-        <button type="button" id="btn-node-color" class="tb" data-i18n-title="nodeColor"><svg><use href="#i-paint-bucket"></use></svg></button>
-        <div class="menu menu-izq menu-colores" id="node-color-menu" hidden>
-          <p class="menu-titulo" id="node-color-target"></p>
-          <div class="swatches" id="swatches"></div>
-          <label class="swatch-propio"><input type="color" id="node-color-custom" value="#d0ebff"><span data-i18n="nodeColorCustom"></span></label>
-          <button type="button" id="node-color-clear" data-i18n="nodeColorClear"></button>
+      <span class="tb-sep"></span>
+      <div class="menu-wrap">
+        <button type="button" id="btn-color" class="tb" data-i18n-title="colorMenu"><svg><use href="#i-palette"></use></svg></button>
+        <div class="menu menu-izq menu-ajustes" id="color-menu" hidden>
+          <p class="menu-seccion" data-i18n="colorAll"></p>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="color"></span><select id="color-select"></select></label>
+          <div class="colores-propios" id="colores-propios" hidden>
+            <label class="color-fila"><span data-i18n="colorFill"></span><input type="color" id="color-fill" value="#d0ebff"></label>
+            <label class="color-fila"><span data-i18n="colorBorder"></span><input type="color" id="color-border" value="#1971c2"></label>
+            <label class="color-fila"><span data-i18n="colorLine"></span><input type="color" id="color-line" value="#1971c2"></label>
+            <label class="color-fila"><span data-i18n="colorText"></span><input type="color" id="color-text" value="#17262b"></label>
+            <p class="ajuste-nota" data-i18n="colorHint"></p>
+          </div>
+          <div class="color-elemento" id="node-color-box" hidden>
+            <p class="menu-seccion" data-i18n="nodeColor"></p>
+            <p class="menu-titulo" id="node-color-target"></p>
+            <div class="segmentos" id="color-partes">
+              <button type="button" data-parte="todo" data-i18n="nodeColorAll"></button>
+              <button type="button" data-parte="texto" data-i18n="nodeColorText"></button>
+              <button type="button" data-parte="borde" data-i18n="nodeColorBorder"></button>
+            </div>
+            <div class="swatches" id="swatches"></div>
+            <label class="swatch-propio"><input type="color" id="node-color-custom" value="#d0ebff"><span data-i18n="nodeColorCustom"></span></label>
+            <button type="button" id="node-color-clear" data-i18n="nodeColorClear"></button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button type="button" id="btn-stroke" class="tb" data-i18n-title="strokeMenu"><svg><use href="#i-brush"></use></svg></button>
+        <div class="menu menu-izq menu-ajustes" id="stroke-menu" hidden>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-brush"></use></svg><span data-i18n="look"></span><select id="look-select"></select></label>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-text-size"></use></svg><span data-i18n="fontSize"></span><select id="size-select"></select></label>
+        </div>
+      </div>
+      <div class="menu-wrap" id="draw-wrap" hidden>
+        <button type="button" id="btn-draw" class="tb" data-i18n-title="drawMenu"><svg><use href="#i-sliders"></use></svg></button>
+        <div class="menu menu-izq menu-ajustes" id="draw-menu" hidden>
+          <label class="ajuste" id="ajuste-curve"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="curve"></span><select id="curve-select"></select></label>
+          <label class="ajuste" id="ajuste-spacing"><svg aria-hidden="true"><use href="#i-distribute"></use></svg><span data-i18n="spacing"></span><select id="spacing-select"></select></label>
+          <label class="ajuste" id="ajuste-padding"><svg aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="padding"></span><select id="padding-select"></select></label>
+          <label class="ajuste" id="ajuste-numbering"><svg aria-hidden="true"><use href="#i-list-ordered"></use></svg><span data-i18n="numbering"></span><select id="numbering-select"></select></label>
+          <label class="ajuste" id="ajuste-showdata"><svg aria-hidden="true"><use href="#i-hash"></use></svg><span data-i18n="showData"></span><select id="showdata-select"></select></label>
         </div>
       </div>
     </div>

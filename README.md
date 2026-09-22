@@ -12,16 +12,19 @@ propia dirección.
 ## Qué permite hacer
 
 - Escribir el diagrama como texto y verlo dibujado al momento. Encima del
-  código hay una barra para quien empieza: un botón que escribe la línea que
-  define el tipo de diagrama (con los 22 tipos agrupados como los ejemplos, el mapa conceptual entre ellos),
-  un desplegable con las cuatro orientaciones en los diagramas que la admiten, y un
-  botón que colorea el elemento donde está el cursor (o los elementos
-  seleccionados) escribiendo en el código la línea `style` o la clase
-  `classDef` correspondiente.
+  código hay una barra con todo lo que cambia el dibujo, repartido por temas:
+  un botón que escribe la línea que define el tipo de diagrama (con los 22
+  tipos agrupados como los ejemplos, el mapa conceptual entre ellos); un
+  desplegable con las cuatro orientaciones, en los diagramas que la admiten;
+  el menú de colores, con el color principal de todo el diagrama y el color
+  del elemento donde está el cursor (o de los seleccionados), de toda la caja,
+  solo del texto o solo del borde, escrito en el código como línea `style` o
+  clase `classDef`; el menú de trazo y texto; y el de ajustes del dibujo, con
+  lo propio de cada tipo.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
-- Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de
-  aspecto, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
+- Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en la barra
+  del editor, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
   color principal (una paleta de cinco colores, o uno propio con selector
   independiente para el relleno, el borde, las líneas y el texto) y, en los
   diagramas de

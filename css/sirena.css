@@ -298,8 +298,29 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-tipos .menu-grupo:first-child { margin-top: 4px; }
 .menu-tipos code { color: var(--text-soft); font-size: 11.5px; }
 
-.menu-colores { min-width: 220px; padding: 10px; }
+.menu-seccion {
+  margin: 0 0 8px;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.color-elemento { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border); }
 .menu-titulo { margin: 0 0 8px; color: var(--text-soft); font-size: 12px; line-height: 1.4; }
+.segmentos { display: flex; gap: 4px; margin-bottom: 8px; }
+.menu .segmentos button {
+  flex: 1;
+  width: auto;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+.menu .segmentos button[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 .menu-titulo code { color: var(--accent); }
 .swatches { display: flex; gap: 6px; margin-bottom: 8px; }
 .swatches button {
@@ -319,10 +340,11 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   cursor: pointer;
 }
 .swatch-propio input { width: 30px; height: 30px; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: none; cursor: pointer; }
-.menu-colores > button { color: var(--text-soft); font-size: 12.5px; }
-.menu-colores[data-sin-objetivo="true"] .swatches,
-.menu-colores[data-sin-objetivo="true"] .swatch-propio,
-.menu-colores[data-sin-objetivo="true"] > button { display: none; }
+.color-elemento > button { color: var(--text-soft); font-size: 12.5px; }
+.color-elemento[data-sin-objetivo="true"] .segmentos,
+.color-elemento[data-sin-objetivo="true"] .swatches,
+.color-elemento[data-sin-objetivo="true"] .swatch-propio,
+.color-elemento[data-sin-objetivo="true"] > button { display: none; }
 
 /* --- Pestañas en pantalla pequeña --- */
 
