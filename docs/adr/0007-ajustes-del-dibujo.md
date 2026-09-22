@@ -69,6 +69,15 @@ con el color que tenían en el dibujo, para que solo cambie el que se ha
 tocado, y un botón devuelve los de serie. El menú se presta al botón derecho
 sobre el fondo, como los demás.
 
+## Tipografía (22-09-2026)
+
+El menú de tamaño del texto lleva también la tipografía (`fontFamily` en la
+cabecera): la del sistema, que es la que fija Sirena de serie, con remates,
+monoespaciada y manuscrita, más un campo para escribir otra. Son familias
+genéricas, que existen en cualquier equipo y salen en el PNG (comprobado en
+Chromium y Firefox con las cuatro); cada opción se muestra con su propia
+letra. Punto 5 del inventario de lo que Mermaid permite.
+
 ## Consecuencias
 
 Al elegir un color principal, el dibujo pasa al tema base de Mermaid, porque es

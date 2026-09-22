@@ -63,6 +63,11 @@ const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL
 // Ancho al que Mermaid corta el texto de las cajas de flujo (wrappingWidth);
 // 120 es su valor de serie. Se escribe en la cabecera, como el resto.
 const WIDTHS = [['120', 'widthNarrow'], ['200', 'widthMedium'], ['300', 'widthWide'], ['450', 'widthXWide']];
+// Tipografía del diagrama (fontFamily en la cabecera). Familias genéricas,
+// que existen en cualquier equipo y salen en el PNG; la de serie es la del
+// sistema, que fija initMermaid.
+const FONTS = [['', 'fontDefault'], ['serif', 'fontSerif'], ['monospace', 'fontMono'], ['cursive', 'fontHand']];
+let fuenteActual = '';
 let anchoCajas = '120';
 // Las líneas y la separación solo las atiende el motor dagre. Mermaid 12 usa elk
 // por defecto, que las ignora y traza en ángulo recto. Sirena lo respeta y, en
@@ -179,6 +184,8 @@ const el = {
   pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
   widthOptions: $('width-options'),
+  fontOptions: $('font-options'),
+  fontCustom: $('font-custom'),
   widthCustom: $('width-custom'),
   sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
@@ -707,6 +714,31 @@ function buildSizeMenu() {
     el.sizeOptions.appendChild(boton);
   });
   el.sizeCustom.value = actual;
+  buildFontMenu();
+}
+
+// Cada tipografía se muestra con su propia letra, para verla antes de elegir.
+function buildFontMenu() {
+  el.fontOptions.innerHTML = '';
+  FONTS.forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = t(clave);
+    if (valor) boton.style.fontFamily = valor;
+    boton.setAttribute('aria-current', valor === fuenteActual ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      el.sizeMenu.hidden = true;
+      cerrarContextual();
+      setFontValue(valor);
+    });
+    el.fontOptions.appendChild(boton);
+  });
+  el.fontCustom.value = fuenteActual;
+}
+
+function setFontValue(valor) {
+  fuenteActual = String(valor || '').trim();
+  el.sizeSelect.dispatchEvent(new Event('change'));
 }
 
 function buildWidthMenu() {
@@ -1494,6 +1526,7 @@ function appearanceConfig() {
   const config = {};
   const variables = {};
   if (el.lookSelect.value && el.lookSelect.value !== 'classic') config.look = el.lookSelect.value;
+  if (fuenteActual) config.fontFamily = fuenteActual;
   if (el.sizeSelect.value && el.sizeSelect.value !== '16') variables.fontSize = el.sizeSelect.value + 'px';
   const color = colorVariables(el.colorSelect.value);
   if (color) {
@@ -1811,6 +1844,7 @@ function readAppearance() {
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   anchoCajas = String(flujo.wrappingWidth || 120);
+  fuenteActual = config.fontFamily || '';
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readShowData();
   // Si el menú del calendario está abierto mientras cambia el código, se relee.
@@ -3407,6 +3441,11 @@ function setupEditorTools() {
   el.sizeCustom.addEventListener('change', aplicarTamano);
   el.sizeCustom.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') { event.preventDefault(); aplicarTamano(); el.sizeMenu.hidden = true; }
+  });
+  const aplicarFuente = () => { setFontValue(el.fontCustom.value); buildFontMenu(); };
+  el.fontCustom.addEventListener('change', aplicarFuente);
+  el.fontCustom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); aplicarFuente(); el.sizeMenu.hidden = true; }
   });
   const aplicarAncho = () => {
     const n = Math.round(Number(el.widthCustom.value));

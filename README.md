@@ -20,7 +20,8 @@ propia dirección.
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto, solo del borde o de la flecha de esa línea, escrito en el
   código como línea `style`, clase `classDef` o `linkStyle`; el trazo; el tamaño del texto, de la lista o
-  escrito en píxeles; el motor de distribución (dagre
+  escrito en píxeles, y la tipografía (la del sistema, con remates,
+  monoespaciada, manuscrita u otra); el motor de distribución (dagre
   y los nueve algoritmos de ELK que trae Mermaid, cada uno con una línea que
   dice cómo reparte los elementos); y un botón por cada ajuste que ese motor y
   ese tipo de diagrama atienden (líneas, con la forma solo con dagre, el
