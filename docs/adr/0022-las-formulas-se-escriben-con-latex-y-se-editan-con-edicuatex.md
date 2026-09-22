@@ -54,7 +54,11 @@ también fuera de Sirena, así que vienen de Mermaid 12:
   rombos y círculos, que solo ofrecen toda su anchura en el centro) y se
   compone en bloque, que es lo que hace que el texto se reparta. Si aun así no
   cabe, porque una fórmula no se puede partir en dos líneas, se encoge un poco
-  la letra antes que cortar nada.
+  la letra antes que cortar nada. Si el texto ocupa más líneas de las que
+  Mermaid contaba, la caja se estira para que no se salga.
+- En un rótulo con fórmula rehace el contenido como una fila y se come los
+  `<br>`. Antes de dibujar se cambian por una marca invisible, que viaja como
+  texto normal, y después se vuelven a poner como saltos de verdad.
 
 ## Alternativas descartadas
 

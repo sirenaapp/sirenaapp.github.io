@@ -827,6 +827,46 @@ function hayFormulas(codigo) {
   return FORMULA_RE.test(codigo === undefined ? el.editor.value : codigo);
 }
 
+// Cuando un rótulo lleva fórmula, Mermaid lo rehace como una fila y se come
+// los <br>. Se cambian por una marca que sobrevive al viaje (es texto normal)
+// y, ya dibujado, se vuelven a poner como saltos de verdad.
+// Un separador invisible: si algo fallara y no se restaurase, no se vería.
+const MARCA_SALTO = '\u2063\u2063\u2063';
+
+function marcarSaltos(codigo) {
+  // Lo que va entre $$ es la fórmula y no se toca.
+  return codigo.split(/(\$\$[\s\S]*?\$\$)/).map((trozo, i) => (
+    i % 2 ? trozo : trozo.replace(/<br\s*\/?>/gi, MARCA_SALTO)
+  )).join('');
+}
+
+function restaurarSaltos(dentro) {
+  const textos = [];
+  const paseo = document.createTreeWalker(dentro, NodeFilter.SHOW_TEXT);
+  while (paseo.nextNode()) textos.push(paseo.currentNode);
+  let hubo = false;
+  textos.forEach((nodo) => {
+    if (!nodo.nodeValue.includes(MARCA_SALTO)) return;
+    hubo = true;
+    const trozos = nodo.nodeValue.split(MARCA_SALTO);
+    const piezas = document.createDocumentFragment();
+    trozos.forEach((trozo, i) => {
+      if (i) piezas.appendChild(document.createElement('br'));
+      piezas.appendChild(document.createTextNode(trozo));
+    });
+    nodo.replaceWith(piezas);
+  });
+  if (!hubo) return false;
+  // La fila que arma Mermaid no deja saltar de línea: se pasa a bloque.
+  dentro.querySelectorAll('div').forEach((caja) => {
+    if (getComputedStyle(caja).display !== 'flex') return;
+    caja.style.display = 'block';
+    caja.style.whiteSpace = 'normal';
+    caja.style.textAlign = 'center';
+  });
+  return true;
+}
+
 function initMermaid() {
   const conFormulas = hayFormulas();
   mermaidConFormulas = conFormulas;
@@ -968,6 +1008,10 @@ function ajustarRotulosHtml() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;
   let ajustado = false;
+  svg.querySelectorAll('.edgeLabel foreignObject, .edgeLabels foreignObject').forEach((hueco) => {
+    const dentro = hueco.firstElementChild;
+    if (dentro && restaurarSaltos(dentro)) ajustado = true;
+  });
   svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
     const nodo = hueco.closest('g.node') || hueco.closest('g[class*="node"]');
     const forma = nodo && nodo.querySelector('rect, polygon, ellipse, circle, path');
@@ -982,6 +1026,7 @@ function ajustarRotulosHtml() {
     const alto = parseFloat(hueco.getAttribute('height')) || 0;
     const x = parseFloat(hueco.getAttribute('x')) || 0;
     const y = parseFloat(hueco.getAttribute('y')) || 0;
+    restaurarSaltos(dentro);
     dentro.style.display = 'block';
     dentro.style.width = disponible + 'px';
     dentro.style.maxWidth = disponible + 'px';
@@ -1002,6 +1047,14 @@ function ajustarRotulosHtml() {
     if (altoNuevo > alto + 1) {
       hueco.setAttribute('height', altoNuevo);
       hueco.setAttribute('y', y - (altoNuevo - alto) / 2);
+      // Si el texto ocupa más líneas de las que Mermaid contaba, la caja se
+      // estira para que no se salga.
+      if (forma.tagName === 'rect' && altoNuevo + 10 > caja.height) {
+        const altoCaja = parseFloat(forma.getAttribute('height')) || caja.height;
+        const crece = altoNuevo + 10 - caja.height;
+        forma.setAttribute('height', altoCaja + crece);
+        forma.setAttribute('y', (parseFloat(forma.getAttribute('y')) || 0) - crece / 2);
+      }
     }
     ajustado = true;
   });
@@ -1030,7 +1083,7 @@ async function renderOnce() {
   const token = ++renderToken;
   try {
     const id = 'sirena-diagram-' + token;
-    const { svg } = await mermaid.render(id, code);
+    const { svg } = await mermaid.render(id, mermaidConFormulas ? marcarSaltos(code) : code);
     if (token !== renderToken) return;
     currentSvg = opaqueEdgeLabels(svg, id);
     el.canvas.innerHTML = currentSvg;
