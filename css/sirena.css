@@ -292,6 +292,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
 .menu-tamano { min-width: 200px; }
+.menu-seccion-ancho { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 
 /* Menú del botón derecho sobre el diagrama: las opciones del objeto señalado. */
 .menu-contextual {
@@ -491,6 +492,15 @@ body > div[id^="dsirena-diagram-"] {
      Gantt) se dibujan según el ancho disponible, y así salen a su medida. */
   width: var(--ancho-medida, 100vw);
   pointer-events: none;
+}
+
+/* Al medir un rótulo con fórmula, Mermaid lo arma como una fila que no salta
+   de línea, y la caja sale tan ancha como el texto entero. Aquí se le deja
+   partir, de modo que la medida respete el ancho de corte (wrappingWidth). */
+body > div[id^="dsirena-diagram-"] .label > span > div,
+body > div[id^="dsirena-diagram-"] .nodeLabel > div {
+  display: block !important;
+  white-space: normal !important;
 }
 
 /* Puntos de anclaje de una caja: salen al pasar el ratón y de ellos se

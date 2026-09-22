@@ -60,6 +60,10 @@ const PNG_FONDOS = [['tema', 'bgTheme'], ['blanco', 'bgWhite'], ['transparente',
 // Ajustes del dibujo: cada uno es un valor de configuración de Mermaid.
 const LOOKS = [['classic', 'lookClassic'], ['handDrawn', 'lookHand'], ['neo', 'lookNeo']];
 const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL']];
+// Ancho al que Mermaid corta el texto de las cajas de flujo (wrappingWidth);
+// 120 es su valor de serie. Se escribe en la cabecera, como el resto.
+const WIDTHS = [['120', 'widthNarrow'], ['200', 'widthMedium'], ['300', 'widthWide'], ['450', 'widthXWide']];
+let anchoCajas = '120';
 // Las líneas y la separación solo las atiende el motor dagre. Mermaid 12 usa elk
 // por defecto, que las ignora y traza en ángulo recto. Sirena lo respeta y, en
 // los diagramas de flujo, escribe siempre el motor en la cabecera (ADR 12).
@@ -145,6 +149,8 @@ const el = {
   guia: $('guia'),
   pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
+  widthOptions: $('width-options'),
+  widthCustom: $('width-custom'),
   sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
   lineTarget: $('line-target'),
@@ -662,6 +668,29 @@ function buildSizeMenu() {
     el.sizeOptions.appendChild(boton);
   });
   el.sizeCustom.value = actual;
+  buildWidthMenu();
+}
+
+function buildWidthMenu() {
+  el.widthOptions.innerHTML = '';
+  WIDTHS.forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = t(clave) + ' (' + valor + ' px)';
+    boton.setAttribute('aria-current', valor === anchoCajas ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      el.sizeMenu.hidden = true;
+      setWidthValue(valor);
+    });
+    el.widthOptions.appendChild(boton);
+  });
+  el.widthCustom.value = anchoCajas;
+}
+
+function setWidthValue(valor) {
+  anchoCajas = String(valor);
+  // El mismo camino que el tamaño del texto: se reescribe la cabecera y se dibuja.
+  el.sizeSelect.dispatchEvent(new Event('change'));
 }
 
 function buildAppearanceSelects() {
@@ -728,6 +757,7 @@ function updateAppearanceVisibility() {
     showdata: tipo === 'pie'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  $('ancho-cajas').hidden = !esFlujo;
   updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
   $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
@@ -1440,6 +1470,7 @@ function appearanceConfig() {
   if (el.paddingSelect.value && el.paddingSelect.value !== '20') {
     flowchart.diagramPadding = Number(el.paddingSelect.value);
   }
+  if (esFlujo && anchoCajas !== '120') flowchart.wrappingWidth = Number(anchoCajas);
   if (Object.keys(flowchart).length) config.flowchart = flowchart;
   if (el.numberingSelect.value === 'yes') config.sequence = { showSequenceNumbers: true };
   return config;
@@ -1526,6 +1557,7 @@ function readAppearance() {
   readLineWidths();
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
+  anchoCajas = String(flujo.wrappingWidth || 120);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readShowData();
   updateEditorTools();
@@ -2877,6 +2909,16 @@ function setupEditorTools() {
   el.sizeCustom.addEventListener('change', aplicarTamano);
   el.sizeCustom.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') { event.preventDefault(); aplicarTamano(); el.sizeMenu.hidden = true; }
+  });
+  const aplicarAncho = () => {
+    const n = Math.round(Number(el.widthCustom.value));
+    if (!n || n < 60 || n > 800) return;
+    setWidthValue(n);
+    buildWidthMenu();
+  };
+  el.widthCustom.addEventListener('change', aplicarAncho);
+  el.widthCustom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); aplicarAncho(); el.sizeMenu.hidden = true; }
   });
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();

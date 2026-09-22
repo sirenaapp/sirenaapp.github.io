@@ -6,12 +6,12 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=e3337de4">
-<script src="lang/es.js?v=6e65fbff"></script>
-<script src="lang/ca.js?v=2ea8b437"></script>
-<script src="lang/gl.js?v=ed8c81c4"></script>
-<script src="lang/eu.js?v=e35619f6"></script>
-<script src="lang/en.js?v=a8880c0a"></script>
+<link rel="stylesheet" href="css/sirena.css?v=9808dd4b">
+<script src="lang/es.js?v=fad4ba47"></script>
+<script src="lang/ca.js?v=e8300d84"></script>
+<script src="lang/gl.js?v=dae3264e"></script>
+<script src="lang/eu.js?v=29a3f5ae"></script>
+<script src="lang/en.js?v=c7101365"></script>
 <script src="js/examples.js?v=5afa6fbc"></script>
 <script src="js/sintaxis.js?v=b9ac2a39"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -194,6 +194,11 @@
           <p class="menu-titulo" data-i18n="fontSize"></p>
           <div id="size-options"></div>
           <label class="tamano-propio"><span data-i18n="sizeCustom"></span><input type="number" id="size-custom" min="8" max="72" step="1" inputmode="numeric"><span>px</span></label>
+          <div id="ancho-cajas" hidden>
+            <p class="menu-seccion menu-seccion-ancho" data-i18n="boxWidth"></p>
+            <div id="width-options"></div>
+            <label class="tamano-propio"><span data-i18n="widthCustomBox"></span><input type="number" id="width-custom" min="60" max="800" step="10" inputmode="numeric"><span>px</span></label>
+          </div>
         </div>
       </div>
       <span class="tb-sep" id="sep-ajustes" hidden></span>
@@ -384,6 +389,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=85d276a5"></script>
+<script type="module" src="js/sirena.js?v=e080f57b"></script>
 </body>
 </html>

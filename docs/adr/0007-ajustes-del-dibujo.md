@@ -31,6 +31,24 @@ donde tienen efecto.
 - **Un panel de opciones siempre visible.** Descartado por no llenar la barra,
   que en el móvil ya ocupa varias filas.
 
+## Ancho de las cajas (22-09-2026)
+
+En los diagramas de flujo Mermaid corta el texto de una caja a 120 píxeles
+(`flowchart.wrappingWidth`), de modo que un texto largo sale en una columna
+estrecha y alta. El botón de tamaño del texto ofrece además el ancho de las
+cajas: estrecho (120, el de serie), medio (200), ancho (300), muy ancho (450)
+o un valor escrito a mano entre 60 y 800. Se escribe en la cabecera como
+`"flowchart": {"wrappingWidth": 300}` y solo cuando no es el de serie; se lee
+de ahí al cargar; y no aparece en otros tipos. Medido con un texto de veinte
+palabras: 152×117 a 120, 219×86 a 200, 317×71 a 300.
+
+Una caja con fórmula no lo respetaba, porque Mermaid la mide como una fila
+sin saltos de línea antes de que Sirena la recomponga
+([ADR 22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md)).
+Se deja partir ya en el elemento de medida, con una regla de CSS, y con eso
+la caja con fórmula sale al mismo ancho que las demás (482 frente a 813 a
+450 píxeles).
+
 ## Consecuencias
 
 Al elegir un color principal, el dibujo pasa al tema base de Mermaid, porque es
