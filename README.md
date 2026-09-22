@@ -11,7 +11,13 @@ propia dirección.
 
 ## Qué permite hacer
 
-- Escribir el diagrama como texto y verlo dibujado al momento.
+- Escribir el diagrama como texto y verlo dibujado al momento. Encima del
+  código hay una barra para quien empieza: un botón que escribe la línea que
+  define el tipo de diagrama (con los 24 tipos agrupados como los ejemplos),
+  cuatro flechas para la orientación en los diagramas que la admiten, y un
+  botón que colorea el elemento donde está el cursor (o los elementos
+  seleccionados) escribiendo en el código la línea `style` o la clase
+  `classDef` correspondiente.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de

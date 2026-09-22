@@ -123,7 +123,14 @@ const el = {
   colorBorder: $('color-border'),
   colorLine: $('color-line'),
   colorText: $('color-text'),
-  directionSelect: $('direction-select'),
+  typeLabel: $('type-label'),
+  typeMenu: $('type-menu'),
+  dirGroup: $('dir-group'),
+  colorWrap: $('color-wrap'),
+  nodeColorMenu: $('node-color-menu'),
+  nodeColorTarget: $('node-color-target'),
+  swatches: $('swatches'),
+  nodeColorCustom: $('node-color-custom'),
   spacingSelect: $('spacing-select'),
   paddingSelect: $('padding-select'),
   numberingSelect: $('numbering-select'),
@@ -505,6 +512,8 @@ function applyLang(code) {
   buildAppearanceSelects();
   buildExportSelects();
   buildLangMenu();
+  buildTypeMenu();
+  updateEditorTools();
   updateStatus();
 }
 
@@ -556,7 +565,6 @@ function buildAppearanceSelects() {
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'elk');
-  fillSelect(el.directionSelect, DIRECTIONS, null, 'TD');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
@@ -590,21 +598,19 @@ function diagramKind() {
   if (/^\s*erDiagram\b/m.test(code)) return 'er';
   if (/^\s*sequenceDiagram\b/m.test(code)) return 'sequence';
   if (/^\s*pie\b/m.test(code)) return 'pie';
+  if (/^\s*block(-beta)?\b/m.test(code)) return 'block';
   return 'otro';
 }
 
 function updateAppearanceVisibility() {
   const tipo = diagramKind();
   const esFlujo = tipo === 'flowchart';
-  const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(tipo);
   $('ajuste-curve').hidden = !esFlujo;
   $('ajuste-spacing').hidden = !esFlujo || el.curveSelect.value === 'elk';
   $('ajuste-padding').hidden = !esFlujo;
-  $('ajuste-direction').hidden = !conDireccion;
   $('ajuste-numbering').hidden = tipo !== 'sequence';
   $('ajuste-showdata').hidden = tipo !== 'pie';
   $('nota-flujo').hidden = esFlujo;
-  readDirection();
   readShowData();
 }
 
@@ -750,7 +756,7 @@ async function renderOnce() {
   updateStatus();
   renderGutter();
 
-  if (!code) {
+  if (!code || soloCabecera(code)) {
     currentSvg = '';
     el.canvas.innerHTML = '';
     showEmpty();
@@ -1047,9 +1053,8 @@ function appearanceConfig() {
 
 // La dirección vive en el cuerpo del diagrama: en la primera línea de los de
 // flujo (flowchart TD) y en una línea «direction» en los demás que la admiten.
-function writeDirection() {
+function writeDirection(valor) {
   const tipo = diagramKind();
-  const valor = el.directionSelect.value || 'TD';
   const cabecera = INIT_RE.exec(el.editor.value);
   const inicio = cabecera ? cabecera[0] : '';
   let cuerpo = el.editor.value.slice(inicio.length);
@@ -1071,13 +1076,17 @@ function writeDirection() {
   el.editor.value = inicio + cuerpo;
 }
 
-// Lee del código la dirección que ya tenga, para colocar el selector.
+// Lee del código la dirección que ya tenga, para marcar el botón que toca.
 function readDirection() {
   const cuerpo = el.editor.value.replace(INIT_RE, '');
   const flujo = /^\s*(?:flowchart|graph)\b[ \t]*(TB|TD|BT|LR|RL)\b/m.exec(cuerpo);
   const suelta = /^[ \t]*direction[ \t]+(TB|TD|BT|LR|RL)[ \t]*$/m.exec(cuerpo);
   const valor = (flujo && flujo[1]) || (suelta && suelta[1]) || 'TD';
-  el.directionSelect.value = valor === 'TB' ? 'TD' : valor;
+  const actual = valor === 'TB' ? 'TD' : valor;
+  el.dirGroup.querySelectorAll('button').forEach((boton) => {
+    boton.setAttribute('aria-current', boton.dataset.dir === actual ? 'true' : 'false');
+  });
+  return actual;
 }
 
 // «Mostrar los valores» es una palabra del propio diagrama de sectores.
@@ -1117,8 +1126,8 @@ function readAppearance() {
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
-  readDirection();
   readShowData();
+  updateEditorTools();
   el.sizeSelect.value = variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16';
 
   const primario = variables.primaryColor || '';
@@ -1201,6 +1210,314 @@ function buildSyntaxBox() {
       el.helpModal.hidden = true;
     });
     el.syntaxBox.appendChild(boton);
+  });
+}
+
+/* --- Barra de herramientas del editor --- */
+
+// Tipos que se ofrecen al empezar, con la línea que los define. Los nombres
+// salen de los ejemplos, que ya están en los cinco idiomas.
+const TYPE_HEADERS = {
+  flowchart: 'flowchart TD', state: 'stateDiagram-v2', gitgraph: 'gitGraph', ishikawa: 'ishikawa-beta',
+  gantt: 'gantt', timeline: 'timeline', journey: 'journey',
+  mindmap: 'mindmap', venn: 'venn-beta', class: 'classDiagram', er: 'erDiagram', treemap: 'treemap-beta',
+  pie: 'pie', xychart: 'xychart-beta', radar: 'radar-beta', quadrant: 'quadrantChart', sankey: 'sankey-beta',
+  sequence: 'sequenceDiagram', block: 'block-beta', kanban: 'kanban', architecture: 'architecture-beta'
+};
+
+// Tipos en los que se puede colorear un elemento suelto.
+const COLORABLE = ['flowchart', 'state', 'class', 'block'];
+
+// Un código que solo tiene la línea que define el tipo (más comentarios y
+// textos accesibles) todavía no es un diagrama: se muestra como vacío en vez
+// de con un error que despistaría a quien acaba de empezar.
+function soloCabecera(code) {
+  const lineas = code.split('\n').filter((l) => l.trim() && !/^\s*%%/.test(l) && !/^\s*acc(Title|Descr)\b/.test(l));
+  return lineas.length <= 1;
+}
+
+// Tipo que hay en el editor, según la chuleta de sintaxis (que distingue más
+// tipos que diagramKind, pensada solo para los ajustes del dibujo).
+function editorType() {
+  const tipo = currentSyntax();
+  return tipo ? tipo.id : null;
+}
+
+function typeLabelFor(id) {
+  const item = findExample(id);
+  return item ? (item.label[lang] || item.label.es) : id;
+}
+
+function buildTypeMenu() {
+  el.typeMenu.innerHTML = '';
+  (window.SIRENA_EXAMPLES || []).forEach((grupo) => {
+    const items = grupo.items.filter((item) => TYPE_HEADERS[item.id]);
+    if (!items.length) return;
+    const titulo = document.createElement('p');
+    titulo.className = 'menu-grupo';
+    titulo.textContent = grupo.group[lang] || grupo.group.es;
+    el.typeMenu.appendChild(titulo);
+    items.forEach((item) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.dataset.tipo = item.id;
+      const nombre = document.createElement('span');
+      nombre.textContent = item.label[lang] || item.label.es;
+      const codigo = document.createElement('code');
+      codigo.textContent = TYPE_HEADERS[item.id];
+      boton.append(nombre, codigo);
+      boton.addEventListener('click', () => {
+        el.typeMenu.hidden = true;
+        startType(item.id);
+      });
+      el.typeMenu.appendChild(boton);
+    });
+  });
+}
+
+// Escribe la línea que define el tipo. Con el editor vacío se inserta ahí; si
+// ya hay un diagrama, se abre uno nuevo y el anterior se queda en la biblioteca.
+function startType(id) {
+  const cabecera = TYPE_HEADERS[id] + '\n    ';
+  if (el.editor.value.trim()) {
+    crearDoc(cabecera, typeLabelFor(id));
+  }
+  el.editor.value = cabecera;
+  history.replaceState(null, '', location.pathname);
+  readAppearance();
+  renderGutter();
+  render();
+  el.editor.focus();
+  el.editor.setSelectionRange(cabecera.length, cabecera.length);
+}
+
+function updateEditorTools() {
+  const tipo = editorType();
+  el.typeLabel.textContent = tipo && TYPE_HEADERS[tipo] ? typeLabelFor(tipo) : t('typeBtn');
+  const kind = diagramKind();
+  const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(kind);
+  el.dirGroup.hidden = !conDireccion;
+  $('dir-sep').hidden = !conDireccion;
+  if (conDireccion) readDirection();
+  const conColor = COLORABLE.includes(kind);
+  el.colorWrap.hidden = !conColor;
+  $('color-sep').hidden = !conColor;
+}
+
+// Identificadores de los elementos que hay en las líneas donde está el cursor
+// (o la selección), según el tipo de diagrama.
+function targetNodes() {
+  const kind = diagramKind();
+  const texto = el.editor.value;
+  const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
+  let hasta = texto.indexOf('\n', el.editor.selectionEnd);
+  if (hasta === -1) hasta = texto.length;
+  const lineas = texto.slice(desde, hasta).split('\n');
+  const columna = el.editor.selectionStart - desde;
+  const ids = [];
+  const RESERVADAS = new Set(['subgraph', 'end', 'direction', 'style', 'classDef', 'class', 'click', 'linkStyle',
+    'note', 'state', 'columns', 'space', 'block', 'cssClass', 'namespace', 'callback', 'link']);
+  lineas.forEach((linea) => {
+    const limpia = linea.replace(/%%.*$/, '').trim();
+    if (!limpia || /^(flowchart|graph|stateDiagram|classDiagram|block|accTitle|accDescr)/.test(limpia)) return;
+    const primera = limpia.split(/\s+/)[0];
+    let candidatos = [];
+    if (kind === 'class' && primera === 'class') {
+      candidatos = [limpia.replace(/^class\s+/, '')];
+    } else if (kind === 'state' && primera === 'state') {
+      const alias = /\bas\s+([\w-]+)/.exec(limpia);
+      candidatos = alias ? [alias[1]] : [];
+    } else if (RESERVADAS.has(primera)) {
+      return;
+    } else if (kind === 'flowchart' || kind === 'block') {
+      // Quita rótulos de flechas y textos entre delimitadores, y separa por flechas y &.
+      const sinTextos = limpia
+        .replace(/"[^"]*"/g, '""')
+        .replace(/--\s[^-]*?\s-->/g, '-->').replace(/\|[^|]*\|/g, '')
+        .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|>[^\]]*\]/g, '');
+      candidatos = sinTextos.split(/\s*(?:<?-{2,}>?|-\.+->?|={2,}>?|~{3,}|o--o|x--x|&)\s*/);
+    } else if (kind === 'state') {
+      candidatos = limpia.replace(/:.*$/, '').split(/\s*-->\s*/);
+    } else if (kind === 'class') {
+      candidatos = limpia.replace(/:.*$/, '').replace(/"[^"]*"/g, '').split(/\s*(?:<\|--|--\|>|<\|\.\.|\.\.\|>|\*--|--\*|o--|--o|<--|-->|<\.\.|\.\.>|--|\.\.)\s*/);
+    }
+    candidatos.forEach((c) => {
+      const m = /^([A-Za-z0-9_][\w-]*)/.exec(c.trim());
+      if (m && m[1] !== '*' && !RESERVADAS.has(m[1]) && !ids.includes(m[1])) ids.push(m[1]);
+    });
+  });
+  // Sin selección y con varios elementos en la línea, se toma el que está
+  // bajo el cursor (o el último que empieza antes de él).
+  if (lineas.length === 1 && ids.length > 1 && el.editor.selectionStart === el.editor.selectionEnd) {
+    const linea = lineas[0];
+    let elegido = ids[0];
+    let mejor = -1;
+    ids.forEach((id) => {
+      const re = new RegExp('(^|[^\\w-])' + id.replace(/[-]/g, '\\-') + '(?![\\w-])', 'g');
+      let m;
+      while ((m = re.exec(linea))) {
+        const inicio = m.index + m[1].length;
+        if (inicio <= columna && inicio > mejor) { mejor = inicio; elegido = id; }
+      }
+    });
+    return [elegido];
+  }
+  return ids;
+}
+
+// Borde y texto a juego con el relleno, como hace el color principal. Los
+// colores de la paleta traen su propio borde.
+function nodeColorValues(relleno, borde) {
+  return { fill: relleno, stroke: borde || darken(relleno, 0.45), color: darken(relleno, 0.75) };
+}
+
+function nodeColorName(valor) {
+  return valor.startsWith('#') ? 'color' + valor.slice(1) : valor;
+}
+
+// Nombres de clase que escribe Sirena: los de la paleta y los de color propio.
+const CLASE_SIRENA = new RegExp('^(' + COLORS.filter(([, , v]) => v).map(([n]) => n).join('|') + '|color[0-9a-f]{6})$');
+
+// Quita a esos elementos cualquier color puesto antes: sus líneas style y su
+// presencia en las asignaciones de clase. Las clases de Sirena que se quedan
+// sin uso se retiran también, para no dejar restos.
+function stripNodeColor(lineas, ids) {
+  // En un diagrama de clases «class X {» define una clase; ahí la asignación
+  // de color es cssClass. En los demás tipos es la palabra class.
+  const asigna = diagramKind() === 'class' ? 'cssClass' : 'class';
+  const ASIGNACION = new RegExp(`^(\\s*)(${asigna})\\s+("?)([^"\\s]+)\\3\\s+([\\w-]+)\\s*$`);
+  ids.forEach((id) => {
+    lineas = lineas.filter((l) => !new RegExp(`^\\s*style\\s+${id}\\s`).test(l));
+    lineas = lineas.map((l) => {
+      const m = ASIGNACION.exec(l);
+      if (!m) return l;
+      const resto = m[4].split(',').filter((x) => x !== id);
+      if (!resto.length) return null;
+      return `${m[1]}${m[2]} ${m[3]}${resto.join(',')}${m[3]} ${m[5]}`;
+    }).filter((l) => l !== null);
+  });
+  const usadas = new Set();
+  lineas.forEach((l) => {
+    const m = ASIGNACION.exec(l);
+    if (m) usadas.add(m[5]);
+    (l.match(/:::([\w-]+)/g) || []).forEach((x) => usadas.add(x.slice(3)));
+  });
+  return lineas.filter((l) => {
+    const m = /^\s*classDef\s+(\S+)\s/.exec(l);
+    return !(m && CLASE_SIRENA.test(m[1]) && !usadas.has(m[1]));
+  });
+}
+
+// Escribe el color de los elementos elegidos: una línea style para uno solo;
+// para varios, una clase (classDef) y su asignación, que es la forma que
+// Mermaid recomienda para colorear por categorías.
+function applyNodeColor(ids, relleno, borde, nombre) {
+  const kind = diagramKind();
+  const v = nodeColorValues(relleno, borde);
+  const estilo = `fill:${v.fill},stroke:${v.stroke},color:${v.color}`;
+  let lineas = stripNodeColor(el.editor.value.replace(/\s+$/, '').split('\n'), ids);
+  const sangria = (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
+  if (ids.length === 1 && !nombre) {
+    lineas.push(`${sangria}style ${ids[0]} ${estilo}`);
+  } else {
+    const clase = nombre;
+    lineas = lineas.filter((l) => !new RegExp(`^\\s*classDef\\s+${clase}\\s`).test(l));
+    lineas.push(`${sangria}classDef ${clase} ${estilo}`);
+    if (kind === 'class') lineas.push(`${sangria}cssClass "${ids.join(',')}" ${clase}`);
+    else lineas.push(`${sangria}class ${ids.join(',')} ${clase}`);
+  }
+  el.editor.value = lineas.join('\n') + '\n';
+  renderGutter();
+  render();
+}
+
+function clearNodeColor(ids) {
+  const lineas = stripNodeColor(el.editor.value.split('\n'), ids);
+  el.editor.value = lineas.join('\n');
+  renderGutter();
+  render();
+}
+
+function openNodeColorMenu() {
+  const ids = targetNodes();
+  const menu = el.nodeColorMenu;
+  menu.dataset.sinObjetivo = ids.length ? 'false' : 'true';
+  el.nodeColorTarget.innerHTML = '';
+  if (!ids.length) {
+    el.nodeColorTarget.textContent = t('nodeColorNone');
+  } else {
+    el.nodeColorTarget.textContent = t(ids.length === 1 ? 'nodeColorOne' : 'nodeColorMany') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = ids.join(', ');
+    el.nodeColorTarget.appendChild(codigo);
+  }
+  el.swatches.innerHTML = '';
+  COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.title = t(clave);
+    boton.setAttribute('aria-label', t(clave));
+    boton.style.background = vars.primaryColor;
+    boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
+    boton.addEventListener('click', () => {
+      menu.hidden = true;
+      applyNodeColor(ids, vars.primaryColor, vars.primaryBorderColor, ids.length > 1 ? nombre : null);
+    });
+    el.swatches.appendChild(boton);
+  });
+  menu.dataset.ids = JSON.stringify(ids);
+  menu.hidden = false;
+}
+
+// Un menú de la barra del editor no debe salirse del panel del código: si su
+// botón está cerca del borde, se desplaza hacia la izquierda lo que haga falta.
+function ajustarMenuAlPanel(menu) {
+  menu.style.left = '';
+  if (window.innerWidth <= 900) return;
+  const r = menu.getBoundingClientRect();
+  const panel = $('pane-editor').getBoundingClientRect();
+  if (r.right > panel.right - 8) menu.style.left = Math.round(panel.right - 8 - r.right) + 'px';
+}
+
+function setupEditorTools() {
+  buildTypeMenu();
+
+  $('btn-type').addEventListener('click', (event) => {
+    event.stopPropagation();
+    el.nodeColorMenu.hidden = true;
+    placeMenu(el.typeMenu, $('btn-type'));
+    el.typeMenu.hidden = !el.typeMenu.hidden;
+    if (!el.typeMenu.hidden) ajustarMenuAlPanel(el.typeMenu);
+  });
+  el.typeMenu.addEventListener('click', (event) => event.stopPropagation());
+
+  $('btn-node-color').addEventListener('click', (event) => {
+    event.stopPropagation();
+    el.typeMenu.hidden = true;
+    if (!el.nodeColorMenu.hidden) { el.nodeColorMenu.hidden = true; return; }
+    placeMenu(el.nodeColorMenu, $('btn-node-color'));
+    openNodeColorMenu();
+    ajustarMenuAlPanel(el.nodeColorMenu);
+  });
+  el.nodeColorMenu.addEventListener('click', (event) => event.stopPropagation());
+
+  el.nodeColorCustom.addEventListener('change', () => {
+    const ids = JSON.parse(el.nodeColorMenu.dataset.ids || '[]');
+    el.nodeColorMenu.hidden = true;
+    const valor = el.nodeColorCustom.value;
+    applyNodeColor(ids, valor, null, ids.length > 1 ? nodeColorName(valor) : null);
+  });
+
+  $('node-color-clear').addEventListener('click', () => {
+    const ids = JSON.parse(el.nodeColorMenu.dataset.ids || '[]');
+    el.nodeColorMenu.hidden = true;
+    clearNodeColor(ids);
+  });
+
+  // Al mover el cursor cambia qué elemento se colorearía: si el menú está
+  // abierto, se cierra para no colorear otra cosa sin querer.
+  ['keyup', 'click'].forEach((evento) => {
+    el.editor.addEventListener(evento, () => { el.nodeColorMenu.hidden = true; });
   });
 }
 
@@ -1660,6 +1977,7 @@ function setupToolbar() {
     crearDoc('', t('newDoc'));
     el.editor.value = '';
     history.replaceState(null, '', location.pathname);
+    updateEditorTools();
     renderGutter();
     render();
     el.editor.focus();
@@ -1821,6 +2139,8 @@ function setupToolbar() {
     el.downloadMenu.hidden = true;
     el.shareMenu.hidden = true;
     el.appearanceMenu.hidden = true;
+    el.typeMenu.hidden = true;
+    el.nodeColorMenu.hidden = true;
   });
 
   $('btn-a11y').addEventListener('click', () => {
@@ -1886,10 +2206,16 @@ function setupToolbar() {
     });
   });
 
-  el.directionSelect.addEventListener('change', () => {
-    writeDirection();
-    render();
+  el.dirGroup.querySelectorAll('button').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      writeDirection(boton.dataset.dir);
+      readDirection();
+      render();
+      el.editor.focus();
+    });
   });
+
+  setupEditorTools();
 
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();
@@ -1951,6 +2277,8 @@ function setupToolbar() {
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
       el.appearanceMenu.hidden = true;
+      el.typeMenu.hidden = true;
+      el.nodeColorMenu.hidden = true;
       el.libraryModal.hidden = true;
     }
   });

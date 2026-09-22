@@ -25,6 +25,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [17](0017-arrastrar-un-archivo-lo-abre.md) | Arrastrar un archivo sobre la ventana lo abre | aceptado |
 | [18](0018-compartir-en-tres-formas.md) | Compartir ofrece tres formas y el visor se comparte tal cual | aceptado |
 | [19](0019-los-ejemplos-incluyen-tipos-de-diagrama-en-beta.md) | Los ejemplos incluyen tipos de diagrama en beta (radar, Venn e Ishikawa) | aceptado |
+| [20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md) | Una barra encima del código para empezar, orientar y colorear | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca
