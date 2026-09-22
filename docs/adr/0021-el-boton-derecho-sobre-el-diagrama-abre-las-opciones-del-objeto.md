@@ -17,8 +17,12 @@ que los botones de la barra pasan a actuar sobre él.
 
 - **Sobre una caja**: color (toda la caja, solo el texto o solo el borde),
   quitar el color, grosor del borde y acceso al menú de formas.
-- **Sobre una flecha o su rótulo**: color de la línea y de su texto, quitar el
-  color y grosor.
+- **Sobre una flecha**: color de la línea y de su texto, quitar el color y
+  grosor.
+- **Sobre el texto de una flecha**: su color (`linkStyle N color:…`, sin tocar
+  la línea), quitarlo, el fondo de los rótulos (que en Mermaid solo se puede
+  cambiar para todos a la vez, `edgeLabelBackground`) y el paso a las
+  propiedades de la flecha.
 - **Sobre el fondo**: los menús generales de la barra que apliquen al tipo de
   diagrama (colores, líneas, forma de todas las cajas, trazo, tamaño del
   texto, motor y orientación).

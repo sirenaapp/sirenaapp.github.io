@@ -1709,11 +1709,11 @@ function targetLinks() {
 
 // Colorea unas flechas (línea y texto del rótulo) con linkStyle; la línea
 // anterior para esas mismas flechas se sustituye.
-function applyLinkColor(indices, color) {
+function applyLinkColor(indices, color, soloTexto) {
   const cabeza = 'linkStyle ' + indices.join(',');
   const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
   const sangria = sangriaDelCodigo(lineas);
-  setPropLine(lineas, cabeza, 'stroke', color, sangria);
+  if (!soloTexto) setPropLine(lineas, cabeza, 'stroke', color, sangria);
   setPropLine(lineas, cabeza, 'color', color, sangria);
   el.editor.value = lineas.join('\n') + '\n';
   renderGutter();
@@ -2455,7 +2455,7 @@ function objetoDelDiagrama(event) {
   const x = caja ? caja.left + caja.width / 2 : event.clientX;
   const y = caja ? caja.top + caja.height / 2 : event.clientY;
   const indice = flechaCercana(flechasSvg, x, y, caja ? Infinity : 12);
-  if (indice >= 0) return { tipo: 'flecha', indice };
+  if (indice >= 0) return { tipo: rotulo ? 'rotulo' : 'flecha', indice };
   return { tipo: 'fondo' };
 }
 
@@ -2476,7 +2476,7 @@ function irAlObjeto(objeto) {
       fila = lineas.findIndex((l) => !/^\s*%%/.test(l) && re.test(l));
       if (fila >= 0) columna = re.exec(lineas[fila]).index + 1;
     }
-  } else if (objeto.tipo === 'flecha') {
+  } else if (objeto.tipo === 'flecha' || objeto.tipo === 'rotulo') {
     let cuenta = 0;
     for (let i = 0; i < lineas.length && fila === -1; i += 1) {
       const n = enlacesDeLinea(lineas[i]);
@@ -2528,7 +2528,7 @@ function segmentosDe(contenedor, opciones, actual, alElegir) {
   contenedor.appendChild(caja);
 }
 
-function accionContextual(contenedor, texto, icono, alPulsar) {
+function accionContextual(contenedor, texto, icono, alPulsar, mantener) {
   const boton = document.createElement('button');
   boton.type = 'button';
   boton.className = 'accion-menu';
@@ -2536,7 +2536,7 @@ function accionContextual(contenedor, texto, icono, alPulsar) {
   const span = document.createElement('span');
   span.textContent = texto;
   boton.appendChild(span);
-  boton.addEventListener('click', () => { cerrarContextual(); alPulsar(); });
+  boton.addEventListener('click', () => { if (!mantener) cerrarContextual(); alPulsar(); });
   contenedor.appendChild(boton);
 }
 
@@ -2595,6 +2595,23 @@ function construirContextual(objeto) {
     return;
   }
 
+  if (objeto.tipo === 'rotulo') {
+    titulo.textContent = t('ctxArrowText') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = 'linkStyle ' + objeto.indice;
+    titulo.appendChild(codigo);
+    const flechas = [objeto.indice];
+    muestrasDeColor(menu, true, (color) => applyLinkColor(flechas, color, true));
+    accionContextual(menu, t('ctxTextClear'), 'i-trash', () => applyLinkColor(flechas, null, true));
+    menu.appendChild(document.createElement('hr'));
+    // El fondo del rótulo solo se puede cambiar para todos a la vez.
+    accionContextual(menu, t('colorLabelBg'), 'i-palette', () => abrirDesdeContextual('btn-color'));
+    accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
+      construirContextual({ tipo: 'flecha', indice: objeto.indice });
+    }, true);
+    return;
+  }
+
   if (objeto.tipo === 'flecha') {
     titulo.textContent = t('ctxArrow') + ' ';
     const codigo = document.createElement('code');
@@ -2619,6 +2636,8 @@ function construirContextual(objeto) {
     });
     return;
   }
+
+
 
   titulo.textContent = t('ctxAll');
   [['colorMenu', 'btn-color', 'i-palette'], ['lines', 'btn-lines', 'i-spline'], ['shapeAll', 'btn-shape', 'i-square'],
