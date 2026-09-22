@@ -290,6 +290,14 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
 .menu-tamano { min-width: 200px; }
+.menu-formas { min-width: 340px; }
+.menu-formas button { justify-content: flex-start; }
+.menu-formas .forma-nombre { flex: 1; }
+.forma-icono { display: inline-flex; width: 44px; height: 26px; flex: none; align-items: center; justify-content: center; color: var(--accent); }
+.forma-icono svg { width: 44px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linejoin: round; stroke-linecap: round; }
+.forma-icono svg * { vector-effect: non-scaling-stroke; }
+.forma-icono svg text { stroke: none; }
+.menu-formas .menu-titulo { margin: 6px 10px 4px; }
 .tamano-propio {
   display: flex;
   align-items: center;

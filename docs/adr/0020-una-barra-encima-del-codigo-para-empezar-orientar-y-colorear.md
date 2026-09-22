@@ -84,6 +84,19 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   claro u oscuro. Con un color principal elegido el tema es `base` y el
   selector queda deshabilitado, porque Mermaid solo admite colores propios
   sobre ese tema.
+- **Forma de la caja.** En flujo, un botón con las 52 formas que Mermaid 12
+  dibuja (comprobadas una a una; `datastore` se dejó fuera porque sale como
+  rectángulo), agrupadas en básicas, proceso, datos y documentos y otras, con
+  su nombre en cada idioma, su sintaxis al lado y una miniatura de la forma
+  real: `scripts/generar-formas-iconos.mjs` la dibuja con el Mermaid del
+  repositorio, se queda con la silueta (muestreo del trazado y reducción de
+  puntos, porque rough.js genera cientos de curvas) y la guarda en
+  `js/formas-iconos.js` (unos 30 KB para las 52). Hay que volver a generarlas
+  al actualizar Mermaid o al cambiar la lista. Cambia la forma del elemento
+  de la línea del cursor allí donde esté definido, conservando su texto: con
+  la sintaxis clásica (`A{Texto}`, `A([Texto])`…) cuando la forma la tiene, y
+  con la nueva (`A@{ shape: doc, label: "Texto" }`) para el resto. Un
+  elemento que solo aparece suelto recibe una línea propia.
 - **Título y descripción accesibles.** El botón pasa de la barra superior a
   esta, junto al resto de lo que se escribe en el código. En los tipos que
   rechazan `accTitle` y `accDescr` o los ignoran (mapa mental, kanban, línea

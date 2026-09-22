@@ -133,6 +133,7 @@ const el = {
   borderWidthSelect: $('border-width-select'),
   linesMenu: $('lines-menu'),
   sizeMenu: $('size-menu'),
+  shapeMenu: $('shape-menu'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
@@ -703,6 +704,7 @@ function updateAppearanceVisibility() {
   const visibles = {
     engine: conMotor,
     lines: esFlujo,
+    shape: esFlujo,
     spacing: esFlujo && motor === 'dagre',
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
@@ -1705,6 +1707,148 @@ function sangriaDelCodigo(lineas) {
   return (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
 }
 
+/* --- Forma de las cajas --- */
+
+// Aperturas de la sintaxis clásica, de la más larga a la más corta, con su
+// cierre y la forma que representan. «[/» y «[\» tienen dos cierres posibles.
+const APERTURAS = [
+  ['(((', [[')))', 'dbl-circ']]], ['((', [['))', 'circle']]], ['([', [['])', 'stadium']]], ['[(', [[')]', 'cyl']]],
+  ['[[', [[']]', 'fr-rect']]], ['{{', [['}}', 'hex']]], ['[/', [['/]', 'lean-r'], ['\\]', 'trap-b']]],
+  ['[\\', [['\\]', 'lean-l'], ['/]', 'trap-t']]], ['>', [[']', 'odd']]], ['[', [[']', 'rect']]],
+  ['(', [[')', 'rounded']]], ['{', [['}', 'diam']]]
+];
+
+function escapaRe(texto) {
+  return texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Busca la definición de un elemento (su identificador seguido de una forma)
+// en una línea. Devuelve dónde empieza y acaba, la forma y el texto.
+function parseNodeDef(linea, id) {
+  const re = new RegExp('(^|[^\\w-])' + escapaRe(id) + '(?=@\\{|[\\[({>])', 'g');
+  let m;
+  while ((m = re.exec(linea))) {
+    const inicio = m.index + m[1].length;
+    const resto = linea.slice(inicio + id.length);
+    if (resto.startsWith('@{')) {
+      const fin = resto.indexOf('}');
+      if (fin === -1) continue;
+      const cuerpo = resto.slice(2, fin);
+      const forma = /shape\s*:\s*([\w-]+)/.exec(cuerpo);
+      const rotulo = /label\s*:\s*"([^"]*)"/.exec(cuerpo);
+      return { inicio, fin: inicio + id.length + fin + 1, forma: forma ? forma[1] : 'rect', texto: rotulo ? rotulo[1] : id, nueva: true };
+    }
+    for (const [apertura, cierres] of APERTURAS) {
+      if (!resto.startsWith(apertura)) continue;
+      let mejor = null;
+      cierres.forEach(([cierre, forma]) => {
+        const pos = resto.indexOf(cierre, apertura.length);
+        if (pos !== -1 && (!mejor || pos < mejor.pos)) mejor = { pos, cierre, forma };
+      });
+      if (!mejor) break;
+      let texto = resto.slice(apertura.length, mejor.pos);
+      if (/^".*"$/.test(texto)) texto = texto.slice(1, -1);
+      return { inicio, fin: inicio + id.length + mejor.pos + mejor.cierre.length, forma: mejor.forma, texto, nueva: false };
+    }
+  }
+  return null;
+}
+
+function shapeInfo(id) {
+  for (const grupo of window.SIRENA_SHAPES || []) {
+    const item = grupo.items.find((f) => f.id === id);
+    if (item) return item;
+  }
+  return null;
+}
+
+// Escribe la definición de un elemento con la forma pedida: con la sintaxis
+// clásica cuando la hay, y si no con la nueva, A@{ shape: …, label: "…" }.
+function nodeDefWith(id, forma, texto) {
+  const info = shapeInfo(forma);
+  if (info && info.classic) {
+    const mitad = info.classic.length / 2;
+    const seguro = /[\[\](){}|"<>#&;]/.test(texto) ? '"' + texto.replace(/"/g, '#quot;') + '"' : texto;
+    return id + info.classic.slice(0, mitad) + seguro + info.classic.slice(mitad);
+  }
+  const rotulo = texto === id ? '' : ', label: "' + texto.replace(/"/g, '#quot;') + '"';
+  return id + '@{ shape: ' + forma + rotulo + ' }';
+}
+
+// Cambia la forma de los elementos: donde estén definidos, o en una línea
+// nueva si solo aparecen sueltos (A --> B).
+function applyShape(ids, forma) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  ids.forEach((id) => {
+    let hecho = false;
+    for (let i = 0; i < lineas.length && !hecho; i += 1) {
+      if (/^\s*%%/.test(lineas[i])) continue;
+      const def = parseNodeDef(lineas[i], id);
+      if (!def) continue;
+      lineas[i] = lineas[i].slice(0, def.inicio) + nodeDefWith(id, forma, def.texto) + lineas[i].slice(def.fin);
+      hecho = true;
+    }
+    if (!hecho) lineas.push(`${sangria}${nodeDefWith(id, forma, id)}`);
+  });
+  el.editor.value = lineas.join('\n') + '\n';
+  renderGutter();
+  render();
+}
+
+function currentShape(id) {
+  for (const linea of el.editor.value.split('\n')) {
+    if (/^\s*%%/.test(linea)) continue;
+    const def = parseNodeDef(linea, id);
+    if (def) return def.forma;
+  }
+  return 'rect';
+}
+
+function buildShapeMenu() {
+  const ids = targetNodes();
+  el.shapeMenu.innerHTML = '';
+  const titulo = document.createElement('p');
+  titulo.className = 'menu-titulo';
+  if (!ids.length) {
+    titulo.textContent = t('shapeNone');
+    el.shapeMenu.appendChild(titulo);
+    return;
+  }
+  titulo.textContent = t('shapeTarget') + ' ';
+  const codigo = document.createElement('code');
+  codigo.textContent = ids.join(', ');
+  titulo.appendChild(codigo);
+  el.shapeMenu.appendChild(titulo);
+  const actual = currentShape(ids[0]);
+  (window.SIRENA_SHAPES || []).forEach((grupo) => {
+    const cabecera = document.createElement('p');
+    cabecera.className = 'menu-grupo';
+    cabecera.textContent = grupo.group[lang] || grupo.group.es;
+    el.shapeMenu.appendChild(cabecera);
+    grupo.items.forEach((item) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.setAttribute('aria-current', item.id === actual ? 'true' : 'false');
+      // La miniatura es la forma tal como la dibuja Mermaid (js/formas-iconos.js).
+      const icono = document.createElement('span');
+      icono.className = 'forma-icono';
+      icono.innerHTML = (window.SIRENA_SHAPE_ICONS || {})[item.id] || '';
+      const nombre = document.createElement('span');
+      nombre.className = 'forma-nombre';
+      nombre.textContent = item.label[lang] || item.label.es;
+      const ejemplo = document.createElement('code');
+      ejemplo.textContent = item.classic ? item.classic.slice(0, item.classic.length / 2) + 'A' + item.classic.slice(item.classic.length / 2) : item.id;
+      boton.append(icono, nombre, ejemplo);
+      boton.addEventListener('click', () => {
+        el.shapeMenu.hidden = true;
+        applyShape(ids, item.id);
+      });
+      el.shapeMenu.appendChild(boton);
+    });
+  });
+}
+
 /* --- Grosor de las líneas --- */
 
 // De todas: linkStyle default para las flechas y classDef default para los
@@ -1864,7 +2008,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -1982,6 +2126,10 @@ function setupEditorTools() {
   el.sizeCustom.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') { event.preventDefault(); aplicarTamano(); el.sizeMenu.hidden = true; }
   });
+  $('btn-shape').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.shapeMenu, $('btn-shape'), buildShapeMenu);
+  });
   $('btn-lines').addEventListener('click', (event) => {
     event.stopPropagation();
     alternarMenuEditor(el.linesMenu, $('btn-lines'), () => { updateAppearanceVisibility(); buildLineTargetSection(); });
@@ -2028,7 +2176,7 @@ function setupEditorTools() {
   // Al mover el cursor cambia qué elemento se colorearía: si el menú de color
   // está abierto, se cierra para no colorear otra cosa sin querer.
   ['keyup', 'click'].forEach((evento) => {
-    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; el.linesMenu.hidden = true; });
+    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; el.linesMenu.hidden = true; el.shapeMenu.hidden = true; });
   });
 }
 

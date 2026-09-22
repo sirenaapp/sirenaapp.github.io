@@ -14,6 +14,8 @@
 <script src="lang/en.js"></script>
 <script src="js/examples.js"></script>
 <script src="js/sintaxis.js"></script>
+<script src="js/formas.js"></script>
+<script src="js/formas-iconos.js"></script>
 </head>
 <body>
 
@@ -60,6 +62,7 @@
   <symbol id="i-merge" viewBox="0 0 24 24"><path d="m8 6 4-4 4 4" /> <path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22" /> <path d="m20 22-5-5" /></symbol>
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /> <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></symbol>
   <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /> <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" /></symbol>
+  <symbol id="i-square" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /></symbol>
   <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" x2="20" y1="9" y2="9" /> <line x1="4" x2="20" y1="15" y2="15" /> <line x1="10" x2="8" y1="3" y2="21" /> <line x1="16" x2="14" y1="3" y2="21" /></symbol>
 </svg>
 
@@ -202,6 +205,10 @@
             <div class="segmentos" id="line-widths"></div>
           </div>
         </div>
+      </div>
+      <div class="menu-wrap" id="wrap-shape" hidden>
+        <button type="button" id="btn-shape" class="tb" data-i18n-title="shapeBtn"><svg><use href="#i-square"></use></svg></button>
+        <div class="menu menu-izq menu-tipos menu-formas" id="shape-menu" hidden></div>
       </div>
       <div class="menu-wrap" id="wrap-spacing" hidden>
         <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>

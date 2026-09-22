@@ -26,7 +26,8 @@ propia dirección.
   ese tipo de diagrama atienden (líneas, con la forma solo con dagre y el
   grosor de todas las flechas y bordes o de la flecha y el borde donde está el
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
-  numeración de mensajes; valores en sectores). El botón de título y descripción accesibles está también aquí.
+  numeración de mensajes; valores en sectores), y en flujo un botón con las 52
+  formas de caja que dibuja Mermaid, para el elemento donde está el cursor. El botón de título y descripción accesibles está también aquí.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
@@ -104,6 +105,7 @@ Para actualizar Mermaid:
 ```bash
 scripts/actualizar-mermaid.sh          # última versión publicada
 scripts/actualizar-mermaid.sh 12.0.0   # una versión concreta
+node scripts/generar-formas-iconos.mjs # y rehacer las miniaturas del menú de formas
 ```
 
 Una acción programada avisa cada lunes, abriendo una incidencia, cuando Mermaid

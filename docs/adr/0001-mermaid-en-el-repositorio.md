@@ -22,7 +22,9 @@ descarga el núcleo y el fragmento del tipo de diagrama que se esté usando.
 
 La actualización se hace con `scripts/actualizar-mermaid.sh`, que baja el
 paquete de npm y sustituye la carpeta, y la versión queda anotada en
-`vendor/mermaid/VERSION`.
+`vendor/mermaid/VERSION`. Después hay que ejecutar
+`scripts/generar-formas-iconos.mjs`, que vuelve a dibujar con el Mermaid
+nuevo las miniaturas del menú de formas (ver [ADR 20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md)).
 
 ## Alternativas descartadas
 
