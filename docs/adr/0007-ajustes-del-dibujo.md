@@ -82,6 +82,20 @@ genéricas, que existen en cualquier equipo y salen en el PNG (comprobado en
 Chromium y Firefox con las cuatro); cada opción se muestra con su propia
 letra. Punto 5 del inventario de lo que Mermaid permite.
 
+## Secuencia, gráfica XY y Sankey (22-09-2026)
+
+Punto 7 del inventario. El botón de numeración de la secuencia pasa a ser un
+menú «Secuencia» con tres ajustes de la cabecera: numerar los mensajes
+(`showSequenceNumbers`), repetir los participantes abajo (`mirrorActors`, de
+serie sí) y partir los mensajes largos (`wrap`). La gráfica XY tiene un botón
+«Gráfica» con el valor sobre cada barra (`xyChart.showDataLabel`) y la
+orientación, que Mermaid escribe en el cuerpo (`xychart-beta horizontal`),
+así que va ahí como `showData` en sectores. Sankey tiene un botón para
+mostrar u ocultar los valores (`sankey.showValues`). Los tres se prestan al
+botón derecho sobre el fondo. Comprobado con Mermaid 12.0.0: sin espejo los
+actores pasan de ocho a cuatro elementos, con `wrap` el mensaje largo de dos
+a cinco líneas, y con los valores la gráfica muestra 5, 7 y 9.
+
 ## Consecuencias
 
 Al elegir un color principal, el dibujo pasa al tema base de Mermaid, porque es

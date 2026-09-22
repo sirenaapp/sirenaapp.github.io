@@ -109,6 +109,8 @@ const WEEKDAYS = [['sunday', 'weekSunday'], ['monday', 'weekMonday']];
 const DONUTS = [['0', 'donutNone'], ['0.3', 'donutThin'], ['0.5', 'donutMedium'], ['0.7', 'donutThick']];
 const LEGENDS = [['right', 'legendRight'], ['left', 'legendLeft'], ['top', 'legendTop'], ['bottom', 'legendBottom']];
 const coloresSectores = {};
+// Gráfica XY: la orientación va en el cuerpo (xychart-beta horizontal).
+const ORIENTATIONS = [['vertical', 'chartVertical'], ['horizontal', 'chartHorizontal']];
 // Máximo de diagramas en la biblioteca. Al llegar se borran los más antiguos.
 const LIMITES = [10, 25, 50, 100];
 const LIMITE_POR_DEFECTO = 50;
@@ -219,6 +221,13 @@ const el = {
   spacingSelect: $('spacing-select'),
   paddingSelect: $('padding-select'),
   numberingSelect: $('numbering-select'),
+  sequenceMenu: $('sequence-menu'),
+  mirrorSelect: $('mirror-select'),
+  wrapSelect: $('wrap-select'),
+  xychartMenu: $('xychart-menu'),
+  datalabelSelect: $('datalabel-select'),
+  orientationSelect: $('orientation-select'),
+  sankeyValuesSelect: $('sankey-values-select'),
   showDataSelect: $('showdata-select'),
   pieMenu: $('pie-menu'),
   donutSelect: $('donut-select'),
@@ -776,6 +785,11 @@ function buildAppearanceSelects() {
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
+  fillSelect(el.mirrorSelect, YESNO, null, 'yes');
+  fillSelect(el.wrapSelect, YESNO, null, 'no');
+  fillSelect(el.datalabelSelect, YESNO, null, 'no');
+  fillSelect(el.orientationSelect, ORIENTATIONS, null, 'vertical');
+  fillSelect(el.sankeyValuesSelect, YESNO, null, 'yes');
   fillSelect(el.showDataSelect, YESNO, null, 'no');
   fillSelect(el.donutSelect, DONUTS, null, '0');
   fillSelect(el.legendSelect, LEGENDS, null, 'right');
@@ -814,6 +828,8 @@ function diagramKind() {
   if (/^\s*pie\b/m.test(code)) return 'pie';
   if (/^\s*block(-beta)?\b/m.test(code)) return 'block';
   if (/^\s*gantt\b/m.test(code)) return 'gantt';
+  if (/^\s*xychart(-beta)?\b/m.test(code)) return 'xychart';
+  if (/^\s*sankey(-beta)?\b/m.test(code)) return 'sankey';
   return 'otro';
 }
 
@@ -833,6 +849,8 @@ function updateAppearanceVisibility() {
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
     numbering: tipo === 'sequence',
+    xychart: tipo === 'xychart',
+    sankey: tipo === 'sankey',
     pie: tipo === 'pie',
     calendar: tipo === 'gantt'
   };
@@ -1574,7 +1592,15 @@ function appearanceConfig() {
   if (esFlujo && anchoCajas !== '120') flowchart.wrappingWidth = Number(anchoCajas);
   if (tipo === 'state' && anchoCajas !== '120') config.state = { wrappingWidth: Number(anchoCajas) };
   if (Object.keys(flowchart).length) config.flowchart = flowchart;
-  if (el.numberingSelect.value === 'yes') config.sequence = { showSequenceNumbers: true };
+  if (tipo === 'sequence') {
+    const seq = {};
+    if (el.numberingSelect.value === 'yes') seq.showSequenceNumbers = true;
+    if (el.mirrorSelect.value === 'no') seq.mirrorActors = false;
+    if (el.wrapSelect.value === 'yes') seq.wrap = true;
+    if (Object.keys(seq).length) config.sequence = seq;
+  }
+  if (tipo === 'xychart' && el.datalabelSelect.value === 'yes') config.xyChart = { showDataLabel: true };
+  if (tipo === 'sankey' && el.sankeyValuesSelect.value === 'no') config.sankey = { showValues: false };
   return config;
 }
 
@@ -1624,6 +1650,18 @@ function writeShowData() {
   const quiere = el.showDataSelect.value === 'yes';
   el.editor.value = el.editor.value.replace(/^([ \t]*pie)([ \t]+showData)?/m,
     (coincidencia, inicio) => inicio + (quiere ? ' showData' : ''));
+}
+
+// La orientación de la gráfica XY se escribe en la primera línea del cuerpo.
+function writeOrientation() {
+  if (diagramKind() !== 'xychart') return;
+  const horizontal = el.orientationSelect.value === 'horizontal';
+  el.editor.value = el.editor.value.replace(/^([ \t]*xychart(?:-beta)?)([ \t]+(?:horizontal|vertical))?/m,
+    (coincidencia, inicio) => inicio + (horizontal ? ' horizontal' : ''));
+}
+
+function readOrientation() {
+  el.orientationSelect.value = /^[ \t]*xychart(?:-beta)?[ \t]+horizontal\b/m.test(el.editor.value) ? 'horizontal' : 'vertical';
 }
 
 function readShowData() {
@@ -1851,6 +1889,11 @@ function readAppearance() {
   anchoCajas = String((diagramKind() === 'state' ? (config.state || {}).wrappingWidth : flujo.wrappingWidth) || 120);
   fuenteActual = config.fontFamily || '';
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
+  el.mirrorSelect.value = config.sequence && config.sequence.mirrorActors === false ? 'no' : 'yes';
+  el.wrapSelect.value = config.sequence && config.sequence.wrap ? 'yes' : 'no';
+  el.datalabelSelect.value = config.xyChart && config.xyChart.showDataLabel ? 'yes' : 'no';
+  el.sankeyValuesSelect.value = config.sankey && config.sankey.showValues === false ? 'no' : 'yes';
+  readOrientation();
   readShowData();
   // Si el menú del calendario está abierto mientras cambia el código, se relee.
   if (el.calendarMenu && !el.calendarMenu.hidden) readGantt();
@@ -3234,7 +3277,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -4352,6 +4395,8 @@ const SUBMENUS = {
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   calendario: { titulo: 'calendar', icono: 'i-calendar', boton: 'btn-calendar', menu: () => el.calendarMenu, preparar: readGantt },
   sectores: { titulo: 'pieMenu', icono: 'i-pie', boton: 'btn-pie', menu: () => el.pieMenu, preparar: buildPieMenu },
+  secuencia: { titulo: 'sequenceMenu', icono: 'i-messages', boton: 'btn-numbering', menu: () => el.sequenceMenu },
+  grafica: { titulo: 'chartMenu', icono: 'i-bars', boton: 'btn-xychart', menu: () => el.xychartMenu, preparar: readOrientation },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
   lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
@@ -4602,6 +4647,8 @@ function construirContextual(objeto) {
   entradaSubmenu(menu, objeto, 'motor');
   entradaSubmenu(menu, objeto, 'calendario');
   entradaSubmenu(menu, objeto, 'sectores');
+  entradaSubmenu(menu, objeto, 'secuencia');
+  entradaSubmenu(menu, objeto, 'grafica');
   if (!$('wrap-merge').hidden) {
     interruptorContextual(menu, t('merge'), 'i-merge', unirFlechasPuesto(), () => {
       alternarUnirFlechas();
@@ -5452,6 +5499,16 @@ function setupToolbar() {
     writeShowData();
     render();
   });
+  $('btn-numbering').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.sequenceMenu, $('btn-numbering'));
+  });
+  $('btn-xychart').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.xychartMenu, $('btn-xychart'), readOrientation);
+  });
+  [el.mirrorSelect, el.wrapSelect, el.datalabelSelect, el.sankeyValuesSelect].forEach((select) => select.addEventListener('change', () => writeAppearance()));
+  el.orientationSelect.addEventListener('change', () => { writeOrientation(); render(); });
   $('btn-pie').addEventListener('click', (event) => {
     event.stopPropagation();
     alternarMenuEditor(el.pieMenu, $('btn-pie'), buildPieMenu);

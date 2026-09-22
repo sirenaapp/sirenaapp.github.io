@@ -30,8 +30,10 @@ propia dirección.
   discontinua, raya y punto, gruesa, invisible— y sus puntas —ninguna, flecha,
   círculo o cruz, al final o en los dos extremos—, para todas o para la del
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
-  numeración de mensajes; en sectores, los valores, el anillo, la posición
-  de la leyenda y el color de cada sector; en el Gantt, el calendario:
+  en secuencia, numerar los mensajes, repetir los participantes abajo y
+  partir los mensajes largos; en la gráfica XY, el valor sobre cada barra y
+  la orientación; en Sankey, mostrar los valores; en sectores, los valores,
+  el anillo, la posición de la leyenda y el color de cada sector; en el Gantt, el calendario:
   formato de las fechas del eje, marcas cada día, semana o mes, semana desde
   el lunes y fines de semana excluidos, escrito en el propio diagrama), en flujo un botón de cajas con
   dos entradas, las 52 formas que dibuja Mermaid (para el elemento donde está
