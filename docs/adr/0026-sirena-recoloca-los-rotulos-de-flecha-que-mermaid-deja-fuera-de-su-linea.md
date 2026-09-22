@@ -29,7 +29,9 @@ línea y a no más de 16,5 px, que es lo máximo que la desplaza el enderezado:
 un rótulo más alejado no se debe a este fallo y no se toca. Como la
 corrección se hace sobre el dibujo, llega también a las descargas.
 
-El fallo se comunica a Mermaid. Cuando lo corrija, la función se quita.
+El fallo se ha comunicado a Mermaid en la incidencia
+[#8292](https://github.com/mermaid-js/mermaid/issues/8292). Cuando lo
+corrija, la función se quita.
 
 Comprobado el 22-09-2026 en Chromium y Firefox con todos los ejemplos: solo se
 mueve el rótulo «Sí» (o «Yes») del diagrama de flujo, y todos los rótulos
