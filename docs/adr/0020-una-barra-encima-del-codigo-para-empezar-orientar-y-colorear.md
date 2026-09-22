@@ -96,9 +96,13 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   columnas, con la sintaxis en el rótulo emergente, porque en lista una
   debajo de otra la ventana no cabía en pantalla. Con «Esta caja» cambia la
   forma del elemento de la línea del cursor; con «Todas las cajas», la de
-  todos los elementos del diagrama, uno a uno, porque Mermaid no tiene un
-  ajuste global de forma. Reescribe cada definición allí donde esté,
-  conservando su texto: con
+  los elementos que llevan la forma general, uno a uno, porque Mermaid no
+  tiene un ajuste global de forma. La forma general es la última que se dio
+  a todas (el rectángulo si nunca se hizo) y queda apuntada en el código
+  como comentario, `%% formaGeneral: rounded`, que Mermaid ignora; así las
+  cajas cambiadas una a una se respetan al volver a cambiar todas, también
+  después de reabrir el diagrama, tal como pidió el autor. Reescribe cada
+  definición allí donde esté, conservando su texto: con
   la sintaxis clásica (`A{Texto}`, `A([Texto])`…) cuando la forma la tiene, y
   con la nueva (`A@{ shape: doc, label: "Texto" }`) para el resto. Un
   elemento que solo aparece suelto recibe una línea propia.

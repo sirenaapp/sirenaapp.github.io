@@ -1789,11 +1789,41 @@ function nodeDefWith(id, forma, texto) {
   return id + '@{ shape: ' + forma + rotulo + ' }';
 }
 
+// La forma general es la que se dio a todas las cajas la última vez (el
+// rectángulo si nunca se hizo). Queda apuntada en el código como comentario,
+// que Mermaid ignora, para que al reabrir el diagrama se sepa cuál es.
+const FORMA_GENERAL_RE = /^[ \t]*%%[ \t]*formaGeneral[ \t]*:[ \t]*([\w-]+)[ \t]*$/m;
+
+function formaGeneral() {
+  const m = FORMA_GENERAL_RE.exec(el.editor.value);
+  return m && shapeInfo(m[1]) ? m[1] : 'rect';
+}
+
+// Elementos que llevan la forma general: los que cambia «Todas las cajas»,
+// respetando los que se cambiaron uno a uno.
+function nodosConFormaGeneral() {
+  const general = formaGeneral();
+  return allNodes().filter((id) => currentShape(id) === general);
+}
+
+function escribirFormaGeneral(lineas, forma) {
+  const i = lineas.findIndex((l) => FORMA_GENERAL_RE.test(l));
+  if (i >= 0) lineas.splice(i, 1);
+  if (forma === 'rect') return;
+  // Debajo de la línea que define el tipo y de los textos accesibles.
+  let pos = lineas.findIndex((l) => l.trim() && !/^\s*%%/.test(l)) + 1;
+  while (pos < lineas.length && /^\s*(?:%%\s*)?acc(Title|Descr)\s*:/.test(lineas[pos])) pos += 1;
+  const sangria = sangriaDelCodigo(lineas);
+  lineas.splice(pos, 0, `${sangria}%% formaGeneral: ${forma}`);
+}
+
 // Cambia la forma de los elementos: donde estén definidos, o en una línea
-// nueva si solo aparecen sueltos (A --> B).
-function applyShape(ids, forma) {
+// nueva si solo aparecen sueltos (A --> B). Con «todas», además, apunta la
+// forma general.
+function applyShape(ids, forma, todas) {
   const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
   const sangria = sangriaDelCodigo(lineas);
+  if (todas) escribirFormaGeneral(lineas, forma);
   ids.forEach((id) => {
     let hecho = false;
     for (let i = 0; i < lineas.length && !hecho; i += 1) {
@@ -1824,7 +1854,7 @@ let formaAlcance = 'esta';
 
 function buildShapeMenu() {
   const enCursor = targetNodes();
-  const ids = formaAlcance === 'todas' ? allNodes() : enCursor;
+  const ids = formaAlcance === 'todas' ? nodosConFormaGeneral() : enCursor;
   el.shapeMenu.innerHTML = '';
   const alcance = document.createElement('div');
   alcance.className = 'segmentos segmentos-menu';
@@ -1844,12 +1874,16 @@ function buildShapeMenu() {
     el.shapeMenu.appendChild(titulo);
     return;
   }
-  titulo.textContent = t(formaAlcance === 'todas' ? 'shapeTargetAll' : 'shapeTarget') + ' ';
-  const codigo = document.createElement('code');
-  codigo.textContent = formaAlcance === 'todas' ? String(ids.length) : ids.join(', ');
-  titulo.appendChild(codigo);
+  if (formaAlcance === 'todas') {
+    titulo.textContent = t('shapeTargetAll').replace('{n}', ids.length).replace('{m}', allNodes().length);
+  } else {
+    titulo.textContent = t('shapeTarget') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = ids.join(', ');
+    titulo.appendChild(codigo);
+  }
   el.shapeMenu.appendChild(titulo);
-  const actual = formaAlcance === 'todas' ? null : currentShape(ids[0]);
+  const actual = formaAlcance === 'todas' ? formaGeneral() : currentShape(ids[0]);
   (window.SIRENA_SHAPES || []).forEach((grupo) => {
     const cabecera = document.createElement('p');
     cabecera.className = 'menu-grupo';
@@ -1875,7 +1909,7 @@ function buildShapeMenu() {
       boton.append(icono, nombre);
       boton.addEventListener('click', () => {
         el.shapeMenu.hidden = true;
-        applyShape(ids, item.id);
+        applyShape(ids, item.id, formaAlcance === 'todas');
       });
       rejilla.appendChild(boton);
     });
