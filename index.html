@@ -7,11 +7,11 @@
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/sirena.css?v=de0efa02">
-<script src="lang/es.js?v=8c7ff648"></script>
-<script src="lang/ca.js?v=5deb6d36"></script>
-<script src="lang/gl.js?v=d8b2d991"></script>
-<script src="lang/eu.js?v=5dd45a2b"></script>
-<script src="lang/en.js?v=887a9349"></script>
+<script src="lang/es.js?v=7ea0e049"></script>
+<script src="lang/ca.js?v=bbb67b55"></script>
+<script src="lang/gl.js?v=c2709f4f"></script>
+<script src="lang/eu.js?v=189002fd"></script>
+<script src="lang/en.js?v=53041bbe"></script>
 <script src="js/examples.js?v=10a5358f"></script>
 <script src="js/sintaxis.js?v=4ea59ce4"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -65,6 +65,7 @@
   <symbol id="i-square" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /></symbol>
   <symbol id="i-pointer" viewBox="0 0 24 24"><path d="M14 4.1 12 6" /> <path d="m5.1 8-2.9-.8" /> <path d="m6 12-1.9 2" /> <path d="M7.2 2.2 8 5.1" /> <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" /></symbol>
   <symbol id="i-salto" viewBox="0 0 24 24"><path d="M20 4v7a4 4 0 0 1-4 4H4" /> <path d="m9 10-5 5 5 5" /></symbol>
+  <symbol id="i-group" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /><rect width="7" height="5" x="7" y="7" rx="1" /><rect width="7" height="5" x="10" y="12" rx="1" /></symbol>
   <symbol id="i-bars" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10" /><line x1="18" x2="18" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="16" /></symbol>
   <symbol id="i-messages" viewBox="0 0 24 24"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></symbol>
   <symbol id="i-pie" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83" /><path d="M22 12A10 10 0 0 0 12 2v10z" /></symbol>
@@ -245,6 +246,7 @@
         <div class="menu menu-izq menu-ancho menu-iconos" id="shape-menu" hidden>
           <button type="button" data-cajas="forma"><svg><use href="#i-square"></use></svg><span><strong data-i18n="shapeMenuForm"></strong><small data-i18n="shapeMenuFormD"></small></span></button>
           <button type="button" data-cajas="ancho"><svg><use href="#i-width"></use></svg><span><strong data-i18n="boxWidth"></strong><small data-i18n="boxWidthD"></small></span></button>
+          <button type="button" data-cajas="bloque"><svg><use href="#i-group"></use></svg><span><strong data-i18n="blockNew"></strong><small data-i18n="blockNewD"></small></span></button>
         </div>
         <div class="menu menu-izq menu-opciones menu-tamano" id="width-menu" hidden>
           <p class="menu-titulo" data-i18n="boxWidth"></p>
@@ -473,6 +475,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=936e8c4e"></script>
+<script type="module" src="js/sirena.js?v=44e539a0"></script>
 </body>
 </html>

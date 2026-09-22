@@ -37,7 +37,8 @@ propia dirección.
   formato de las fechas del eje, marcas cada día, semana o mes, semana desde
   el lunes y fines de semana excluidos, escrito en el propio diagrama), en flujo un botón de cajas con
   dos entradas, las 52 formas que dibuja Mermaid (para el elemento donde está
-  el cursor o para todas) y el ancho de las cajas (el punto en que Mermaid
+  el cursor o para todas), el ancho de las cajas y un bloque nuevo con las
+  cajas del cursor o de la selección (el punto en que Mermaid
   corta el texto, `wrappingWidth`; en estados, solo el ancho), y
   un botón que inserta un salto de línea (`<br>`) y otros dos que ponen el
   texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
@@ -45,7 +46,9 @@ propia dirección.
   flecha o el fondo abre las opciones que le corresponden (en una flecha,
   también su tipo de línea y sus puntas, cada opción dibujada; en una caja,
   un enlace que se abre al pulsarla en la vista a pantalla completa o en la
-  página donde se incruste, y en el editor con Ctrl y clic) y lleva el cursor del
+  página donde se incruste, y en el editor con Ctrl y clic, y meterla en un
+  bloque o moverla de bloque; sobre un bloque, su título, su dirección y
+  deshacerlo) y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
   flecha permite escribirlo encima del propio dibujo, con una barrita de
   botones para la negrita, la cursiva, el salto de línea y la fórmula. En los diagramas de flujo

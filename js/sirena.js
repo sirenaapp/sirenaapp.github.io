@@ -1668,6 +1668,163 @@ function readShowData() {
   el.showDataSelect.value = /^[ \t]*pie[ \t]+showData\b/m.test(el.editor.value) ? 'yes' : 'no';
 }
 
+/* --- Bloques (subgraph … end) --- */
+
+// Los bloques del código: id, título, líneas que ocupa, dirección propia y
+// las cajas que están dentro solo como referencia (una línea con el id).
+function bloquesDelCodigo() {
+  const lineas = el.editor.value.split('\n');
+  const bloques = [];
+  const pila = [];
+  lineas.forEach((linea, i) => {
+    const abre = /^[ \t]*subgraph[ \t]+(.+?)[ \t]*$/.exec(linea);
+    if (abre) {
+      const m = /^([\w-]+)[ \t]*\[(.*)\]$/.exec(abre[1]) || /^"?([^"\]]+)"?$/.exec(abre[1]);
+      const id = m ? m[1].trim() : abre[1];
+      const titulo = m && m[2] !== undefined ? m[2] : id;
+      pila.push({ id, titulo, inicio: i, fin: -1, direccion: '', miembros: [] });
+      return;
+    }
+    if (/^[ \t]*end[ \t]*$/.test(linea) && pila.length) {
+      const b = pila.pop();
+      b.fin = i;
+      bloques.push(b);
+      return;
+    }
+    if (!pila.length) return;
+    const actual = pila[pila.length - 1];
+    const dir = /^[ \t]*direction[ \t]+(TB|TD|BT|LR|RL)[ \t]*$/.exec(linea);
+    if (dir) actual.direccion = dir[1];
+    const suelto = /^[ \t]*([A-Za-z0-9_][\w-]*)[ \t]*$/.exec(linea.replace(/%%.*$/, ''));
+    if (suelto && !RESERVADAS.has(suelto[1])) actual.miembros.push({ id: suelto[1], linea: i });
+  });
+  return bloques.sort((a, b) => a.inicio - b.inicio);
+}
+
+function bloqueDeCaja(id) {
+  return bloquesDelCodigo().find((b) => b.miembros.some((m) => m.id === id)) || null;
+}
+
+function idDeBloqueLibre() {
+  const usados = new Set([...allNodes(), ...bloquesDelCodigo().map((b) => b.id)]);
+  for (let n = 1; n < 1000; n += 1) if (!usados.has('G' + n)) return 'G' + n;
+  return 'G' + Date.now();
+}
+
+// Crea un bloque con las cajas dadas (referenciadas dentro) y abre su título.
+function crearBloque(ids) {
+  if (diagramKind() !== 'flowchart') return;
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const cajas = (ids || []).filter((id) => allNodes().includes(id));
+  // Las que ya estaban en otro bloque por referencia salen de él.
+  cajas.forEach((id) => quitarReferencia(lineas, id));
+  const id = idDeBloqueLibre();
+  const nuevas = [`${sangria}subgraph ${id} [${t('blockDefault')}]`].concat(cajas.map((c) => `${sangria}${sangria || '    '}${c}`), [`${sangria}end`]);
+  lineas.splice(posicionParaFlecha(lineas), 0, ...nuevas);
+  aplicarCodigo(lineas);
+  editarBloqueCuandoAparezca(id);
+}
+
+// Quita la referencia suelta de una caja en cualquier bloque (sobre lineas).
+function quitarReferencia(lineas, id) {
+  for (let i = lineas.length - 1; i >= 0; i -= 1) {
+    if (new RegExp('^[ \\t]*' + escapaRe(id) + '[ \\t]*$').test(lineas[i]) && dentroDeBloque(lineas, i)) lineas.splice(i, 1);
+  }
+}
+
+function dentroDeBloque(lineas, i) {
+  let nivel = 0;
+  for (let k = 0; k < i; k += 1) {
+    if (/^[ \t]*subgraph\b/.test(lineas[k])) nivel += 1;
+    else if (/^[ \t]*end[ \t]*$/.test(lineas[k])) nivel -= 1;
+  }
+  return nivel > 0;
+}
+
+// Mete una caja en un bloque (por referencia) o la saca (destino vacío).
+function moverABloque(idCaja, idBloque) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  quitarReferencia(lineas, idCaja);
+  if (idBloque) {
+    const b = bloquesDelCodigo().find((x) => x.id === idBloque);
+    // Tras quitar referencias los índices pueden haber cambiado: se busca el «end» del bloque.
+    let fin = -1;
+    let nivel = 0;
+    let dentro = false;
+    for (let i = 0; i < lineas.length; i += 1) {
+      if (new RegExp('^[ \\t]*subgraph[ \\t]+' + escapaRe(b.id) + '(?:[ \\t]|$)').test(lineas[i])) { dentro = true; nivel = 0; continue; }
+      if (!dentro) continue;
+      if (/^[ \t]*subgraph\b/.test(lineas[i])) nivel += 1;
+      else if (/^[ \t]*end[ \t]*$/.test(lineas[i])) { if (nivel === 0) { fin = i; break; } nivel -= 1; }
+    }
+    if (fin >= 0) {
+      const sangria = (lineas[fin].match(/^[ \t]*/) || [''])[0] + (sangriaDelCodigo(lineas) || '    ');
+      lineas.splice(fin, 0, sangria + idCaja);
+    }
+  }
+  aplicarCodigo(lineas);
+}
+
+// Dirección propia del bloque, o ninguna (la del diagrama).
+function escribirDireccionBloque(idBloque, direccion) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const b = bloquesDelCodigo().find((x) => x.id === idBloque);
+  if (!b) return;
+  for (let i = b.inicio + 1; i < b.fin; i += 1) {
+    if (/^[ \t]*direction[ \t]+/.test(lineas[i])) { lineas.splice(i, 1); break; }
+  }
+  if (direccion) {
+    const sangria = (lineas[b.inicio].match(/^[ \t]*/) || [''])[0] + (sangriaDelCodigo(lineas) || '    ');
+    lineas.splice(b.inicio + 1, 0, `${sangria}direction ${direccion}`);
+  }
+  aplicarCodigo(lineas);
+}
+
+// Deshace el bloque: quita subgraph, end y direction; lo demás se queda.
+function deshacerBloque(idBloque) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const b = bloquesDelCodigo().find((x) => x.id === idBloque);
+  if (!b) return;
+  const quitar = new Set([b.inicio, b.fin]);
+  for (let i = b.inicio + 1; i < b.fin; i += 1) if (/^[ \t]*direction[ \t]+/.test(lineas[i])) quitar.add(i);
+  const restantes = lineas.filter((l, i) => !quitar.has(i));
+  aplicarCodigo(limpiarSueltos(restantes));
+}
+
+// Al aparecer el bloque recién creado, se escribe su título encima.
+function editarBloqueCuandoAparezca(id) {
+  let intentos = 0;
+  const probar = () => {
+    const svg = el.canvas.querySelector('svg');
+    const cluster = svg && svg.querySelector('g.cluster[id$="-' + id + '"]');
+    const etiqueta = cluster && cluster.querySelector('.cluster-label');
+    if (etiqueta) { editarEnElSitio({ tipo: 'bloque', id }, etiqueta.getBoundingClientRect()); return; }
+    if (intentos++ < 20) setTimeout(probar, 100);
+  };
+  setTimeout(probar, 150);
+}
+
+// Submenú «Bloque» de una caja: nuevo, mover a uno existente o sacar.
+function construirMenuBloque(caja) {
+  const id = objetoContextual && objetoContextual.id;
+  const actual = bloqueDeCaja(id);
+  accionContextual(caja, t('blockNewWith'), 'i-plus', () => { cerrarContextual(); crearBloque([id]); });
+  bloquesDelCodigo().forEach((b) => {
+    if (actual && actual.id === b.id) return;
+    accionContextual(caja, t('blockMoveTo').replace('{b}', b.titulo), 'i-group', () => { cerrarContextual(); moverABloque(id, b.id); });
+  });
+  if (actual) accionContextual(caja, t('blockLeave').replace('{b}', actual.titulo), 'i-close', () => { cerrarContextual(); moverABloque(id, null); });
+}
+
+// Submenú de dirección de un bloque.
+function construirDireccionBloque(caja) {
+  const id = objetoContextual && objetoContextual.id;
+  const b = bloquesDelCodigo().find((x) => x.id === id);
+  const opciones = [['', 'blockDirDefault'], ['TB', 'dirTB'], ['LR', 'dirLR'], ['BT', 'dirBT'], ['RL', 'dirRL']];
+  segmentosDe(caja, opciones.map(([v, k]) => [v, t(k)]), b ? b.direccion : '', (valor) => { cerrarContextual(); escribirDireccionBloque(id, valor); });
+}
+
 /* --- Enlace de una caja (click A "https://…" "texto") --- */
 
 // Enlace que tiene una caja, o null. Mermaid admite «click A "url"» y
@@ -3518,6 +3675,7 @@ function setupEditorTools() {
     event.stopPropagation();
     cerrarMenusEditor();
     if (boton.dataset.cajas === 'forma') abrirFormas(null);
+    else if (boton.dataset.cajas === 'bloque') crearBloque(targetNodes());
     else alternarMenuEditor(el.widthMenu, $('btn-shape'), buildWidthMenu);
   });
   $('shape-close').addEventListener('click', cerrarFormas);
@@ -3616,6 +3774,10 @@ function textoACodigo(texto) {
 
 // Texto que tiene ahora el objeto señalado.
 function textoDelObjeto(objeto) {
+  if (objeto.tipo === 'bloque') {
+    const b = bloquesDelCodigo().find((x) => x.id === objeto.id);
+    return b ? b.titulo : '';
+  }
   if (objeto.tipo === 'nodo') {
     for (const linea of el.editor.value.split('\n')) {
       if (/^\s*%%/.test(linea)) continue;
@@ -3635,6 +3797,14 @@ function textoDelObjeto(objeto) {
 // Escribe el texto nuevo en el código, conservando forma y estilo.
 function escribirTextoDelObjeto(objeto, texto) {
   const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  if (objeto.tipo === 'bloque') {
+    const b = bloquesDelCodigo().find((x) => x.id === objeto.id);
+    if (!b) return;
+    const sangria = (lineas[b.inicio].match(/^[ \t]*/) || [''])[0];
+    lineas[b.inicio] = `${sangria}subgraph ${b.id} [${texto.trim() || b.id}]`;
+    aplicarCodigo(lineas);
+    return;
+  }
   if (objeto.tipo === 'nodo') {
     const forma = currentShape(objeto.id);
     for (let i = 0; i < lineas.length; i += 1) {
@@ -3775,6 +3945,12 @@ function setupEditorSitio() {
     }
     event.preventDefault();
     const bajo = document.elementFromPoint(event.clientX, event.clientY);
+    if (objeto.tipo === 'bloque') {
+      const cluster = bajo && bajo.closest('g.cluster');
+      const etiqueta = cluster && cluster.querySelector('.cluster-label');
+      if (etiqueta) editarEnElSitio(objeto, etiqueta.getBoundingClientRect());
+      return;
+    }
     const destino = objeto.tipo === 'nodo'
       ? (bajo && bajo.closest('g.node'))
       : ((bajo && bajo.closest('.edgeLabel')) || rotuloDeLaFlecha(objeto.indice));
@@ -4185,6 +4361,13 @@ function objetoDelDiagrama(event) {
     if (indice >= 0) return { tipo: 'flecha', indice };
   }
 
+  // Un bloque (subgraph): su id va detrás del id del dibujo.
+  const cluster = objetivo.closest && objetivo.closest('g.cluster');
+  if (cluster && !(objetivo.closest && objetivo.closest('.edgeLabel'))) {
+    const id = (cluster.id || '').slice(svg.id.length + 1);
+    if (bloquesDelCodigo().some((b) => b.id === id)) return { tipo: 'bloque', id };
+  }
+
   // El rótulo no dice a qué flecha pertenece, y acertar un trazo fino con el
   // ratón es difícil: en ambos casos vale la flecha que pase más cerca.
   const rotulo = objetivo.closest && objetivo.closest('.edgeLabel');
@@ -4399,6 +4582,8 @@ const SUBMENUS = {
   grafica: { titulo: 'chartMenu', icono: 'i-bars', boton: 'btn-xychart', menu: () => el.xychartMenu, preparar: readOrientation },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
+  bloque: { titulo: 'blockMenu', icono: 'i-group', construir: construirMenuBloque },
+  bloqueDir: { titulo: 'direction', icono: 'i-arrow-down', construir: construirDireccionBloque },
   lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
   puntas: { titulo: 'arrowHead', icono: 'i-arrow-right', construir: (caja) => construirTipoFlecha(caja, 'puntas') }
 };
@@ -4567,6 +4752,7 @@ function construirContextual(objeto) {
         crearFlecha(objeto.id, id, '');
         editarCajaCuandoAparezca(id);
       });
+      entradaSubmenu(menu, objeto, 'bloque');
       accionContextual(menu, t(enlaceDeCaja(objeto.id) ? 'ctxLinkEdit' : 'ctxLink'), 'i-link', () => abrirEnlace(objeto.id));
       accionContextual(menu, t('ctxDeleteBox'), 'i-trash', () => borrarNodo(objeto.id));
     }
@@ -4595,6 +4781,22 @@ function construirContextual(objeto) {
         editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
       });
     }
+    return;
+  }
+
+  if (objeto.tipo === 'bloque') {
+    const b = bloquesDelCodigo().find((x) => x.id === objeto.id);
+    titulo.textContent = t('blockMenu') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = b ? b.titulo : objeto.id;
+    titulo.appendChild(codigo);
+    accionContextual(menu, t('blockTitle'), 'i-pencil', () => {
+      const cluster = el.canvas.querySelector('g.cluster[id$="-' + objeto.id + '"]');
+      const etiqueta = cluster && cluster.querySelector('.cluster-label');
+      editarEnElSitio(objeto, etiqueta && etiqueta.getBoundingClientRect());
+    });
+    entradaSubmenu(menu, objeto, 'bloqueDir');
+    accionContextual(menu, t('blockDissolve'), 'i-trash', () => deshacerBloque(objeto.id));
     return;
   }
 
@@ -4662,6 +4864,7 @@ function construirContextual(objeto) {
       const id = crearCaja('');
       editarCajaCuandoAparezca(id);
     });
+    accionContextual(menu, t('blockNew'), 'i-group', () => crearBloque([]));
   }
   accionContextual(menu, t('a11y'), 'i-a11y', abrirAccesibilidad);
 }

@@ -160,6 +160,26 @@ Cmd) y clic, y un clic simple avisa de ello, para que el clic normal siga
 sirviendo para mover, seleccionar y editar. El SVG y el HTML exportados
 conservan el enlace; en el PNG no existe.
 
+## Bloques (22-09-2026)
+
+Punto 8 del inventario. Un bloque es un `subgraph Id [Título] … end` de
+Mermaid, que puede agrupar cajas definidas fuera de él con solo escribir su id
+dentro (comprobado con Mermaid 12.0.0, también con dirección propia y con
+varios bloques). Sirena trabaja solo con esas referencias sueltas, que puede
+poner y quitar sin tocar las flechas; las cajas que se definan dentro de un
+bloque con sus flechas se respetan, pero no se mueven desde la interfaz.
+
+- **Crear**: desde el botón derecho sobre una caja («Meter en un bloque
+  nuevo»), desde el botón de cajas de la barra con las cajas de la línea del
+  cursor o de la selección, o vacío desde el fondo. El bloque se escribe antes
+  de los estilos con un id libre (`G1`, `G2`…) y el título «Bloque», y se abre
+  el campo para escribirlo encima del dibujo.
+- **Sobre una caja**: mover a cualquiera de los bloques que haya, o sacarla.
+- **Sobre un bloque** (el dibujo lo identifica como `g.cluster` con su id):
+  escribir el título (también con doble clic), dirección propia (`direction`
+  dentro del bloque, o la del diagrama) y deshacerlo, que quita `subgraph`,
+  `end` y `direction` y deja las cajas.
+
 ## Consecuencias
 
 Se puede dar formato mirando el dibujo, sin buscar la línea en el código, y
