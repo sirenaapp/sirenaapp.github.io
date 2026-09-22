@@ -840,6 +840,152 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'ecuacion',
+        label: { es: 'Ecuación de segundo grado (mapa conceptual con fórmulas)', ca: 'Equació de segon grau (mapa conceptual amb fórmules)', gl: 'Ecuación de segundo grao (mapa conceptual con fórmulas)', eu: 'Bigarren mailako ekuazioa (kontzeptu-mapa formulekin)', en: 'Quadratic equation (concept map with formulas)' },
+        code: {
+          es: `%%{init: {"layout": "elk"}}%%
+flowchart TD
+    accTitle: Mapa conceptual de la ecuación de segundo grado
+    accDescr: Qué es una ecuación de segundo grado, cómo se resuelve según sea completa o incompleta, y cómo el discriminante decide cuántas soluciones tiene.
+    E["Ecuación de segundo grado<br>$$ax^2+bx+c=0 \\quad (a \\neq 0)$$"]
+    C["Completa<br>$$ax^2+bx+c=0$$"]
+    I1["Incompleta sin término en x<br>$$ax^2+c=0$$"]
+    I2["Incompleta sin término independiente<br>$$ax^2+bx=0$$"]
+    F["Fórmula general<br>$$x=\\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$$"]
+    R1["Despejar<br>$$x=\\pm\\sqrt{-\\dfrac{c}{a}}$$"]
+    R2["Sacar factor común<br>$$x\\,(ax+b)=0 \\Rightarrow x=0,\\; x=-\\dfrac{b}{a}$$"]
+    D["Discriminante<br>$$\\Delta=b^2-4ac$$"]
+    S2["Dos soluciones reales<br>$$x_1 \\neq x_2$$"]
+    S1["Una solución doble<br>$$x=-\\dfrac{b}{2a}$$"]
+    S0["Ninguna solución real"]
+    V["Relación con los coeficientes<br>$$x_1+x_2=-\\dfrac{b}{a} \\qquad x_1 \\cdot x_2=\\dfrac{c}{a}$$"]
+    E -- "puede ser" --> C
+    E -- "puede ser" --> I1
+    E -- "puede ser" --> I2
+    C -- "se resuelve con" --> F
+    I1 -- "se resuelve al" --> R1
+    I2 -- "se resuelve al" --> R2
+    F -- "contiene el" --> D
+    D -- "$$\\Delta \\gt 0$$" --> S2
+    D -- "$$\\Delta=0$$" --> S1
+    D -- "$$\\Delta \\lt 0$$" --> S0
+    S2 -- "cumplen la" --> V
+    S1 -- "cumple la" --> V`,
+          ca: `%%{init: {"layout": "elk"}}%%
+flowchart TD
+    accTitle: Mapa conceptual de l'equació de segon grau
+    accDescr: Què és una equació de segon grau, com es resol segons sigui completa o incompleta, i com el discriminant decideix quantes solucions té.
+    E["Equació de segon grau<br>$$ax^2+bx+c=0 \\quad (a \\neq 0)$$"]
+    C["Completa<br>$$ax^2+bx+c=0$$"]
+    I1["Incompleta sense terme en x<br>$$ax^2+c=0$$"]
+    I2["Incompleta sense terme independent<br>$$ax^2+bx=0$$"]
+    F["Fórmula general<br>$$x=\\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$$"]
+    R1["Aïllar<br>$$x=\\pm\\sqrt{-\\dfrac{c}{a}}$$"]
+    R2["Treure factor comú<br>$$x\\,(ax+b)=0 \\Rightarrow x=0,\\; x=-\\dfrac{b}{a}$$"]
+    D["Discriminant<br>$$\\Delta=b^2-4ac$$"]
+    S2["Dues solucions reals<br>$$x_1 \\neq x_2$$"]
+    S1["Una solució doble<br>$$x=-\\dfrac{b}{2a}$$"]
+    S0["Cap solució real"]
+    V["Relació amb els coeficients<br>$$x_1+x_2=-\\dfrac{b}{a} \\qquad x_1 \\cdot x_2=\\dfrac{c}{a}$$"]
+    E -- "pot ser" --> C
+    E -- "pot ser" --> I1
+    E -- "pot ser" --> I2
+    C -- "es resol amb" --> F
+    I1 -- "es resol en" --> R1
+    I2 -- "es resol en" --> R2
+    F -- "conté el" --> D
+    D -- "$$\\Delta \\gt 0$$" --> S2
+    D -- "$$\\Delta=0$$" --> S1
+    D -- "$$\\Delta \\lt 0$$" --> S0
+    S2 -- "compleixen la" --> V
+    S1 -- "compleix la" --> V`,
+          gl: `%%{init: {"layout": "elk"}}%%
+flowchart TD
+    accTitle: Mapa conceptual da ecuación de segundo grao
+    accDescr: Que é unha ecuación de segundo grao, como se resolve segundo sexa completa ou incompleta, e como o discriminante decide cantas solucións ten.
+    E["Ecuación de segundo grao<br>$$ax^2+bx+c=0 \\quad (a \\neq 0)$$"]
+    C["Completa<br>$$ax^2+bx+c=0$$"]
+    I1["Incompleta sen termo en x<br>$$ax^2+c=0$$"]
+    I2["Incompleta sen termo independente<br>$$ax^2+bx=0$$"]
+    F["Fórmula xeral<br>$$x=\\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$$"]
+    R1["Despexar<br>$$x=\\pm\\sqrt{-\\dfrac{c}{a}}$$"]
+    R2["Sacar factor común<br>$$x\\,(ax+b)=0 \\Rightarrow x=0,\\; x=-\\dfrac{b}{a}$$"]
+    D["Discriminante<br>$$\\Delta=b^2-4ac$$"]
+    S2["Dúas solucións reais<br>$$x_1 \\neq x_2$$"]
+    S1["Unha solución dobre<br>$$x=-\\dfrac{b}{2a}$$"]
+    S0["Ningunha solución real"]
+    V["Relación cos coeficientes<br>$$x_1+x_2=-\\dfrac{b}{a} \\qquad x_1 \\cdot x_2=\\dfrac{c}{a}$$"]
+    E -- "pode ser" --> C
+    E -- "pode ser" --> I1
+    E -- "pode ser" --> I2
+    C -- "resólvese con" --> F
+    I1 -- "resólvese ao" --> R1
+    I2 -- "resólvese ao" --> R2
+    F -- "contén o" --> D
+    D -- "$$\\Delta \\gt 0$$" --> S2
+    D -- "$$\\Delta=0$$" --> S1
+    D -- "$$\\Delta \\lt 0$$" --> S0
+    S2 -- "cumpren a" --> V
+    S1 -- "cumpre a" --> V`,
+          eu: `%%{init: {"layout": "elk"}}%%
+flowchart TD
+    accTitle: Bigarren mailako ekuazioaren kontzeptu-mapa
+    accDescr: Zer den bigarren mailako ekuazio bat, nola ebazten den osoa edo osatugabea izan, eta diskriminatzaileak nola erabakitzen duen zenbat soluzio dituen.
+    E["Bigarren mailako ekuazioa<br>$$ax^2+bx+c=0 \\quad (a \\neq 0)$$"]
+    C["Osoa<br>$$ax^2+bx+c=0$$"]
+    I1["Osatugabea, x gairik gabe<br>$$ax^2+c=0$$"]
+    I2["Osatugabea, gai askerik gabe<br>$$ax^2+bx=0$$"]
+    F["Formula orokorra<br>$$x=\\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$$"]
+    R1["Bakandu<br>$$x=\\pm\\sqrt{-\\dfrac{c}{a}}$$"]
+    R2["Faktore komuna atera<br>$$x\\,(ax+b)=0 \\Rightarrow x=0,\\; x=-\\dfrac{b}{a}$$"]
+    D["Diskriminatzailea<br>$$\\Delta=b^2-4ac$$"]
+    S2["Bi soluzio erreal<br>$$x_1 \\neq x_2$$"]
+    S1["Soluzio bikoitz bat<br>$$x=-\\dfrac{b}{2a}$$"]
+    S0["Soluzio errealik ez"]
+    V["Koefizienteekiko erlazioa<br>$$x_1+x_2=-\\dfrac{b}{a} \\qquad x_1 \\cdot x_2=\\dfrac{c}{a}$$"]
+    E -- "izan daiteke" --> C
+    E -- "izan daiteke" --> I1
+    E -- "izan daiteke" --> I2
+    C -- "honekin ebazten da" --> F
+    I1 -- "honela ebazten da" --> R1
+    I2 -- "honela ebazten da" --> R2
+    F -- "hau dauka" --> D
+    D -- "$$\\Delta \\gt 0$$" --> S2
+    D -- "$$\\Delta=0$$" --> S1
+    D -- "$$\\Delta \\lt 0$$" --> S0
+    S2 -- "hau betetzen dute" --> V
+    S1 -- "hau betetzen du" --> V`,
+          en: `%%{init: {"layout": "elk"}}%%
+flowchart TD
+    accTitle: Concept map of the quadratic equation
+    accDescr: What a quadratic equation is, how it is solved depending on whether it is complete or incomplete, and how the discriminant decides how many solutions it has.
+    E["Quadratic equation<br>$$ax^2+bx+c=0 \\quad (a \\neq 0)$$"]
+    C["Complete<br>$$ax^2+bx+c=0$$"]
+    I1["Incomplete, no x term<br>$$ax^2+c=0$$"]
+    I2["Incomplete, no constant term<br>$$ax^2+bx=0$$"]
+    F["Quadratic formula<br>$$x=\\dfrac{-b\\pm\\sqrt{b^2-4ac}}{2a}$$"]
+    R1["Isolate x<br>$$x=\\pm\\sqrt{-\\dfrac{c}{a}}$$"]
+    R2["Take out the common factor<br>$$x\\,(ax+b)=0 \\Rightarrow x=0,\\; x=-\\dfrac{b}{a}$$"]
+    D["Discriminant<br>$$\\Delta=b^2-4ac$$"]
+    S2["Two real solutions<br>$$x_1 \\neq x_2$$"]
+    S1["One double solution<br>$$x=-\\dfrac{b}{2a}$$"]
+    S0["No real solution"]
+    V["Relation with the coefficients<br>$$x_1+x_2=-\\dfrac{b}{a} \\qquad x_1 \\cdot x_2=\\dfrac{c}{a}$$"]
+    E -- "can be" --> C
+    E -- "can be" --> I1
+    E -- "can be" --> I2
+    C -- "is solved with" --> F
+    I1 -- "is solved by" --> R1
+    I2 -- "is solved by" --> R2
+    F -- "contains the" --> D
+    D -- "$$\\Delta \\gt 0$$" --> S2
+    D -- "$$\\Delta=0$$" --> S1
+    D -- "$$\\Delta \\lt 0$$" --> S0
+    S2 -- "satisfy the" --> V
+    S1 -- "satisfies the" --> V`
+        }
+      },
+      {
         id: 'mindmap',
         label: { es: 'Mapa mental', ca: 'Mapa mental', gl: 'Mapa mental', eu: 'Adimen-mapa', en: 'Mind map' },
         code: {

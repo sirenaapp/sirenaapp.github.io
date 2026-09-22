@@ -41,6 +41,7 @@ se corrige el ejemplo en `js/examples.js` en la misma actualización.
 ## Consecuencias
 
 El menú pasa de 21 a 24 ejemplos y cubre los organizadores gráficos habituales
-en el aula. A cambio, cada actualización de Mermaid añade una comprobación, y
+en el aula (25 desde el 22-09-2026, con el mapa conceptual de la ecuación de
+segundo grado, que enseña las fórmulas del [ADR 22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md)). A cambio, cada actualización de Mermaid añade una comprobación, y
 un cambio de sintaxis en los tipos beta puede romper el ejemplo hasta que se
 corrija.

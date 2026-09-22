@@ -39,7 +39,14 @@ caja con ella. También se puede escribir a mano, sin abrir nada.
 
 El botón aparece solo en los tipos que las dibujan, comprobados uno a uno:
 flujo (y mapa conceptual), estados, clases, secuencia, bloques, kanban y
-entidad-relación. En los demás el `$$…$$` saldría tal cual.
+entidad-relación. En los demás el `$$…$$` saldría tal cual. La chuleta de
+cada uno de esos tipos lleva una fila con el fragmento que funciona (en
+clases solo en la etiqueta de una relación o de la clase, no en sus miembros,
+comprobado el 22-09-2026), y avisa de que `<` y `>` se escriben `\lt` y
+`\gt`: Mermaid los convierte en `&lt;` y `&gt;` antes de pasar la fórmula a
+KaTeX, que entonces da error. Como ejemplo hay un mapa conceptual de la
+ecuación de segundo grado, con fórmulas en las cajas y en los rótulos de
+flecha.
 
 Con los rótulos en HTML aparecieron dos problemas, medidos el 22-09-2026
 también fuera de Sirena, así que vienen de Mermaid 12:

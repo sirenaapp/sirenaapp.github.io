@@ -11,7 +11,8 @@ window.SIRENA_SYNTAX = [
       { c: 'C([Inicio])', t: { es: 'Caja redondeada, para inicio o fin', ca: 'Caixa arrodonida, per a inici o fi', gl: 'Caixa redondeada, para inicio ou fin', eu: 'Kutxa biribildua, hasiera edo amaierarako', en: 'Rounded box, for start or end' } },
       { c: 'A --> B', t: { es: 'Flecha entre dos elementos', ca: 'Fletxa entre dos elements', gl: 'Frecha entre dous elementos', eu: 'Gezia bi elementuren artean', en: 'Arrow between two items' } },
       { c: 'A -- Sí --> B', t: { es: 'Flecha con texto', ca: 'Fletxa amb text', gl: 'Frecha con texto', eu: 'Testudun gezia', en: 'Arrow with a label' } },
-      { c: 'subgraph Bloque\n  A --> B\nend', t: { es: 'Agrupar elementos en un bloque', ca: 'Agrupar elements en un bloc', gl: 'Agrupar elementos nun bloque', eu: 'Elementuak bloke batean taldekatu', en: 'Group items in a block' } }
+      { c: 'subgraph Bloque\n  A --> B\nend', t: { es: 'Agrupar elementos en un bloque', ca: 'Agrupar elements en un bloc', gl: 'Agrupar elementos nun bloque', eu: 'Elementuak bloke batean taldekatu', en: 'Group items in a block' } },
+      { c: 'A["$$x=\\dfrac{a}{b}$$"]', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -34,7 +35,8 @@ window.SIRENA_SYNTAX = [
       { c: 'A->>B: Mensaje', t: { es: 'Mensaje de A a B', ca: 'Missatge d\'A a B', gl: 'Mensaxe de A a B', eu: 'A-tik B-ra mezua', en: 'Message from A to B' } },
       { c: 'B-->>A: Respuesta', t: { es: 'Respuesta, con línea discontinua', ca: 'Resposta, amb línia discontínua', gl: 'Resposta, con liña descontinua', eu: 'Erantzuna, marra etenarekin', en: 'Reply, with a dashed line' } },
       { c: 'Note over A: Aclaración', t: { es: 'Nota sobre un participante', ca: 'Nota sobre un participant', gl: 'Nota sobre un participante', eu: 'Parte-hartzaile bati buruzko oharra', en: 'Note about a participant' } },
-      { c: 'loop Cada semana\n  A->>B: Aviso\nend', t: { es: 'Bloque que se repite', ca: 'Bloc que es repeteix', gl: 'Bloque que se repite', eu: 'Errepikatzen den blokea', en: 'Block that repeats' } }
+      { c: 'loop Cada semana\n  A->>B: Aviso\nend', t: { es: 'Bloque que se repite', ca: 'Bloc que es repeteix', gl: 'Bloque que se repite', eu: 'Errepikatzen den blokea', en: 'Block that repeats' } },
+      { c: 'A->>B: $$x=\\dfrac{a}{b}$$', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -44,7 +46,8 @@ window.SIRENA_SYNTAX = [
       { c: 'classDiagram', t: { es: 'Empezar un diagrama de clases', ca: 'Començar un diagrama de classes', gl: 'Comezar un diagrama de clases', eu: 'Klase-diagrama bat hasi', en: 'Start a class diagram' } },
       { c: 'class Persona {\n  +String nombre\n  +saludar()\n}', t: { es: 'Clase con atributos y métodos', ca: 'Classe amb atributs i mètodes', gl: 'Clase con atributos e métodos', eu: 'Klasea atributu eta metodoekin', en: 'Class with attributes and methods' } },
       { c: 'A <|-- B', t: { es: 'B hereda de A', ca: 'B hereta d\'A', gl: 'B herda de A', eu: 'B-k A-tik heredatzen du', en: 'B inherits from A' } },
-      { c: 'A "1" --> "*" B', t: { es: 'Relación con cardinalidad', ca: 'Relació amb cardinalitat', gl: 'Relación con cardinalidade', eu: 'Erlazioa kardinaltasunarekin', en: 'Relation with cardinality' } }
+      { c: 'A "1" --> "*" B', t: { es: 'Relación con cardinalidad', ca: 'Relació amb cardinalitat', gl: 'Relación con cardinalidade', eu: 'Erlazioa kardinaltasunarekin', en: 'Relation with cardinality' } },
+      { c: 'Recta --> Punto : $$y=mx+n$$', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -54,7 +57,8 @@ window.SIRENA_SYNTAX = [
       { c: 'stateDiagram-v2', t: { es: 'Empezar un diagrama de estados', ca: 'Començar un diagrama d\'estats', gl: 'Comezar un diagrama de estados', eu: 'Egoera-diagrama bat hasi', en: 'Start a state diagram' } },
       { c: '[*] --> Inicial', t: { es: 'Estado de partida', ca: 'Estat de partida', gl: 'Estado de partida', eu: 'Hasierako egoera', en: 'Starting state' } },
       { c: 'A --> B: al ocurrir algo', t: { es: 'Paso de un estado a otro', ca: 'Pas d\'un estat a un altre', gl: 'Paso dun estado a outro', eu: 'Egoera batetik bestera igarotzea', en: 'Moving from one state to another' } },
-      { c: 'state Compuesto {\n  X --> Y\n}', t: { es: 'Estado que contiene otros', ca: 'Estat que en conté d\'altres', gl: 'Estado que contén outros', eu: 'Beste batzuk dituen egoera', en: 'State containing others' } }
+      { c: 'state Compuesto {\n  X --> Y\n}', t: { es: 'Estado que contiene otros', ca: 'Estat que en conté d\'altres', gl: 'Estado que contén outros', eu: 'Beste batzuk dituen egoera', en: 'State containing others' } },
+      { c: 'A : $$x=\\dfrac{a}{b}$$', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -64,7 +68,8 @@ window.SIRENA_SYNTAX = [
       { c: 'erDiagram', t: { es: 'Empezar un entidad-relación', ca: 'Començar un entitat-relació', gl: 'Comezar un entidade-relación', eu: 'Entitate-erlazio bat hasi', en: 'Start an entity relationship diagram' } },
       { c: 'CENTRO ||--o{ GRUPO : tiene', t: { es: 'Uno a muchos, con el nombre de la relación', ca: 'Un a molts, amb el nom de la relació', gl: 'Un a moitos, co nome da relación', eu: 'Bat askori, erlazioaren izenarekin', en: 'One to many, with the relation name' } },
       { c: 'A }o--o{ B : relación', t: { es: 'Muchos a muchos', ca: 'Molts a molts', gl: 'Moitos a moitos', eu: 'Asko askori', en: 'Many to many' } },
-      { c: 'GRUPO {\n  string nombre\n  int curso\n}', t: { es: 'Atributos de una entidad', ca: 'Atributs d\'una entitat', gl: 'Atributos dunha entidade', eu: 'Entitate baten atributuak', en: 'Attributes of an entity' } }
+      { c: 'GRUPO {\n  string nombre\n  int curso\n}', t: { es: 'Atributos de una entidad', ca: 'Atributs d\'una entitat', gl: 'Atributos dunha entidade', eu: 'Entitate baten atributuak', en: 'Attributes of an entity' } },
+      { c: 'A ||--o{ B : "$$x=\\dfrac{a}{b}$$"', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -115,7 +120,8 @@ window.SIRENA_SYNTAX = [
     rows: [
       { c: 'kanban', t: { es: 'Empezar un tablero kanban', ca: 'Començar un tauler kanban', gl: 'Comezar un taboleiro kanban', eu: 'Kanban taula bat hasi', en: 'Start a kanban board' } },
       { c: '  Pendiente', t: { es: 'Columna del tablero', ca: 'Columna del tauler', gl: 'Columna do taboleiro', eu: 'Taulako zutabea', en: 'Board column' } },
-      { c: '    t1[Tarea]', t: { es: 'Tarjeta dentro de la columna', ca: 'Targeta dins de la columna', gl: 'Tarxeta dentro da columna', eu: 'Txartela zutabearen barruan', en: 'Card inside the column' } }
+      { c: '    t1[Tarea]', t: { es: 'Tarjeta dentro de la columna', ca: 'Targeta dins de la columna', gl: 'Tarxeta dentro da columna', eu: 'Txartela zutabearen barruan', en: 'Card inside the column' } },
+      { c: '    t2["$$x=\\dfrac{a}{b}$$"]', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {
@@ -182,7 +188,8 @@ window.SIRENA_SYNTAX = [
       { c: 'a["Texto"]:3', t: { es: 'Bloque que ocupa tres columnas', ca: 'Bloc que ocupa tres columnes', gl: 'Bloque que ocupa tres columnas', eu: 'Hiru zutabe hartzen dituen blokea', en: 'Block spanning three columns' } },
       { c: 'space', t: { es: 'Hueco vacío en la rejilla', ca: 'Buit a la graella', gl: 'Oco baleiro na grella', eu: 'Hutsunea saretan', en: 'Empty gap in the grid' } },
       { c: 'a --> b', t: { es: 'Flecha entre dos bloques', ca: 'Fletxa entre dos blocs', gl: 'Frecha entre dous bloques', eu: 'Gezia bi blokeren artean', en: 'Arrow between two blocks' } },
-      { c: 'r<["Red"]>(right)', t: { es: 'Bloque con forma de flecha (left, right, up, down)', ca: 'Bloc amb forma de fletxa (left, right, up, down)', gl: 'Bloque con forma de frecha (left, right, up, down)', eu: 'Gezi-formako blokea (left, right, up, down)', en: 'Arrow-shaped block (left, right, up, down)' } }
+      { c: 'r<["Red"]>(right)', t: { es: 'Bloque con forma de flecha (left, right, up, down)', ca: 'Bloc amb forma de fletxa (left, right, up, down)', gl: 'Bloque con forma de frecha (left, right, up, down)', eu: 'Gezi-formako blokea (left, right, up, down)', en: 'Arrow-shaped block (left, right, up, down)' } },
+      { c: 'a["$$x=\\dfrac{a}{b}$$"]', t: { es: 'Fórmula en LaTeX (los signos < y > se escriben \\lt y \\gt)', ca: 'Fórmula en LaTeX (els signes < i > s\'escriuen \\lt i \\gt)', gl: 'Fórmula en LaTeX (os signos < e > escríbense \\lt e \\gt)', eu: 'LaTeX formula (< eta > zeinuak \\lt eta \\gt idazten dira)', en: 'LaTeX formula (the signs < and > are written \\lt and \\gt)' } }
     ]
   },
   {

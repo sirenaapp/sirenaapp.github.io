@@ -42,7 +42,7 @@ propia dirección.
   pasar el menú del navegador. Un aviso flotante sobre el lienzo lo
   cuenta al entrar, solo cuando el diagrama es de flujo o un mapa conceptual,
   y se retira al usarlo o al cerrarlo.
-- Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
+- Elegir entre 25 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
   Mermaid (escritos en la cabecera del código, como todo lo demás) y, en la
@@ -61,9 +61,12 @@ propia dirección.
   orientación de la forma del diagrama.
 - Escribir fórmulas matemáticas en los rótulos, con LaTeX entre `$$…$$`, a mano
   o con el editor [Edicuatex](https://edicuatex.github.io/), que se abre desde
-  la barra y devuelve la fórmula al diagrama. La negrita y la cursiva no se
-  pueden combinar con una fórmula en el mismo rótulo, porque Mermaid deja el
-  marcado a la vista.
+  la barra y devuelve la fórmula al diagrama. Los signos `<` y `>` se
+  escriben `\lt` y `\gt`, porque Mermaid los convierte en entidades HTML
+  antes de componer la fórmula. La negrita y la cursiva no se pueden combinar
+  con una fórmula en el mismo rótulo, porque Mermaid deja el marcado a la
+  vista. Hay un ejemplo con fórmulas, el mapa conceptual de la ecuación de
+  segundo grado, y la chuleta de cada tipo que las dibuja lleva su fragmento.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla. En los tipos que no los admiten (mapa mental,
   kanban, línea del tiempo, bloques, Sankey, Venn e Ishikawa) se guardan como
