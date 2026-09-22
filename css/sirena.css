@@ -486,6 +486,9 @@ body > div[id^="dsirena-diagram-"] {
   position: absolute !important;
   left: -10000px;
   top: 0;
+  /* Con el ancho de la ventana, como si siguiera en el flujo: algunos
+     diagramas (el de Gantt) se dibujan según el ancho disponible. */
+  width: 100vw;
   pointer-events: none;
 }
 
