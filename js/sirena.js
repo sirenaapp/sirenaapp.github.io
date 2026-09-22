@@ -1004,7 +1004,8 @@ function opaqueEdgeLabels(svg, id) {
   const fill = regla[0].match(/fill:\s*([^;}]+)/);
   if (!fill) return svg;
   const color = fill[1].trim().replace(/^rgba\(([^)]+?),[^,)]+\)$/, 'rgb($1)');
-  const extra = `#${id} .edgeLabel rect.background{opacity:1;fill:${color};}`;
+  // Con los rótulos en HTML el fondo lo lleva el <p>, con la misma transparencia.
+  const extra = `#${id} .edgeLabel rect.background{opacity:1;fill:${color};}#${id} .edgeLabel p{background-color:${color};}`;
   return svg.replace('</style>', extra + '</style>');
 }
 
@@ -1029,6 +1030,42 @@ function ajustarRotulosHtml() {
     if (!dentro) return;
     restaurarSaltos(dentro);
     soltarFilas(dentro);
+    // Mermaid pinta el fondo del rótulo en su <p>, y al que lleva una fórmula
+    // no le pone <p>: la línea lo atraviesa. Se le da el mismo fondo.
+    if (dentro.querySelector('.katex') && !dentro.querySelector('p') && !hueco.previousElementSibling) {
+      const rotulo = hueco.closest('.edgeLabel');
+      const fondo = rotulo && getComputedStyle(rotulo).backgroundColor;
+      if (fondo && fondo !== 'rgba(0, 0, 0, 0)') {
+        // El fondo va como rectángulo SVG delante del hueco, dentro del mismo
+        // grupo, que se pinta después de las líneas también al pasar el
+        // diagrama a imagen; un fondo en el HTML no siempre lo hacía.
+        // Mermaid mide la fórmula a la altura de una línea de texto, así que
+        // el hueco se amplía a lo que ocupa y se deja ver lo que sobresalga
+        // (en la imagen la fuente de KaTeX no se carga y la fórmula crece).
+        dentro.style.display = 'inline-block';
+        const ancho = parseFloat(hueco.getAttribute('width')) || 0;
+        const alto = parseFloat(hueco.getAttribute('height')) || 0;
+        const anchoReal = Math.max(ancho, Math.ceil(dentro.scrollWidth));
+        const altoReal = Math.max(alto, Math.ceil(dentro.scrollHeight));
+        const x = (parseFloat(hueco.getAttribute('x')) || 0) - (anchoReal - ancho) / 2;
+        const y = (parseFloat(hueco.getAttribute('y')) || 0) - (altoReal - alto) / 2;
+        hueco.setAttribute('width', anchoReal);
+        hueco.setAttribute('height', altoReal);
+        hueco.setAttribute('x', x);
+        hueco.setAttribute('y', y);
+        hueco.style.overflow = 'visible';
+        const margen = 3;
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('class', 'background');
+        rect.setAttribute('x', x - margen);
+        rect.setAttribute('y', y - margen);
+        rect.setAttribute('width', anchoReal + 2 * margen);
+        rect.setAttribute('height', altoReal + 2 * margen);
+        rect.setAttribute('rx', 2);
+        rect.setAttribute('fill', fondo.replace(/^rgba\(([^)]+?),[^,)]+\)$/, 'rgb($1)'));
+        hueco.parentNode.insertBefore(rect, hueco);
+      }
+    }
     ajustado = true;
   });
   svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
@@ -3075,6 +3112,8 @@ function setupEditorSitio() {
     else formatoEnElSitio(accion);
   });
   el.viewport.addEventListener('dblclick', (event) => {
+    // En el modo visor no se edita nada.
+    if (viewer) return;
     const objeto = objetoDelDiagrama(event);
     if (objeto.tipo === 'fondo') {
       // En el lienzo vacío, el doble clic crea una caja y la deja lista.
@@ -3426,7 +3465,7 @@ function setupCrear() {
 
   // Las anclas siguen al ratón de caja en caja.
   el.viewport.addEventListener('pointermove', (event) => {
-    if (trazando || event.pointerType === 'touch' || diagramKind() !== 'flowchart') return;
+    if (viewer || trazando || event.pointerType === 'touch' || diagramKind() !== 'flowchart') return;
     const caja = cajaBajoPuntero(event.clientX, event.clientY);
     if (caja) mostrarAnclas(caja.nodo, caja.id);
     else if (anclasDe && !cercaDeLasAnclas(event.clientX, event.clientY)) ocultarAnclas();
@@ -4124,14 +4163,16 @@ function diagramName() {
 // el navegador impide convertir el dibujo en PNG y otros programas de dibujo no
 // lo abren bien, así que en la copia que se exporta se sustituye por texto SVG.
 function flattenForeignObjects(copy, original) {
+  // Con fórmulas, el diagrama entero va en HTML y se pasa a PNG como
+  // dirección de datos, que el navegador dibuja igual que en pantalla: no se
+  // toca nada. Aplanar solo los rótulos sin fórmula los dejaba sin fondo y
+  // repartidos en líneas a ojo, con las flechas atravesando el texto.
+  if (original.querySelector('.katex')) return;
   const source = original.querySelectorAll('foreignObject');
   const target = copy.querySelectorAll('foreignObject');
   target.forEach((node, index) => {
     const from = source[index];
     const content = from || node;
-    // Una fórmula se queda tal cual: convertirla en texto la echaría a perder,
-    // y el navegador la dibuja igual al pasar el diagrama a PNG (comprobado).
-    if (content.querySelector('.katex')) return;
     const text = (content.textContent || '').trim();
     const inner = content.querySelector('div, span, p');
     const style = inner ? getComputedStyle(inner) : null;

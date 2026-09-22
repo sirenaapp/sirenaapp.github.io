@@ -111,8 +111,9 @@ addEventListener('message', function (e) {
 </script>
 ```
 
-El parámetro `v=1` deja la página con el diagrama solo, sin editor ni barra de
-herramientas, y con un enlace discreto para abrirlo y editarlo. El guion es
+El parámetro `v=1` deja la página con el diagrama solo, sin editor, barra de
+herramientas ni nada de edición sobre el dibujo, y con un enlace discreto para
+abrirlo y editarlo. El guion es
 opcional: sirve para que el marco se ajuste solo al alto del diagrama. Ese mismo
 parámetro lo lleva el enlace a pantalla completa, que se copia desde el botón de
 compartir y se envía tal cual a quien solo tiene que ver el diagrama.

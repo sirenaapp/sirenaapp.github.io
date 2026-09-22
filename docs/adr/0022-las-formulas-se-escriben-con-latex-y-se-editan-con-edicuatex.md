@@ -25,9 +25,20 @@ Un diagrama que lleva `$$…$$` se dibuja con los rótulos en HTML; los demás
 siguen con texto SVG, como hasta ahora. El cambio es automático: al escribir o
 al borrar una fórmula, Sirena vuelve a preparar Mermaid.
 
-Al exportar, la copia conserva las fórmulas tal cual (no se aplanan como el
-resto de bloques HTML, que las echaría a perder) y el SVG se le pasa al
-navegador como dirección de datos cuando lleva HTML dentro.
+Al exportar, si el diagrama lleva fórmulas no se aplana ningún rótulo: la
+copia va entera en HTML y se le pasa al navegador como dirección de datos, que
+la dibuja igual que en pantalla. Aplanar solo los rótulos sin fórmula, como se
+hizo al principio, los dejaba sin fondo y repartidos en líneas a ojo, con las
+flechas atravesando el texto (22-09-2026). El fondo de los rótulos de flecha
+en HTML se hace opaco, como ya se hacía con los de texto SVG.
+
+El rótulo de flecha que lleva una fórmula no tiene fondo en Mermaid (lo pinta
+en el `<p>` del rótulo, y a ese no le pone `<p>`), así que la línea lo
+atraviesa. Se le añade un rectángulo SVG de fondo dentro de su mismo grupo,
+que se pinta después de las líneas también en la imagen exportada; un fondo
+puesto en el HTML no lo hacía. El hueco se amplía a lo que ocupa la fórmula y
+se deja ver lo que sobresalga, porque en la imagen la fuente de KaTeX no se
+carga y la fórmula sale algo más grande.
 
 El botón de fórmula abre **Edicuatex** (<https://edicuatex.github.io/>), el
 editor de fórmulas de la misma casa, en una ventana aparte, con `?pm=1&origin=…`,

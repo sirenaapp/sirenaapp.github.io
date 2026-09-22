@@ -58,7 +58,9 @@ ratón es difícil, así que en ambos casos se toma la flecha que pase más cerc
 Con Mayús pulsada no se intercepta, de modo que sigue disponible el menú del
 navegador para guardar o copiar la imagen. En pantalla táctil lo abre la
 pulsación larga. En el modo visor ([ADR 5](0005-modo-visor-para-incrustar.md))
-no aparece, porque ahí no se edita.
+no aparece nada de esto, porque ahí no se edita: ni el menú, ni el aviso, ni
+los puntos de anclaje, ni el doble clic (comprobado el 22-09-2026 tras verse
+los puntos en un enlace a pantalla completa).
 
 Como un menú contextual no se ve, sobre el lienzo aparece un aviso flotante
 que lo cuenta, junto con el doble clic para escribir (con los gestos de la
