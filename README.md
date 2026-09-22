@@ -28,6 +28,10 @@ propia dirección.
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
   numeración de mensajes; valores en sectores), y en flujo un botón con las 52
   formas de caja que dibuja Mermaid, para el elemento donde está el cursor. El botón de título y descripción accesibles está también aquí.
+- Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
+  flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
+  editor a su línea. En pantalla táctil, la pulsación larga; con Mayús se deja
+  pasar el menú del navegador.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de

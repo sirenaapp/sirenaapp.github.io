@@ -134,6 +134,7 @@ const el = {
   linesMenu: $('lines-menu'),
   sizeMenu: $('size-menu'),
   shapeMenu: $('shape-menu'),
+  contextMenu: $('context-menu'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
@@ -2326,6 +2327,279 @@ function setupEditorTools() {
   });
 }
 
+/* --- Menú del botón derecho sobre el diagrama --- */
+
+// Distancia en pantalla de un punto al trazado de una flecha.
+function distanciaAFlecha(path, x, y) {
+  const svg = path.ownerSVGElement;
+  const matriz = path.getScreenCTM();
+  if (!svg || !matriz) return Infinity;
+  const largo = path.getTotalLength();
+  const pasos = Math.max(12, Math.min(60, Math.round(largo / 8)));
+  let cerca = Infinity;
+  for (let k = 0; k <= pasos; k += 1) {
+    const q = path.getPointAtLength((largo * k) / pasos);
+    const pt = svg.createSVGPoint();
+    pt.x = q.x;
+    pt.y = q.y;
+    const p = pt.matrixTransform(matriz);
+    cerca = Math.min(cerca, Math.hypot(p.x - x, p.y - y));
+  }
+  return cerca;
+}
+
+// Flecha más próxima a un punto de la pantalla, si está lo bastante cerca.
+function flechaCercana(flechas, x, y, radio) {
+  let mejor = -1;
+  let cerca = radio;
+  flechas.forEach((path, i) => {
+    const d = distanciaAFlecha(path, x, y);
+    if (d < cerca) { cerca = d; mejor = i; }
+  });
+  return mejor;
+}
+
+// Identifica qué hay bajo el ratón: una caja, una flecha (o su rótulo, que
+// se resuelve por cercanía) o el fondo.
+function objetoDelDiagrama(event) {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return { tipo: 'fondo' };
+  const flechasSvg = [...svg.querySelectorAll('.edgePaths path, path.flowchart-link')];
+
+  const nodo = event.target.closest && event.target.closest('g.node');
+  if (nodo) {
+    const m = /-flowchart-(.+)-\d+$/.exec(nodo.id || '');
+    const id = m && m[1];
+    if (id && allNodes().includes(id)) return { tipo: 'nodo', id };
+  }
+
+  const flecha = event.target.closest && event.target.closest('.edgePaths path, path.flowchart-link');
+  if (flecha) {
+    const indice = flechasSvg.indexOf(flecha);
+    if (indice >= 0) return { tipo: 'flecha', indice };
+  }
+
+  // El rótulo no dice a qué flecha pertenece, y acertar un trazo fino con el
+  // ratón es difícil: en ambos casos vale la flecha que pase más cerca.
+  const rotulo = event.target.closest && event.target.closest('.edgeLabel');
+  const caja = rotulo && rotulo.getBoundingClientRect();
+  const x = caja ? caja.left + caja.width / 2 : event.clientX;
+  const y = caja ? caja.top + caja.height / 2 : event.clientY;
+  const indice = flechaCercana(flechasSvg, x, y, caja ? Infinity : 12);
+  if (indice >= 0) return { tipo: 'flecha', indice };
+  return { tipo: 'fondo' };
+}
+
+// Coloca el cursor del editor donde se define el objeto, de modo que los
+// menús de la barra y los de este actúen sobre él.
+function irAlObjeto(objeto) {
+  const lineas = el.editor.value.split('\n');
+  let fila = -1;
+  let columna = 0;
+  if (objeto.tipo === 'nodo') {
+    for (let i = 0; i < lineas.length && fila === -1; i += 1) {
+      if (/^\s*%%/.test(lineas[i])) continue;
+      const def = parseNodeDef(lineas[i], objeto.id);
+      if (def) { fila = i; columna = def.inicio + 1; }
+    }
+    if (fila === -1) {
+      const re = new RegExp('(^|[^\\w-])' + escapaRe(objeto.id) + '(?![\\w-])');
+      fila = lineas.findIndex((l) => !/^\s*%%/.test(l) && re.test(l));
+      if (fila >= 0) columna = re.exec(lineas[fila]).index + 1;
+    }
+  } else if (objeto.tipo === 'flecha') {
+    let cuenta = 0;
+    for (let i = 0; i < lineas.length && fila === -1; i += 1) {
+      const n = enlacesDeLinea(lineas[i]);
+      if (objeto.indice < cuenta + n) { fila = i; columna = Math.max(0, lineas[i].search(/\S/)); }
+      cuenta += n;
+    }
+  }
+  if (fila < 0) return false;
+  const inicio = lineas.slice(0, fila).reduce((n, l) => n + l.length + 1, 0) + columna;
+  el.editor.setSelectionRange(inicio, inicio);
+  const alto = el.editor.clientHeight;
+  const altoLinea = parseFloat(getComputedStyle(el.editor).lineHeight) || 22;
+  el.editor.scrollTop = Math.max(0, fila * altoLinea - alto / 2);
+  renderGutter();
+  return true;
+}
+
+// Muestras de color, como las del menú de colores.
+function muestrasDeColor(contenedor, usarBorde, alElegir) {
+  const caja = document.createElement('div');
+  caja.className = 'swatches';
+  COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.title = t(clave);
+    boton.setAttribute('aria-label', t(clave));
+    boton.style.background = usarBorde ? vars.primaryBorderColor : vars.primaryColor;
+    boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
+    boton.addEventListener('click', () => {
+      cerrarContextual();
+      alElegir(usarBorde ? vars.primaryBorderColor : vars.primaryColor, vars.primaryBorderColor, nombre);
+    });
+    caja.appendChild(boton);
+  });
+  contenedor.appendChild(caja);
+}
+
+function segmentosDe(contenedor, opciones, actual, alElegir) {
+  const caja = document.createElement('div');
+  caja.className = 'segmentos';
+  opciones.forEach(([valor, texto]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = texto;
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+    boton.addEventListener('click', () => alElegir(valor));
+    caja.appendChild(boton);
+  });
+  contenedor.appendChild(caja);
+}
+
+function accionContextual(contenedor, texto, icono, alPulsar) {
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'accion-menu';
+  boton.innerHTML = '<svg aria-hidden="true"><use href="#' + icono + '"></use></svg>';
+  const span = document.createElement('span');
+  span.textContent = texto;
+  boton.appendChild(span);
+  boton.addEventListener('click', () => { cerrarContextual(); alPulsar(); });
+  contenedor.appendChild(boton);
+}
+
+// Abre uno de los menús de la barra del editor, si su botón está visible.
+function abrirDesdeContextual(idBoton) {
+  const boton = $(idBoton);
+  if (!boton || boton.closest('[hidden]')) return;
+  boton.click();
+}
+
+function cerrarContextual() {
+  el.contextMenu.hidden = true;
+}
+
+function grosorDeBorde(ids) {
+  return getPropLine('style ' + ids[0], 'stroke-width').replace('px', '');
+}
+
+function construirContextual(objeto) {
+  const menu = el.contextMenu;
+  menu.innerHTML = '';
+  const titulo = document.createElement('p');
+  titulo.className = 'menu-titulo';
+  menu.appendChild(titulo);
+
+  if (objeto.tipo === 'nodo') {
+    titulo.textContent = t('ctxBox') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = objeto.id;
+    titulo.appendChild(codigo);
+    const ids = [objeto.id];
+    segmentosDe(menu, [['todo', t('nodeColorAll')], ['texto', t('nodeColorText')], ['borde', t('nodeColorBorder')]], colorParte === 'flecha' ? 'todo' : colorParte, (valor) => {
+      colorParte = valor;
+      construirContextual(objeto);
+    });
+    if (colorParte === 'flecha') colorParte = 'todo';
+    muestrasDeColor(menu, colorParte !== 'todo', (color, borde) => {
+      applyNodeColor(ids, color, borde, null);
+    });
+    accionContextual(menu, t('nodeColorClear'), 'i-trash', () => clearNodeColor(ids));
+    menu.appendChild(document.createElement('hr'));
+    const grupoGrosor = document.createElement('p');
+    grupoGrosor.className = 'menu-grupo';
+    grupoGrosor.textContent = t('borderWidth');
+    menu.appendChild(grupoGrosor);
+    segmentosDe(menu, BORDER_WIDTHS.map(([v, k]) => [v, t(k)]), grosorDeBorde(ids), (valor) => {
+      cerrarContextual();
+      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+      setStyleProp(lineas, ids[0], 'stroke-width', valor ? valor + 'px' : null, sangriaDelCodigo(lineas));
+      el.editor.value = lineas.join('\n') + '\n';
+      renderGutter();
+      render();
+    });
+    accionContextual(menu, t('ctxShape'), 'i-square', () => abrirDesdeContextual('btn-shape'));
+    return;
+  }
+
+  if (objeto.tipo === 'flecha') {
+    titulo.textContent = t('ctxArrow') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = 'linkStyle ' + objeto.indice;
+    titulo.appendChild(codigo);
+    const flechas = [objeto.indice];
+    muestrasDeColor(menu, true, (color) => applyLinkColor(flechas, color));
+    accionContextual(menu, t('nodeColorClear'), 'i-trash', () => applyLinkColor(flechas, null));
+    menu.appendChild(document.createElement('hr'));
+    const grupo = document.createElement('p');
+    grupo.className = 'menu-grupo';
+    grupo.textContent = t('arrowWidth');
+    menu.appendChild(grupo);
+    const actual = getPropLine('linkStyle ' + objeto.indice, 'stroke-width').replace('px', '');
+    segmentosDe(menu, ARROW_WIDTHS.map(([v, k]) => [v, t(k)]), actual, (valor) => {
+      cerrarContextual();
+      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+      setPropLine(lineas, 'linkStyle ' + objeto.indice, 'stroke-width', valor ? valor + 'px' : null, sangriaDelCodigo(lineas));
+      el.editor.value = lineas.join('\n') + '\n';
+      renderGutter();
+      render();
+    });
+    return;
+  }
+
+  titulo.textContent = t('ctxAll');
+  [['colorMenu', 'btn-color', 'i-palette'], ['lines', 'btn-lines', 'i-spline'], ['shapeAll', 'btn-shape', 'i-square'],
+   ['strokeMenu', 'btn-stroke', 'i-brush'], ['fontSize', 'btn-size', 'i-text-size'],
+   ['engine', 'btn-engine', 'i-workflow'], ['direction', 'btn-dir', 'i-arrow-down']].forEach(([clave, boton, icono]) => {
+    const wrap = $(boton) && $(boton).closest('.menu-wrap');
+    if (!wrap || wrap.hidden) return;
+    accionContextual(menu, t(clave), icono, () => abrirDesdeContextual(boton));
+  });
+}
+
+function abrirContextual(event) {
+  // Con Mayús se deja pasar el menú del navegador (guardar o copiar la imagen).
+  if (event.shiftKey || viewer) return;
+  const objeto = objetoDelDiagrama(event);
+  if (objeto.tipo !== 'fondo') irAlObjeto(objeto);
+  event.preventDefault();
+  cerrarMenusEditor();
+  construirContextual(objeto);
+  const menu = el.contextMenu;
+  menu.hidden = false;
+  menu.style.left = '0px';
+  menu.style.top = '0px';
+  const caja = menu.getBoundingClientRect();
+  const x = Math.min(event.clientX, window.innerWidth - caja.width - 8);
+  const y = Math.min(event.clientY, window.innerHeight - caja.height - 8);
+  menu.style.left = Math.max(8, x) + 'px';
+  menu.style.top = Math.max(8, y) + 'px';
+}
+
+function setupContextual() {
+  el.viewport.addEventListener('contextmenu', abrirContextual);
+  el.contextMenu.addEventListener('click', (event) => event.stopPropagation());
+  el.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
+  document.addEventListener('click', cerrarContextual);
+  el.viewport.addEventListener('pointerdown', (event) => { if (event.button !== 2) cerrarContextual(); });
+  window.addEventListener('blur', cerrarContextual);
+  // En pantalla táctil, la pulsación larga hace las veces del botón derecho.
+  let tempo = null;
+  const cancelar = () => { clearTimeout(tempo); tempo = null; };
+  el.viewport.addEventListener('touchstart', (event) => {
+    if (event.touches.length !== 1) return cancelar();
+    const toque = event.touches[0];
+    tempo = setTimeout(() => {
+      abrirContextual({ target: document.elementFromPoint(toque.clientX, toque.clientY), clientX: toque.clientX, clientY: toque.clientY, preventDefault: () => {}, shiftKey: false });
+    }, 550);
+  }, { passive: true });
+  ['touchmove', 'touchend', 'touchcancel'].forEach((evento) => el.viewport.addEventListener(evento, cancelar, { passive: true }));
+}
+
+
 /* --- Título y descripción accesibles (accTitle y accDescr de Mermaid) --- */
 
 // Tipos que no admiten accTitle ni accDescr (dan error o los ignoran): en ellos
@@ -3033,6 +3307,7 @@ function setupToolbar() {
   });
 
   setupEditorTools();
+  setupContextual();
 
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();
@@ -3093,6 +3368,7 @@ function setupToolbar() {
       el.langMenu.hidden = true;
       el.downloadMenu.hidden = true;
       cerrarMenusEditor();
+      cerrarContextual();
       el.libraryModal.hidden = true;
     }
   });
