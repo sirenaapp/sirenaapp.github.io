@@ -108,6 +108,8 @@ window.SIRENA_LANG.gl = {
   engDiscoD: 'Coloca á parte as partes que non están conectadas',
   undo: 'Desfacer (Ctrl+Z)',
   redo: 'Refacer (Ctrl+Y)',
+  nodeColorLink: 'A frecha',
+  nodeColorLinks: 'Colorear a frecha desta liña:',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Cor do elemento onde está o cursor',
   nodeColorNone: 'Sitúe o cursor na liña dun elemento (unha caixa, un estado…) e volva premer o botón.',

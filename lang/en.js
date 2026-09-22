@@ -108,6 +108,8 @@ window.SIRENA_LANG.en = {
   engDiscoD: 'Places unconnected parts separately',
   undo: 'Undo (Ctrl+Z)',
   redo: 'Redo (Ctrl+Y)',
+  nodeColorLink: 'The arrow',
+  nodeColorLinks: 'Colour the arrow on this line:',
   typeBtn: 'Diagram type',
   nodeColor: 'Colour of the element at the cursor',
   nodeColorNone: 'Place the cursor on the line of an element (a box, a state…) and press the button again.',

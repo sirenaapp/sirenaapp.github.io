@@ -45,7 +45,13 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   queden sin uso. Solo el texto o solo el borde cambian esa propiedad
   (`color` o `stroke`) en la línea `style` del elemento, creándola si no
   existe, sin tocar el resto; para ellos la paleta ofrece los colores oscuros
-  del borde, porque el relleno claro no se leería.
+  del borde, porque el relleno claro no se leería. En un diagrama de flujo,
+  cuando la línea del cursor lleva una flecha, aparece una cuarta opción, «La
+  flecha», que escribe `linkStyle N stroke:…,color:…` (línea y texto del
+  rótulo); Sirena cuenta las flechas como lo hace Mermaid, por orden de
+  aparición desde 0 y contando las que suman «&» y las encadenadas, que es lo
+  que más cuesta hacer a mano. El fondo del rótulo de una sola flecha no se
+  puede cambiar en Mermaid; el de todos es la variable `edgeLabelBackground`.
 - **Trazo y texto.** El trazo y el tamaño del texto, en un botón.
 - **Motor de distribución.** Un botón que lista todos los motores que trae
   Mermaid 12: dagre y los algoritmos de ELK (por capas, árbol, radial, por

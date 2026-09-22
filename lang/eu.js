@@ -108,6 +108,8 @@ window.SIRENA_LANG.eu = {
   engDiscoD: 'Konektatuta ez dauden zatiak aparte jartzen ditu',
   undo: 'Desegin (Ctrl+Z)',
   redo: 'Berregin (Ctrl+Y)',
+  nodeColorLink: 'Gezia',
+  nodeColorLinks: 'Lerro honetako gezia koloreztatu:',
   typeBtn: 'Diagrama mota',
   nodeColor: 'Kurtsorea dagoen elementuaren kolorea',
   nodeColorNone: 'Jarri kurtsorea elementu baten lerroan (kutxa bat, egoera bat…) eta sakatu berriro botoia.',

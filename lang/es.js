@@ -108,6 +108,8 @@ window.SIRENA_LANG.es = {
   engDiscoD: 'Coloca aparte las partes que no están conectadas',
   undo: 'Deshacer (Ctrl+Z)',
   redo: 'Rehacer (Ctrl+Y)',
+  nodeColorLink: 'La flecha',
+  nodeColorLinks: 'Colorear la flecha de esta línea:',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Color del elemento donde está el cursor',
   nodeColorNone: 'Sitúe el cursor en la línea de un elemento (una caja, un estado…) y vuelva a pulsar el botón.',

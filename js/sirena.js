@@ -1495,6 +1495,60 @@ function targetNodes() {
   return ids;
 }
 
+// Flechas de un diagrama de flujo, numeradas como las cuenta Mermaid para
+// linkStyle: por orden de aparición, empezando en 0. Una línea con «&» o con
+// varias flechas encadenadas suma varias.
+const ENLACE_RE = /<?-{2,}[>xo]?|<?-\.+-?[>xo]?|<?={2,}[>xo]?|~{3,}/g;
+
+function enlacesDeLinea(linea) {
+  const limpia = linea.replace(/%%.*$/, '').trim();
+  if (!limpia || /^(flowchart|graph|subgraph|end|direction|style|classDef|class|linkStyle|click|accTitle|accDescr)\b/.test(limpia)) return 0;
+  const sinTextos = limpia
+    .replace(/"[^"]*"/g, '""')
+    .replace(/--\s[^-]*?\s-->/g, '-->').replace(/-\.\s[^.]*?\s\.->/g, '-.->').replace(/==\s[^=]*?\s==>/g, '==>')
+    .replace(/\|[^|]*\|/g, '')
+    .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|>[^\]]*\]/g, '');
+  const segmentos = sinTextos.split(ENLACE_RE);
+  let total = 0;
+  for (let i = 0; i < segmentos.length - 1; i += 1) {
+    const izq = (segmentos[i].match(/&/g) || []).length + 1;
+    const der = (segmentos[i + 1].match(/&/g) || []).length + 1;
+    total += izq * der;
+  }
+  return total;
+}
+
+// Índices de las flechas que hay en las líneas del cursor o de la selección.
+function targetLinks() {
+  if (diagramKind() !== 'flowchart') return [];
+  const texto = el.editor.value;
+  const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
+  let hasta = texto.indexOf('\n', el.editor.selectionEnd);
+  if (hasta === -1) hasta = texto.length;
+  const previas = texto.slice(0, desde).split('\n');
+  let indice = previas.reduce((n, l) => n + enlacesDeLinea(l), 0);
+  const ids = [];
+  texto.slice(desde, hasta).split('\n').forEach((linea) => {
+    const n = enlacesDeLinea(linea);
+    for (let k = 0; k < n; k += 1) ids.push(indice + k);
+    indice += n;
+  });
+  return ids;
+}
+
+// Colorea unas flechas (línea y texto del rótulo) con linkStyle; la línea
+// anterior para esas mismas flechas se sustituye.
+function applyLinkColor(indices, color) {
+  const lista = indices.join(',');
+  let lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = (lineas.find((l, i) => i > 0 && l.trim()) || '    ').match(/^[ \t]*/)[0] || '    ';
+  lineas = lineas.filter((l) => !new RegExp(`^\\s*linkStyle\\s+${lista.replace(/,/g, ',')}\\s`).test(l));
+  if (color) lineas.push(`${sangria}linkStyle ${lista} stroke:${color},color:${color}`);
+  el.editor.value = lineas.join('\n') + '\n';
+  renderGutter();
+  render();
+}
+
 // Borde y texto a juego con el relleno, como hace el color principal. Los
 // colores de la paleta traen su propio borde.
 function nodeColorValues(relleno, borde) {
@@ -1605,14 +1659,23 @@ function clearNodeColor(ids) {
 
 function buildNodeColorSection() {
   const ids = targetNodes();
+  const flechas = targetLinks();
   const caja = el.nodeColorBox;
-  caja.dataset.sinObjetivo = ids.length ? 'false' : 'true';
+  if (colorParte === 'flecha' && !flechas.length) colorParte = 'todo';
+  caja.dataset.sinObjetivo = ids.length || flechas.length ? 'false' : 'true';
   caja.dataset.ids = JSON.stringify(ids);
+  caja.dataset.flechas = JSON.stringify(flechas);
   el.colorPartes.querySelectorAll('button').forEach((boton) => {
     boton.setAttribute('aria-current', boton.dataset.parte === colorParte ? 'true' : 'false');
+    if (boton.dataset.parte === 'flecha') boton.hidden = !flechas.length;
   });
   el.nodeColorTarget.innerHTML = '';
-  if (!ids.length) {
+  if (colorParte === 'flecha') {
+    el.nodeColorTarget.textContent = t('nodeColorLinks') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = 'linkStyle ' + flechas.join(',');
+    el.nodeColorTarget.appendChild(codigo);
+  } else if (!ids.length) {
     el.nodeColorTarget.textContent = t('nodeColorNone');
   } else {
     el.nodeColorTarget.textContent = t(ids.length === 1 ? 'nodeColorOne' : 'nodeColorMany') + ' ';
@@ -1633,7 +1696,8 @@ function buildNodeColorSection() {
     boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
     boton.addEventListener('click', () => {
       el.colorMenu.hidden = true;
-      applyNodeColor(ids, color, vars.primaryBorderColor, ids.length > 1 ? nombre : null);
+      if (colorParte === 'flecha') applyLinkColor(flechas, vars.primaryBorderColor);
+      else applyNodeColor(ids, color, vars.primaryBorderColor, ids.length > 1 ? nombre : null);
     });
     el.swatches.appendChild(boton);
   });
@@ -1757,15 +1821,19 @@ function setupEditorTools() {
 
   el.nodeColorCustom.addEventListener('change', () => {
     const ids = JSON.parse(el.nodeColorBox.dataset.ids || '[]');
+    const flechas = JSON.parse(el.nodeColorBox.dataset.flechas || '[]');
     el.colorMenu.hidden = true;
     const valor = el.nodeColorCustom.value;
-    applyNodeColor(ids, valor, null, ids.length > 1 ? nodeColorName(valor) : null);
+    if (colorParte === 'flecha') applyLinkColor(flechas, valor);
+    else applyNodeColor(ids, valor, null, ids.length > 1 ? nodeColorName(valor) : null);
   });
 
   $('node-color-clear').addEventListener('click', () => {
     const ids = JSON.parse(el.nodeColorBox.dataset.ids || '[]');
+    const flechas = JSON.parse(el.nodeColorBox.dataset.flechas || '[]');
     el.colorMenu.hidden = true;
-    clearNodeColor(ids);
+    if (colorParte === 'flecha') applyLinkColor(flechas, null);
+    else clearNodeColor(ids);
   });
 
   // Al mover el cursor cambia qué elemento se colorearía: si el menú de color

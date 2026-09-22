@@ -108,6 +108,8 @@ window.SIRENA_LANG.ca = {
   engDiscoD: 'Col·loca a part les parts que no estan connectades',
   undo: 'Desfés (Ctrl+Z)',
   redo: 'Refés (Ctrl+Y)',
+  nodeColorLink: 'La fletxa',
+  nodeColorLinks: 'Acolorir la fletxa d\'aquesta línia:',
   typeBtn: 'Tipus de diagrama',
   nodeColor: 'Color de l\'element on hi ha el cursor',
   nodeColorNone: 'Situeu el cursor a la línia d\'un element (una caixa, un estat…) i torneu a prémer el botó.',
