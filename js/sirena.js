@@ -126,6 +126,8 @@ const el = {
   typeLabel: $('type-label'),
   typeMenu: $('type-menu'),
   dirGroup: $('dir-group'),
+  dirMenu: $('dir-menu'),
+  dirIcon: $('dir-icon'),
   colorWrap: $('color-wrap'),
   nodeColorMenu: $('node-color-menu'),
   nodeColorTarget: $('node-color-target'),
@@ -1083,7 +1085,9 @@ function readDirection() {
   const suelta = /^[ \t]*direction[ \t]+(TB|TD|BT|LR|RL)[ \t]*$/m.exec(cuerpo);
   const valor = (flujo && flujo[1]) || (suelta && suelta[1]) || 'TD';
   const actual = valor === 'TB' ? 'TD' : valor;
-  el.dirGroup.querySelectorAll('button').forEach((boton) => {
+  const iconos = { TD: 'i-arrow-down', LR: 'i-arrow-right', BT: 'i-arrow-up', RL: 'i-arrow-left' };
+  el.dirIcon.setAttribute('href', '#' + iconos[actual]);
+  el.dirMenu.querySelectorAll('button').forEach((boton) => {
     boton.setAttribute('aria-current', boton.dataset.dir === actual ? 'true' : 'false');
   });
   return actual;
@@ -1220,10 +1224,25 @@ function buildSyntaxBox() {
 const TYPE_HEADERS = {
   flowchart: 'flowchart TD', state: 'stateDiagram-v2', gitgraph: 'gitGraph', ishikawa: 'ishikawa-beta',
   gantt: 'gantt', timeline: 'timeline', journey: 'journey',
-  mindmap: 'mindmap', venn: 'venn-beta', class: 'classDiagram', er: 'erDiagram', treemap: 'treemap-beta',
+  concept: 'flowchart TD', mindmap: 'mindmap', venn: 'venn-beta', class: 'classDiagram', er: 'erDiagram', treemap: 'treemap-beta',
   pie: 'pie', xychart: 'xychart-beta', radar: 'radar-beta', quadrant: 'quadrantChart', sankey: 'sankey-beta',
   sequence: 'sequenceDiagram', block: 'block-beta', kanban: 'kanban', architecture: 'architecture-beta'
 };
+
+// El mapa conceptual es un diagrama de flujo con los enlaces rotulados con un
+// verbo: se reconoce por el comentario que escribe el botón de tipo.
+function conceptHints() {
+  return Object.values(window.SIRENA_LANG).map((l) => l.conceptHint).filter(Boolean);
+}
+
+function isConceptMap(code) {
+  if (conceptHints().some((pista) => code.includes(pista))) return true;
+  const titulo = /^[ \t]*accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
+  if (!titulo) return false;
+  const ejemplo = findExample('concept');
+  const nombres = ejemplo ? Object.values(ejemplo.label) : [];
+  return nombres.some((n) => titulo[1].toLowerCase().includes(n.toLowerCase()));
+}
 
 // Tipos en los que se puede colorear un elemento suelto.
 const COLORABLE = ['flowchart', 'state', 'class', 'block'];
@@ -1240,6 +1259,7 @@ function soloCabecera(code) {
 // tipos que diagramKind, pensada solo para los ajustes del dibujo).
 function editorType() {
   const tipo = currentSyntax();
+  if (tipo && tipo.id === 'flowchart' && isConceptMap(el.editor.value)) return 'concept';
   return tipo ? tipo.id : null;
 }
 
@@ -1278,7 +1298,7 @@ function buildTypeMenu() {
 // Escribe la línea que define el tipo. Con el editor vacío se inserta ahí; si
 // ya hay un diagrama, se abre uno nuevo y el anterior se queda en la biblioteca.
 function startType(id) {
-  const cabecera = TYPE_HEADERS[id] + '\n    ';
+  const cabecera = TYPE_HEADERS[id] + '\n    ' + (id === 'concept' ? t('conceptHint') + '\n    ' : '');
   if (el.editor.value.trim()) {
     crearDoc(cabecera, typeLabelFor(id));
   }
@@ -1485,6 +1505,7 @@ function setupEditorTools() {
   $('btn-type').addEventListener('click', (event) => {
     event.stopPropagation();
     el.nodeColorMenu.hidden = true;
+    el.dirMenu.hidden = true;
     placeMenu(el.typeMenu, $('btn-type'));
     el.typeMenu.hidden = !el.typeMenu.hidden;
     if (!el.typeMenu.hidden) ajustarMenuAlPanel(el.typeMenu);
@@ -1494,6 +1515,7 @@ function setupEditorTools() {
   $('btn-node-color').addEventListener('click', (event) => {
     event.stopPropagation();
     el.typeMenu.hidden = true;
+    el.dirMenu.hidden = true;
     if (!el.nodeColorMenu.hidden) { el.nodeColorMenu.hidden = true; return; }
     placeMenu(el.nodeColorMenu, $('btn-node-color'));
     openNodeColorMenu();
@@ -2140,6 +2162,7 @@ function setupToolbar() {
     el.shareMenu.hidden = true;
     el.appearanceMenu.hidden = true;
     el.typeMenu.hidden = true;
+    el.dirMenu.hidden = true;
     el.nodeColorMenu.hidden = true;
   });
 
@@ -2206,8 +2229,18 @@ function setupToolbar() {
     });
   });
 
-  el.dirGroup.querySelectorAll('button').forEach((boton) => {
+  $('btn-dir').addEventListener('click', (event) => {
+    event.stopPropagation();
+    el.typeMenu.hidden = true;
+    el.nodeColorMenu.hidden = true;
+    placeMenu(el.dirMenu, $('btn-dir'));
+    el.dirMenu.hidden = !el.dirMenu.hidden;
+    if (!el.dirMenu.hidden) ajustarMenuAlPanel(el.dirMenu);
+  });
+  el.dirMenu.addEventListener('click', (event) => event.stopPropagation());
+  el.dirMenu.querySelectorAll('button').forEach((boton) => {
     boton.addEventListener('click', () => {
+      el.dirMenu.hidden = true;
       writeDirection(boton.dataset.dir);
       readDirection();
       render();
@@ -2278,6 +2311,7 @@ function setupToolbar() {
       el.downloadMenu.hidden = true;
       el.appearanceMenu.hidden = true;
       el.typeMenu.hidden = true;
+      el.dirMenu.hidden = true;
       el.nodeColorMenu.hidden = true;
       el.libraryModal.hidden = true;
     }

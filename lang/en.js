@@ -78,6 +78,7 @@ window.SIRENA_LANG.en = {
   colorLine: 'Lines',
   colorText: 'Text',
   colorHint: 'Changing the fill adjusts border, lines and text on its own until they are set by hand.',
+  conceptHint: '%% Concept map: every link carries a verb, for example A[Water] -- is found as --> B[Three states]',
   typeBtn: 'Diagram type',
   nodeColor: 'Colour of the element at the cursor',
   nodeColorNone: 'Place the cursor on the line of an element (a box, a state…) and press the button again.',

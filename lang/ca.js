@@ -78,6 +78,7 @@ window.SIRENA_LANG.ca = {
   colorLine: 'Línies',
   colorText: 'Text',
   colorHint: "En canviar el farciment, la vora, les línies i el text s'ajusten sols mentre no es toquin.",
+  conceptHint: '%% Mapa conceptual: cada enllaç porta un verb, per exemple A[Aigua] -- es presenta en --> B[Tres estats]',
   typeBtn: 'Tipus de diagrama',
   nodeColor: 'Color de l\'element on hi ha el cursor',
   nodeColorNone: 'Situeu el cursor a la línia d\'un element (una caixa, un estat…) i torneu a prémer el botó.',

@@ -17,13 +17,19 @@ un elemento concreto, que en Mermaid exige conocer `style`, `classDef` y
 El panel del código lleva una barra de herramientas propia, con tres grupos:
 
 - **Tipo de diagrama.** Un botón con el nombre del tipo que hay en el editor
-  (o «Tipo de diagrama» si no hay ninguno) abre un menú con los 21 tipos que
+  (o «Tipo de diagrama» si no hay ninguno) abre un menú con los 22 tipos que
   tienen ejemplo, agrupados como los ejemplos y con su línea de definición. Con
   el editor vacío, la línea se inserta; con un diagrama escrito, se abre uno
-  nuevo y el anterior queda en la biblioteca (ADR 13). Un código que solo
+  nuevo y el anterior queda en la biblioteca (ADR 13). El mapa conceptual,
+  que en Mermaid es un diagrama de flujo con los enlaces rotulados con un
+  verbo, figura como tipo propio por su peso en el aula: escribe `flowchart
+  TD` más un comentario que explica cómo se rotulan los enlaces, y por ese
+  comentario la barra lo reconoce como mapa conceptual. Un código que solo
   tiene esa línea se muestra como vacío, sin error, para no despistar.
-- **Orientación.** Cuatro botones con flechas, con el actual marcado, solo en
-  los tipos que la admiten (flujo, estados, clases y entidad-relación). Escribe
+- **Orientación.** Un botón que muestra la flecha de la orientación actual y
+  despliega las cuatro con su nombre, solo en los tipos que la admiten (flujo,
+  estados, clases y entidad-relación); las cuatro flechas sueltas ocupaban
+  sitio y se agruparon a petición del autor. Escribe
   en el código como antes (`flowchart LR` o una línea `direction`). Sale del
   menú de aspecto, donde estaba como desplegable, para no tener dos veces lo
   mismo.

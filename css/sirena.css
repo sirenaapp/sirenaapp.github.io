@@ -279,8 +279,8 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .tb-texto { gap: 6px; padding: 0 9px 0 7px; font-size: 13px; white-space: nowrap; }
 .tb-texto span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 
-.dir-group { display: inline-flex; gap: 2px; }
-.dir-group .tb[aria-current="true"] { color: var(--accent); background: var(--accent-soft); border-color: var(--border); }
+.menu-direccion { min-width: 200px; white-space: nowrap; }
+.menu-direccion button { align-items: center; }
 
 /* Los menús de esta barra cuelgan por la izquierda, que es donde están sus botones. */
 .menu-izq { right: auto; left: 0; top: 34px; }

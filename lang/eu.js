@@ -78,6 +78,7 @@ window.SIRENA_LANG.eu = {
   colorLine: 'Marrak',
   colorText: 'Testua',
   colorHint: 'Betegarria aldatzean, ertza, marrak eta testua bakarrik doitzen dira ukitzen ez diren bitartean.',
+  conceptHint: '%% Kontzeptu-mapa: lotura bakoitzak aditz bat darama, adibidez A[Ura] -- egoera hauetan agertzen da --> B[Hiru egoera]',
   typeBtn: 'Diagrama mota',
   nodeColor: 'Kurtsorea dagoen elementuaren kolorea',
   nodeColorNone: 'Jarri kurtsorea elementu baten lerroan (kutxa bat, egoera bat…) eta sakatu berriro botoia.',

@@ -149,11 +149,14 @@
         <div class="menu menu-izq menu-tipos" id="type-menu" hidden></div>
       </div>
       <span class="tb-sep" id="dir-sep" hidden></span>
-      <div class="dir-group" id="dir-group" role="group" data-i18n-aria="direction" hidden>
-        <button type="button" class="tb" data-dir="TD" data-i18n-title="dirTD"><svg><use href="#i-arrow-down"></use></svg></button>
-        <button type="button" class="tb" data-dir="LR" data-i18n-title="dirLR"><svg><use href="#i-arrow-right"></use></svg></button>
-        <button type="button" class="tb" data-dir="BT" data-i18n-title="dirBT"><svg><use href="#i-arrow-up"></use></svg></button>
-        <button type="button" class="tb" data-dir="RL" data-i18n-title="dirRL"><svg><use href="#i-arrow-left"></use></svg></button>
+      <div class="menu-wrap" id="dir-group" hidden>
+        <button type="button" id="btn-dir" class="tb" data-i18n-title="direction"><svg><use id="dir-icon" href="#i-arrow-down"></use></svg></button>
+        <div class="menu menu-izq menu-iconos menu-direccion" id="dir-menu" hidden>
+          <button type="button" data-dir="TD"><svg><use href="#i-arrow-down"></use></svg><span data-i18n="dirTD"></span></button>
+          <button type="button" data-dir="LR"><svg><use href="#i-arrow-right"></use></svg><span data-i18n="dirLR"></span></button>
+          <button type="button" data-dir="BT"><svg><use href="#i-arrow-up"></use></svg><span data-i18n="dirBT"></span></button>
+          <button type="button" data-dir="RL"><svg><use href="#i-arrow-left"></use></svg><span data-i18n="dirRL"></span></button>
+        </div>
       </div>
       <span class="tb-sep" id="color-sep" hidden></span>
       <div class="menu-wrap" id="color-wrap" hidden>

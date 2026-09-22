@@ -13,8 +13,8 @@ propia dirección.
 
 - Escribir el diagrama como texto y verlo dibujado al momento. Encima del
   código hay una barra para quien empieza: un botón que escribe la línea que
-  define el tipo de diagrama (con los 24 tipos agrupados como los ejemplos),
-  cuatro flechas para la orientación en los diagramas que la admiten, y un
+  define el tipo de diagrama (con los 22 tipos agrupados como los ejemplos, el mapa conceptual entre ellos),
+  un desplegable con las cuatro orientaciones en los diagramas que la admiten, y un
   botón que colorea el elemento donde está el cursor (o los elementos
   seleccionados) escribiendo en el código la línea `style` o la clase
   `classDef` correspondiente.

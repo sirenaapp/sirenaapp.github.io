@@ -78,6 +78,7 @@ window.SIRENA_LANG.es = {
   colorLine: 'Líneas',
   colorText: 'Texto',
   colorHint: 'Al cambiar el relleno, el borde, las líneas y el texto se ajustan solos mientras no se toquen.',
+  conceptHint: '%% Mapa conceptual: cada enlace lleva un verbo, por ejemplo A[Agua] -- se presenta en --> B[Tres estados]',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Color del elemento donde está el cursor',
   nodeColorNone: 'Sitúe el cursor en la línea de un elemento (una caja, un estado…) y vuelva a pulsar el botón.',

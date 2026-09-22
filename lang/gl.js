@@ -78,6 +78,7 @@ window.SIRENA_LANG.gl = {
   colorLine: 'Liñas',
   colorText: 'Texto',
   colorHint: 'Ao cambiar o recheo, o bordo, as liñas e o texto axústanse sós mentres non se toquen.',
+  conceptHint: '%% Mapa conceptual: cada ligazón leva un verbo, por exemplo A[Auga] -- preséntase en --> B[Tres estados]',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Cor do elemento onde está o cursor',
   nodeColorNone: 'Sitúe o cursor na liña dun elemento (unha caixa, un estado…) e volva premer o botón.',
