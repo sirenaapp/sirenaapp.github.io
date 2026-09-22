@@ -32,6 +32,7 @@ navegador como dirección de datos cuando lleva HTML dentro.
 El botón de fórmula abre **Edicuatex** (<https://edicuatex.github.io/>), el
 editor de fórmulas de la misma casa, en una ventana aparte, con `?pm=1&origin=…`,
 y recoge el LaTeX que devuelve por `postMessage` comprobando que viene de ahí.
+Como Edicuatex no se cierra al enviar, la cierra Sirena, que es quien la abrió.
 Si el cursor está dentro de un rótulo, la fórmula se inserta ahí y el rótulo se
 entrecomilla (las llaves del LaTeX romperían la sintaxis); si no, se crea una
 caja con ella. También se puede escribir a mano, sin abrir nada.

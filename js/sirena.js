@@ -2999,12 +2999,23 @@ function abrirEditorFormulas() {
   if (!ventanaFormulas) toast(t('formulaBlocked'));
 }
 
+// Al recibir la fórmula se cierra la ventana del editor, que no se cierra
+// sola, y el foco vuelve al diagrama.
+function cerrarEditorFormulas() {
+  if (ventanaFormulas && !ventanaFormulas.closed) {
+    try { ventanaFormulas.close(); } catch (_) { /* si el navegador no deja, se queda abierta */ }
+  }
+  ventanaFormulas = null;
+  window.focus();
+}
+
 function setupFormulas() {
   window.addEventListener('message', (event) => {
     if (event.origin !== new URL(EDICUATEX).origin) return;
     const datos = event.data;
     if (!datos || datos.type !== 'edicuatex:result') return;
     insertarFormula(datos.latex);
+    cerrarEditorFormulas();
   });
 }
 
