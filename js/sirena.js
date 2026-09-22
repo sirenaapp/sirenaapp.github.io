@@ -723,6 +723,7 @@ function updateAppearanceVisibility() {
     showdata: tipo === 'pie'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
   $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
   readShowData();
@@ -2258,6 +2259,22 @@ function buildOptionMenu(menu, select, titulo) {
   });
 }
 
+// «Unir las flechas que van al mismo sitio» se pone y se quita con el mismo
+// botón, sin menú, porque solo tiene dos estados.
+function unirFlechasPuesto() {
+  return el.mergeSelect.value === 'yes';
+}
+
+function alternarUnirFlechas() {
+  el.mergeSelect.value = unirFlechasPuesto() ? 'no' : 'yes';
+  el.mergeSelect.dispatchEvent(new Event('change'));
+  updateMergeButton();
+}
+
+function updateMergeButton() {
+  $('btn-merge').setAttribute('aria-pressed', unirFlechasPuesto() ? 'true' : 'false');
+}
+
 // Menú de motores, cada uno con una línea que dice cómo reparte los elementos.
 function buildEngineMenu() {
   el.engineMenu.innerHTML = '';
@@ -2317,6 +2334,12 @@ function setupEditorTools() {
     alternarMenuEditor(el.strokeMenu, $('btn-stroke'));
   });
   // Un botón por ajuste: su menú lista las opciones del selector y marca la actual.
+  $('btn-merge').addEventListener('click', (event) => {
+    event.stopPropagation();
+    cerrarMenusEditor();
+    alternarUnirFlechas();
+  });
+
   document.querySelectorAll('.menu-opciones[data-select]').forEach((menu) => {
     const select = $(menu.dataset.select);
     const wrap = menu.parentElement;
@@ -2550,6 +2573,24 @@ function segmentosDe(contenedor, opciones, actual, alElegir) {
   contenedor.appendChild(caja);
 }
 
+// Entrada del menú contextual que enciende y apaga algo.
+function interruptorContextual(contenedor, texto, icono, puesto, alPulsar) {
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'accion-menu';
+  boton.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+  boton.innerHTML = '<svg aria-hidden="true"><use href="#' + icono + '"></use></svg>';
+  const span = document.createElement('span');
+  span.textContent = texto;
+  boton.appendChild(span);
+  const marca = document.createElement('span');
+  marca.className = 'marca';
+  if (puesto) marca.innerHTML = '<svg aria-hidden="true"><use href="#i-check"></use></svg>';
+  boton.appendChild(marca);
+  boton.addEventListener('click', alPulsar);
+  contenedor.appendChild(boton);
+}
+
 function accionContextual(contenedor, texto, icono, alPulsar, mantener, conPaso) {
   const boton = document.createElement('button');
   boton.type = 'button';
@@ -2740,6 +2781,12 @@ function construirContextual(objeto) {
   entradaSubmenu(menu, objeto, 'trazo');
   entradaSubmenu(menu, objeto, 'tamano');
   entradaSubmenu(menu, objeto, 'motor');
+  if (!$('wrap-merge').hidden) {
+    interruptorContextual(menu, t('merge'), 'i-merge', unirFlechasPuesto(), () => {
+      alternarUnirFlechas();
+      construirContextual(objeto);
+    });
+  }
   entradaSubmenu(menu, objeto, 'direccion');
 }
 

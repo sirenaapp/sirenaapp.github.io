@@ -281,6 +281,8 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .editor-tools .tb-fin { margin-left: auto; }
 .editor-tools .tb:disabled { opacity: .35; cursor: default; }
 .editor-tools .tb:disabled:hover { background: transparent; border-color: transparent; }
+/* Un botón que es interruptor se ve encendido cuando está puesto. */
+.editor-tools .tb[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); border-color: var(--border); }
 
 .tb-texto { gap: 6px; padding: 0 9px 0 7px; font-size: 13px; white-space: nowrap; }
 .tb-texto span { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
@@ -310,6 +312,9 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-contextual .accion-menu { display: flex; align-items: center; gap: 8px; }
 .menu-contextual .accion-menu svg { width: 16px; height: 16px; flex: none; color: var(--text-soft); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .menu-contextual .accion-menu .chevron { margin-left: auto; color: var(--text-soft); }
+.menu-contextual .accion-menu .marca { margin-left: auto; color: var(--accent); display: inline-flex; }
+.menu-contextual .accion-menu .marca svg { width: 15px; height: 15px; color: var(--accent); }
+.menu-contextual .accion-menu[aria-pressed="true"] { color: var(--accent); font-weight: 600; }
 
 /* Cabecera de un submenú, con el paso atrás. */
 .submenu-cabecera { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }

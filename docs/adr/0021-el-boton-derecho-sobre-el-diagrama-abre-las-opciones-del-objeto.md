@@ -24,8 +24,10 @@ que los botones de la barra pasan a actuar sobre él.
   cambiar para todos a la vez, `edgeLabelBackground`) y el paso a las
   propiedades de la flecha.
 - **Sobre el fondo**: lo general que aplique al tipo de diagrama (colores,
-  líneas, forma de todas las cajas, trazo, tamaño del texto, motor y
-  orientación).
+  líneas, forma de todas las cajas, trazo, tamaño del texto, motor, unir las
+  flechas que van al mismo sitio y orientación). «Unir flechas» aparece como
+  interruptor, con su marca cuando está puesto, igual que su botón de la
+  barra.
 
 Las opciones que no caben en una pulsación se abren dentro del propio menú,
 como submenú con su paso atrás, y no llevando al menú de la barra, que el
