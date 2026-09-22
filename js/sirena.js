@@ -67,6 +67,7 @@ const WIDTHS = [['120', 'widthNarrow'], ['200', 'widthMedium'], ['300', 'widthWi
 // que existen en cualquier equipo y salen en el PNG; la de serie es la del
 // sistema, que fija initMermaid.
 const FONTS = [['', 'fontDefault'], ['serif', 'fontSerif'], ['monospace', 'fontMono'], ['cursive', 'fontHand']];
+const SIN_TRAZO = ['gantt', 'pie', 'journey', 'sankey', 'xychart', 'quadrant', 'treemap', 'radar', 'architecture', 'treeview'];
 let fuenteActual = '';
 let anchoCajas = '120';
 // Las líneas y la separación solo las atiende el motor dagre. Mermaid 12 usa elk
@@ -855,6 +856,9 @@ function updateAppearanceVisibility() {
     calendar: tipo === 'gantt'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  // El trazo (clásico, a mano alzada, moderno) no cambia nada en estos tipos
+  // (comprobado con Mermaid 12.0.0): el botón sobra.
+  $('wrap-stroke').hidden = SIN_TRAZO.includes(editorType());
   const btnShape = $('btn-shape');
   btnShape.title = t(esFlujo ? 'shapeBtn' : 'boxWidth');
   btnShape.setAttribute('aria-label', btnShape.title);
@@ -1668,6 +1672,41 @@ function readShowData() {
   el.showDataSelect.value = /^[ \t]*pie[ \t]+showData\b/m.test(el.editor.value) ? 'yes' : 'no';
 }
 
+/* --- Árbol (treeView): resaltar una fila --- */
+
+// Índice de línea del código de la fila n del árbol (sin cabecera ni
+// accesibilidad ni comentarios).
+function lineaDelArbol(n) {
+  if (n < 0) return -1;
+  const lineas = el.editor.value.split('\n');
+  let k = 0;
+  for (let i = 0; i < lineas.length; i += 1) {
+    const l = lineas[i].trim();
+    if (!l || /^%%/.test(l) || /^treeView(-beta)?\b/.test(l) || /^acc(Title|Descr)\s*:/.test(l)) continue;
+    if (k === n) return i;
+    k += 1;
+  }
+  return -1;
+}
+
+function filaResaltada(linea) {
+  return /:::highlight\b/.test(el.editor.value.split('\n')[linea] || '');
+}
+
+function alternarResaltado(linea) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const actual = lineas[linea];
+  if (actual === undefined) return;
+  if (/:::highlight\b/.test(actual)) {
+    lineas[linea] = actual.replace(/\s*:::highlight\b/, '');
+  } else {
+    // La anotación va detrás de la etiqueta y antes de la nota (## …).
+    const m = /^(.*?)(\s*##.*)?$/.exec(actual);
+    lineas[linea] = m[1].replace(/\s+$/, '') + ' :::highlight' + (m[2] || '');
+  }
+  aplicarCodigo(lineas);
+}
+
 /* --- Bloques (subgraph … end) --- */
 
 // Los bloques del código: id, título, líneas que ocupa, dirección propia y
@@ -1724,6 +1763,31 @@ function crearBloque(ids) {
   lineas.splice(posicionParaFlecha(lineas), 0, ...nuevas);
   aplicarCodigo(lineas);
   editarBloqueCuandoAparezca(id);
+}
+
+// Bloque que contiene una caja, esté definida dentro o solo referenciada.
+function bloqueQueContiene(id) {
+  const lineas = el.editor.value.split('\n');
+  return bloquesDelCodigo().find((b) => {
+    for (let i = b.inicio + 1; i < b.fin; i += 1) {
+      const ids = [];
+      idsDeLinea(lineas[i], 'flowchart', ids);
+      if (ids.includes(id)) return true;
+    }
+    return false;
+  }) || null;
+}
+
+// Crea una caja nueva dentro de un bloque y abre su texto.
+function crearCajaEnBloque(idBloque) {
+  const b = bloquesDelCodigo().find((x) => x.id === idBloque);
+  if (!b) return;
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const id = idLibre();
+  const sangria = (lineas[b.inicio].match(/^[ \t]*/) || [''])[0] + (sangriaDelCodigo(lineas) || '    ');
+  lineas.splice(b.fin, 0, sangria + nodeDefWith(id, formaGeneral(), id));
+  aplicarCodigo(lineas);
+  editarCajaCuandoAparezca(id);
 }
 
 // Quita la referencia suelta de una caja en cualquier bloque (sobre lineas).
@@ -1810,8 +1874,9 @@ function construirMenuBloque(caja) {
   const id = objetoContextual && objetoContextual.id;
   const actual = bloqueDeCaja(id);
   accionContextual(caja, t('blockNewWith'), 'i-plus', () => { cerrarContextual(); crearBloque([id]); });
+  const contenedor = actual || bloqueQueContiene(id);
   bloquesDelCodigo().forEach((b) => {
-    if (actual && actual.id === b.id) return;
+    if (contenedor && contenedor.id === b.id) return;
     accionContextual(caja, t('blockMoveTo').replace('{b}', b.titulo), 'i-group', () => { cerrarContextual(); moverABloque(id, b.id); });
   });
   if (actual) accionContextual(caja, t('blockLeave').replace('{b}', actual.titulo), 'i-close', () => { cerrarContextual(); moverABloque(id, null); });
@@ -4362,6 +4427,21 @@ function objetoDelDiagrama(event) {
     if (indice >= 0) return { tipo: 'flecha', indice };
   }
 
+  // Una fila del árbol (treeView): el orden de los grupos es el de las líneas.
+  const arbol = objetivo.closest && objetivo.closest('g.tree-view');
+  if (arbol) {
+    let fila = objetivo;
+    while (fila && fila.parentElement !== arbol) fila = fila.parentElement;
+    if (fila) {
+      const grupos = [...arbol.children].filter((c) => c.tagName === 'g');
+      let indice = grupos.indexOf(fila);
+      // Mermaid añade una raíz «/» que no está en el código.
+      if (grupos[0] && (grupos[0].textContent || '').trim() === '/') indice -= 1;
+      const linea = lineaDelArbol(indice);
+      if (linea >= 0) return { tipo: 'arbol', linea };
+    }
+  }
+
   // Un bloque (subgraph): su id va detrás del id del dibujo.
   const cluster = objetivo.closest && objetivo.closest('g.cluster');
   if (cluster && !(objetivo.closest && objetivo.closest('.edgeLabel'))) {
@@ -4575,7 +4655,7 @@ const SUBMENUS = {
   colores: { titulo: 'colorMenu', icono: 'i-palette', boton: 'btn-color', menu: () => el.colorMenu, preparar: buildNodeColorSection },
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
-  tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
+  tamano: { titulo: 'typography', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   calendario: { titulo: 'calendar', icono: 'i-calendar', boton: 'btn-calendar', menu: () => el.calendarMenu, preparar: readGantt },
   sectores: { titulo: 'pieMenu', icono: 'i-pie', boton: 'btn-pie', menu: () => el.pieMenu, preparar: buildPieMenu },
@@ -4751,6 +4831,9 @@ function construirContextual(objeto) {
       accionContextual(menu, t('ctxAddLinked'), 'i-plus', () => {
         const id = idLibre();
         crearFlecha(objeto.id, id, '');
+        // Si la caja de origen está en un bloque, la nueva nace en el mismo.
+        const bloque = bloqueQueContiene(objeto.id);
+        if (bloque) moverABloque(id, bloque.id);
         editarCajaCuandoAparezca(id);
       });
       entradaSubmenu(menu, objeto, 'bloque');
@@ -4785,6 +4868,16 @@ function construirContextual(objeto) {
     return;
   }
 
+  if (objeto.tipo === 'arbol') {
+    titulo.textContent = t('treeRow') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = (el.editor.value.split('\n')[objeto.linea] || '').trim().replace(/\s*:::highlight\b/, '').replace(/\s*##.*$/, '').slice(0, 40);
+    titulo.appendChild(codigo);
+    const puesto = filaResaltada(objeto.linea);
+    accionContextual(menu, t(puesto ? 'treeUnhighlight' : 'treeHighlight'), 'i-brush', () => alternarResaltado(objeto.linea));
+    return;
+  }
+
   if (objeto.tipo === 'bloque') {
     const b = bloquesDelCodigo().find((x) => x.id === objeto.id);
     titulo.textContent = t('blockMenu') + ' ';
@@ -4796,6 +4889,7 @@ function construirContextual(objeto) {
       const etiqueta = cluster && cluster.querySelector('.cluster-label');
       editarEnElSitio(objeto, etiqueta && etiqueta.getBoundingClientRect());
     });
+    accionContextual(menu, t('blockAddBox'), 'i-plus', () => crearCajaEnBloque(objeto.id));
     entradaSubmenu(menu, objeto, 'bloqueDir');
     accionContextual(menu, t('blockDissolve'), 'i-trash', () => deshacerBloque(objeto.id));
     return;

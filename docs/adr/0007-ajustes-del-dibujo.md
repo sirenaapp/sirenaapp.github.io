@@ -96,6 +96,18 @@ botón derecho sobre el fondo. Comprobado con Mermaid 12.0.0: sin espejo los
 actores pasan de ocho a cuatro elementos, con `wrap` el mensaje largo de dos
 a cinco líneas, y con los valores la gráfica muestra 5, 7 y 9.
 
+## Revisión del autor (22-09-2026)
+
+- El trazo (clásico, a mano alzada, moderno) no cambia nada en Gantt,
+  sectores, recorrido, Sankey, gráfica XY, cuadrantes, treemap, radar,
+  arquitectura ni árbol (comprobado con Mermaid 12.0.0 comparando el dibujo
+  con los tres valores), y en secuencia y línea del tiempo solo actúa
+  «moderno». El botón se oculta en los diez primeros; en los otros dos se
+  deja, porque una de las opciones sí actúa. Lo destapó el autor al ver que
+  en el Gantt «el trazo de la línea parece no tener efecto».
+- El botón «Tamaño del texto» pasa a llamarse «Tipografía», con dos
+  secciones dentro: «Tamaño del texto» y «Tipo de letra».
+
 ## Consecuencias
 
 Al elegir un color principal, el dibujo pasa al tema base de Mermaid, porque es

@@ -20,9 +20,9 @@ propia dirección.
   el menú de colores, con el color principal de todo el diagrama y el color
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto, solo del borde o de la flecha de esa línea, escrito en el
-  código como línea `style`, clase `classDef` o `linkStyle`; el trazo; el tamaño del texto, de la lista o
-  escrito en píxeles, y la tipografía (la del sistema, con remates,
-  monoespaciada, manuscrita u otra); el motor de distribución (dagre
+  código como línea `style`, clase `classDef` o `linkStyle`; el trazo, solo en los tipos donde cambia algo; la tipografía, con el tamaño
+  del texto (de la lista o escrito en píxeles) y el tipo de letra (el del
+  sistema, con remates, monoespaciada, manuscrita u otro); el motor de distribución (dagre
   y los nueve algoritmos de ELK que trae Mermaid, cada uno con una línea que
   dice cómo reparte los elementos); y un botón por cada ajuste que ese motor y
   ese tipo de diagrama atienden (líneas, con la forma solo con dagre, el
@@ -48,8 +48,8 @@ propia dirección.
   también su tipo de línea y sus puntas, cada opción dibujada; en una caja,
   un enlace que se abre al pulsarla en la vista a pantalla completa o en la
   página donde se incruste, y en el editor con Ctrl y clic, y meterla en un
-  bloque o moverla de bloque; sobre un bloque, su título, su dirección y
-  deshacerlo) y lleva el cursor del
+  bloque o moverla de bloque; sobre un bloque, su título, añadir una caja dentro, su dirección y
+  deshacerlo; en el árbol, resaltar una fila) y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
   flecha permite escribirlo encima del propio dibujo, con una barrita de
   botones para la negrita, la cursiva, el salto de línea y la fórmula. En los diagramas de flujo

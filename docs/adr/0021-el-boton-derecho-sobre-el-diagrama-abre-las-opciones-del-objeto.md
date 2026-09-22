@@ -176,9 +176,22 @@ bloque con sus flechas se respetan, pero no se mueven desde la interfaz.
   el campo para escribirlo encima del dibujo.
 - **Sobre una caja**: mover a cualquiera de los bloques que haya, o sacarla.
 - **Sobre un bloque** (el dibujo lo identifica como `g.cluster` con su id):
-  escribir el título (también con doble clic), dirección propia (`direction`
-  dentro del bloque, o la del diagrama) y deshacerlo, que quita `subgraph`,
-  `end` y `direction` y deja las cajas.
+  escribir el título (también con doble clic), añadir una caja dentro,
+  dirección propia (`direction` dentro del bloque, o la del diagrama) y
+  deshacerlo, que quita `subgraph`, `end` y `direction` y deja las cajas.
+  La «caja conectada» creada desde una caja que está en un bloque nace en el
+  mismo bloque. Lo pidió el autor al no ver cómo meter elementos en un bloque
+  recién creado.
+
+## Árbol: resaltar (22-09-2026)
+
+En el árbol (`treeView`), el botón derecho sobre una fila ofrece «Resaltar» o
+«Quitar el resaltado», que pone o quita `:::highlight` en su línea (detrás de
+la etiqueta y antes de la nota `## …`). La fila se identifica por su orden en
+el dibujo (un `g` por fila dentro de `g.tree-view`, descontando la raíz «/»
+que Mermaid añade), que coincide con el orden de las líneas del código sin
+cabecera, accesibilidad ni comentarios. Lo pidió el autor al ver el resaltado
+en el ejemplo sin forma de ponerlo desde la interfaz.
 
 ## Consecuencias
 
