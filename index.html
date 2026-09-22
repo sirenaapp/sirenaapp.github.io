@@ -58,6 +58,8 @@
   <symbol id="i-paint-bucket" viewBox="0 0 24 24"><path d="M11 7 6 2" /> <path d="M18.992 12H2.041" /> <path d="M21.145 18.38A3.34 3.34 0 0 1 20 16.5a3.3 3.3 0 0 1-1.145 1.88c-.575.46-.855 1.02-.855 1.595A2 2 0 0 0 20 22a2 2 0 0 0 2-2.025c0-.58-.285-1.13-.855-1.595" /> <path d="m8.5 4.5 2.148-2.148a1.205 1.205 0 0 1 1.704 0l7.296 7.296a1.205 1.205 0 0 1 0 1.704l-7.592 7.592a3.615 3.615 0 0 1-5.112 0l-3.888-3.888a3.615 3.615 0 0 1 0-5.112L5.67 7.33" /></symbol>
   <symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2" /> <path d="M7 11v4a2 2 0 0 0 2 2h4" /> <rect width="8" height="8" x="13" y="13" rx="2" /></symbol>
   <symbol id="i-merge" viewBox="0 0 24 24"><path d="m8 6 4-4 4 4" /> <path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22" /> <path d="m20 22-5-5" /></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /> <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /> <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" /></symbol>
   <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" x2="20" y1="9" y2="9" /> <line x1="4" x2="20" y1="15" y2="15" /> <line x1="10" x2="8" y1="3" y2="21" /> <line x1="16" x2="14" y1="3" y2="21" /></symbol>
 </svg>
 
@@ -92,7 +94,6 @@
     <input type="file" id="file-input" accept=".mmd,.mermaid,.md,.txt,text/plain" hidden>
     <span class="tb-sep"></span>
     <select id="example-select" class="tb-select" data-i18n-title="chooseExample"></select>
-    <select id="theme-select" class="tb-select" data-i18n-title="theme"></select>
     </div>
     <span class="tb-sep"></span>
     <button type="button" id="btn-copy-code" class="tb" data-i18n-title="copyCode"><svg><use href="#i-copy"></use></svg></button>
@@ -146,7 +147,8 @@
         <button type="button" id="btn-color" class="tb" data-i18n-title="colorMenu"><svg><use href="#i-palette"></use></svg></button>
         <div class="menu menu-izq menu-ajustes" id="color-menu" hidden>
           <p class="menu-seccion" data-i18n="colorAll"></p>
-          <label class="ajuste"><svg aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="color"></span><select id="color-select"></select></label>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="theme"></span><select id="theme-select"></select></label>
+          <label class="ajuste"><svg aria-hidden="true"><use href="#i-paint-bucket"></use></svg><span data-i18n="color"></span><select id="color-select"></select></label>
           <div class="colores-propios" id="colores-propios" hidden>
             <label class="color-fila"><span data-i18n="colorFill"></span><input type="color" id="color-fill" value="#d0ebff"></label>
             <label class="color-fila"><span data-i18n="colorBorder"></span><input type="color" id="color-border" value="#1971c2"></label>
@@ -202,6 +204,9 @@
       </div>
       <span class="tb-sep"></span>
       <button type="button" id="btn-a11y" class="tb" data-i18n-title="a11y"><svg><use href="#i-a11y"></use></svg></button>
+      <span class="tb-sep tb-fin"></span>
+      <button type="button" id="btn-undo" class="tb" data-i18n-title="undo" disabled><svg><use href="#i-undo"></use></svg></button>
+      <button type="button" id="btn-redo" class="tb" data-i18n-title="redo" disabled><svg><use href="#i-redo"></use></svg></button>
       <div hidden>
         <select id="engine-select"></select>
         <select id="curve-select"></select>

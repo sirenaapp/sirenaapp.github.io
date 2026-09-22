@@ -106,6 +106,8 @@ window.SIRENA_LANG.es = {
   engRectD: 'En un rectángulo compacto, sin tener en cuenta las flechas',
   engDisco: 'ELK por partes',
   engDiscoD: 'Coloca aparte las partes que no están conectadas',
+  undo: 'Deshacer (Ctrl+Z)',
+  redo: 'Rehacer (Ctrl+Y)',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Color del elemento donde está el cursor',
   nodeColorNone: 'Sitúe el cursor en la línea de un elemento (una caja, un estado…) y vuelva a pulsar el botón.',

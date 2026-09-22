@@ -106,6 +106,8 @@ window.SIRENA_LANG.eu = {
   engRectD: 'Laukizuzen trinko batean, geziak kontuan hartu gabe',
   engDisco: 'ELK zatika',
   engDiscoD: 'Konektatuta ez dauden zatiak aparte jartzen ditu',
+  undo: 'Desegin (Ctrl+Z)',
+  redo: 'Berregin (Ctrl+Y)',
   typeBtn: 'Diagrama mota',
   nodeColor: 'Kurtsorea dagoen elementuaren kolorea',
   nodeColorNone: 'Jarri kurtsorea elementu baten lerroan (kutxa bat, egoera bat…) eta sakatu berriro botoia.',

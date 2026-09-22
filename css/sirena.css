@@ -265,19 +265,23 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .editor-tools {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   padding: 4px 8px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
   flex-wrap: wrap;
 }
 
-.editor-tools .tb { height: 30px; min-width: 30px; flex: none; }
-.editor-tools .tb svg { width: 18px; height: 18px; }
+.editor-tools .tb { height: 28px; min-width: 28px; padding: 0 5px; flex: none; }
+.editor-tools .tb svg { width: 17px; height: 17px; }
+.editor-tools .tb-sep { margin: 0 1px; }
 .editor-tools .menu-wrap { flex: none; }
+.editor-tools .tb-fin { margin-left: auto; }
+.editor-tools .tb:disabled { opacity: .35; cursor: default; }
+.editor-tools .tb:disabled:hover { background: transparent; border-color: transparent; }
 
 .tb-texto { gap: 6px; padding: 0 9px 0 7px; font-size: 13px; white-space: nowrap; }
-.tb-texto span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.tb-texto span { max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
 
 .menu-direccion { min-width: 200px; white-space: nowrap; }
 .menu-opciones { min-width: 160px; white-space: nowrap; }

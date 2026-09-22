@@ -27,8 +27,9 @@ propia dirección.
   sectores). El botón de título y descripción accesibles está también aquí.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
-- Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en la barra
-  del editor, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
+- Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
+  Mermaid (escritos en la cabecera del código, como todo lo demás) y, en la
+  barra del editor, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
   color principal (una paleta de cinco colores, o uno propio con selector
   independiente para el relleno, el borde, las líneas y el texto) y, en los
   diagramas de

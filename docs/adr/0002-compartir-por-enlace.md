@@ -13,8 +13,12 @@ traslada el contenido a un tercero.
 
 El botón de enlace comprime el código del diagrama con `CompressionStream`
 (deflate sin cabecera), lo codifica en base64 apto para direcciones y lo coloca
-en el fragmento de la dirección (`#z=…`), junto con el tema elegido (`t=…`). Al
-abrir esa dirección, la página descomprime el contenido y lo carga en el editor.
+en el fragmento de la dirección (`#z=…`). Al abrir esa dirección, la página
+descomprime el contenido y lo carga en el editor. Hasta el 22-09-2026 el tema
+de Mermaid viajaba aparte (`t=…`); desde entonces va en la cabecera del código,
+como el resto de ajustes ([ADR 8](0008-ajustes-escritos-en-el-codigo.md)), y
+el parámetro `t=` solo se lee de los enlaces antiguos para pasarlo a la
+cabecera.
 
 El fragmento no se envía al servidor en ninguna petición, de modo que el
 diagrama nunca sale del navegador de quien lo escribe ni del de quien lo abre.

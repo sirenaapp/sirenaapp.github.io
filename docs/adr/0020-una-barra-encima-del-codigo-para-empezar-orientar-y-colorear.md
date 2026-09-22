@@ -63,8 +63,14 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   con cualquier motor; numeración en secuencia; valores en sectores. La
   orientación se oculta con los motores que no la atienden (tensión, fuerzas,
   cajas y empaquetado). Cada botón abre la lista de opciones con la actual
-  marcada. La barra superior se queda con los temas de Mermaid, que no se
-  escriben en el código.
+  marcada. El selector de tema de Mermaid pasa también de la barra superior
+  al menú de colores, como primera fila: es un juego de colores y ahí lo buscó
+  el autor. Y desde ese momento el tema se escribe en la cabecera
+  (`"theme":"forest"`), porque el autor señaló que lo que no está en el
+  editor no se comparte; «Predeterminado» no escribe nada y sigue al modo
+  claro u oscuro. Con un color principal elegido el tema es `base` y el
+  selector queda deshabilitado, porque Mermaid solo admite colores propios
+  sobre ese tema.
 - **Título y descripción accesibles.** El botón pasa de la barra superior a
   esta, junto al resto de lo que se escribe en el código. En los tipos que
   rechazan `accTitle` y `accDescr` o los ignoran (mapa mental, kanban, línea
@@ -97,7 +103,10 @@ sintaxis. Los iconos son de Lucide y los rótulos están en los cinco idiomas.
 ## Consecuencias
 
 Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,
-y el código resultante la enseña. La barra ocupa una línea encima del código y
+y el código resultante la enseña. La barra lleva además deshacer y rehacer con
+historial propio (Ctrl+Z y Ctrl+Y), porque el del navegador se pierde cada vez
+que un botón escribe en el código; lo tecleado seguido se agrupa en una sola
+entrada y el historial empieza de cero al cambiar de documento. La barra ocupa una línea encima del código y
 en pantalla estrecha se desplaza en horizontal. Donde los ADR anteriores
 hablan del «menú de aspecto» hay que leer ahora estos menús de la barra del
 editor. Al añadir un tipo de diagrama

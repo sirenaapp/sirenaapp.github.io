@@ -106,6 +106,8 @@ window.SIRENA_LANG.gl = {
   engRectD: 'Nun rectángulo compacto, sen ter en conta as frechas',
   engDisco: 'ELK por partes',
   engDiscoD: 'Coloca á parte as partes que non están conectadas',
+  undo: 'Desfacer (Ctrl+Z)',
+  redo: 'Refacer (Ctrl+Y)',
   typeBtn: 'Tipo de diagrama',
   nodeColor: 'Cor do elemento onde está o cursor',
   nodeColorNone: 'Sitúe o cursor na liña dun elemento (unha caixa, un estado…) e volva premer o botón.',

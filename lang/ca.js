@@ -106,6 +106,8 @@ window.SIRENA_LANG.ca = {
   engRectD: 'En un rectangle compacte, sense tenir en compte les fletxes',
   engDisco: 'ELK per parts',
   engDiscoD: 'Col·loca a part les parts que no estan connectades',
+  undo: 'Desfés (Ctrl+Z)',
+  redo: 'Refés (Ctrl+Y)',
   typeBtn: 'Tipus de diagrama',
   nodeColor: 'Color de l\'element on hi ha el cursor',
   nodeColorNone: 'Situeu el cursor a la línia d\'un element (una caixa, un estat…) i torneu a prémer el botó.',

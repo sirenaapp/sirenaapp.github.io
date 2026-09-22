@@ -106,6 +106,8 @@ window.SIRENA_LANG.en = {
   engRectD: 'In a compact rectangle, ignoring the arrows',
   engDisco: 'ELK by parts',
   engDiscoD: 'Places unconnected parts separately',
+  undo: 'Undo (Ctrl+Z)',
+  redo: 'Redo (Ctrl+Y)',
   typeBtn: 'Diagram type',
   nodeColor: 'Colour of the element at the cursor',
   nodeColorNone: 'Place the cursor on the line of an element (a box, a state…) and press the button again.',

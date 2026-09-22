@@ -258,6 +258,7 @@ function crearDoc(codigo, nombre) {
   docActivo = doc.id;
   localStorage.setItem(STORE.docActivo, doc.id);
   updateDocName();
+  reiniciarHistorial();
   return doc;
 }
 
@@ -317,6 +318,7 @@ function abrirDoc(id) {
   el.editor.value = doc.codigo;
   history.replaceState(null, '', location.pathname);
   updateDocName();
+  reiniciarHistorial();
   readAppearance();
   renderGutter();
   render();
@@ -643,7 +645,7 @@ function updateAppearanceVisibility() {
 }
 
 function buildThemeSelect() {
-  const current = el.themeSelect.value || localStorage.getItem(STORE.theme) || defaultMermaidTheme();
+  const current = el.themeSelect.value || 'default';
   el.themeSelect.innerHTML = '';
   MERMAID_THEMES.forEach((name) => {
     el.themeSelect.appendChild(new Option(t(THEME_KEYS[name]), name));
@@ -732,7 +734,9 @@ function initMermaid() {
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    theme: el.themeSelect.value || defaultMermaidTheme(),
+    // «Predeterminado» sigue al modo claro u oscuro; los demás temas van en
+    // la cabecera del código y Mermaid los aplica desde ahí.
+    theme: el.themeSelect.value && el.themeSelect.value !== 'default' ? el.themeSelect.value : defaultMermaidTheme(),
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
@@ -757,8 +761,75 @@ function scheduleRender(delay = 350) {
 let renderChain = Promise.resolve();
 
 function render() {
+  anotarHistorial();
   renderChain = renderChain.then(renderOnce, renderOnce);
   return renderChain;
+}
+
+/* --- Deshacer y rehacer --- */
+
+// El deshacer del navegador se pierde cada vez que la barra escribe en el
+// código (color, motor, título…), así que Sirena guarda su propio historial:
+// una instantánea por cada cambio que llega a dibujarse. Lo tecleado seguido
+// se agrupa en una sola entrada, para no deshacer letra a letra.
+const HISTORIAL_MAX = 100;
+const historial = { pila: [], indice: -1, origen: '', marca: 0, pendiente: '', restaurando: false };
+
+function instantanea() {
+  return { v: el.editor.value, a: el.editor.selectionStart, b: el.editor.selectionEnd };
+}
+
+function anotarHistorial() {
+  const origen = historial.pendiente || 'accion';
+  historial.pendiente = '';
+  if (historial.restaurando) return;
+  const actual = instantanea();
+  const cima = historial.pila[historial.indice];
+  if (cima && cima.v === actual.v) return;
+  const ahora = Date.now();
+  historial.pila.length = historial.indice + 1;
+  if (origen === 'tecleo' && historial.origen === 'tecleo' && ahora - historial.marca < 1500 && historial.indice > 0) {
+    historial.pila[historial.indice] = actual;
+  } else {
+    historial.pila.push(actual);
+    if (historial.pila.length > HISTORIAL_MAX) historial.pila.shift();
+    historial.indice = historial.pila.length - 1;
+  }
+  historial.origen = origen;
+  historial.marca = ahora;
+  updateUndoButtons();
+}
+
+// Al cambiar de documento el historial empieza de cero.
+function reiniciarHistorial() {
+  historial.pila = [];
+  historial.indice = -1;
+  historial.origen = '';
+  updateUndoButtons();
+}
+
+function restaurarHistorial(paso) {
+  const i = historial.indice + paso;
+  if (i < 0 || i >= historial.pila.length) return;
+  historial.indice = i;
+  const s = historial.pila[i];
+  historial.restaurando = true;
+  el.editor.value = s.v;
+  codigoPrevio = s.v;
+  el.editor.focus();
+  el.editor.setSelectionRange(s.a, s.b);
+  updateStatus();
+  renderGutter();
+  readAppearance();
+  render();
+  historial.restaurando = false;
+  historial.origen = 'restaurar';
+  updateUndoButtons();
+}
+
+function updateUndoButtons() {
+  $('btn-undo').disabled = historial.indice <= 0;
+  $('btn-redo').disabled = historial.indice >= historial.pila.length - 1;
 }
 
 // Mermaid pinta el fondo de los rótulos de las flechas con «opacity: 0.5», de
@@ -1055,6 +1126,8 @@ function appearanceConfig() {
   if (color) {
     Object.assign(variables, color);
     config.theme = 'base';
+  } else if (el.themeSelect.value && el.themeSelect.value !== 'default') {
+    config.theme = el.themeSelect.value;
   }
   if (Object.keys(variables).length) config.themeVariables = variables;
   const flowchart = {};
@@ -1153,6 +1226,7 @@ function readAppearance() {
     try { config = JSON.parse(encontrado[1]); } catch (_) { config = {}; }
   }
   const variables = config.themeVariables || {};
+  el.themeSelect.value = MERMAID_THEMES.includes(config.theme) ? config.theme : 'default';
   el.lookSelect.value = config.look || 'classic';
   const flujo = config.flowchart || {};
   const motor = config.layout || 'elk';
@@ -1182,7 +1256,12 @@ function readAppearance() {
   updateColorInput();
 }
 
+function updateThemeInput() {
+  el.themeSelect.disabled = Boolean(colorVariables(el.colorSelect.value));
+}
+
 function updateColorInput() {
+  updateThemeInput();
   const propio = el.colorSelect.value === 'custom';
   el.coloresPropios.hidden = !propio;
 }
@@ -2034,7 +2113,6 @@ async function buildLink(extra) {
   const { raw, deflated } = await compress(el.editor.value);
   const params = new URLSearchParams();
   params.set(deflated ? 'z' : 'd', toBase64Url(raw));
-  params.set('t', el.themeSelect.value);
   if (extra) Object.entries(extra).forEach(([key, value]) => params.set(key, value));
   return location.origin + location.pathname + '#' + params.toString();
 }
@@ -2085,8 +2163,14 @@ async function loadFromHash() {
   try {
     const code = await decompress(fromBase64Url(payload), params.has('z'));
     el.editor.value = code;
+    // Los enlaces anteriores al 22-09-2026 llevaban el tema fuera del código
+    // (t=); se pasa a la cabecera para que el diagrama lo conserve.
     const theme = params.get('t');
-    if (theme && MERMAID_THEMES.includes(theme)) el.themeSelect.value = theme;
+    if (theme && theme !== 'default' && MERMAID_THEMES.includes(theme) && !INIT_RE.test(code)) {
+      readAppearance();
+      el.themeSelect.value = theme;
+      el.editor.value = '%%{init: ' + JSON.stringify(appearanceConfig()) + '}%%\n' + code;
+    }
     const desdeEnlace = [[el.lookSelect, 'l', LOOKS], [el.sizeSelect, 's', SIZES],
                          [el.colorSelect, 'c', COLORS], [el.curveSelect, 'cv', CURVES]];
     desdeEnlace.forEach(([select, clave, opciones]) => {
@@ -2308,9 +2392,6 @@ function setupToolbar() {
   $('btn-dark').addEventListener('click', () => {
     const dark = !isDark();
     applyDark(dark, true);
-    if (!localStorage.getItem(STORE.theme)) {
-      el.themeSelect.value = defaultMermaidTheme();
-    }
     initMermaid();
     render();
   });
@@ -2419,9 +2500,8 @@ function setupToolbar() {
   });
 
   el.themeSelect.addEventListener('change', () => {
-    localStorage.setItem(STORE.theme, el.themeSelect.value);
     initMermaid();
-    render();
+    writeAppearance();
   });
 
   $('btn-zoom-in').addEventListener('click', () => zoomBy(1.2));
@@ -2472,9 +2552,6 @@ async function start() {
   sistemaOscuro.addEventListener('change', (evento) => {
     if (!followsSystem()) return;
     applyDark(evento.matches);
-    if (!localStorage.getItem(STORE.theme)) {
-      el.themeSelect.value = defaultMermaidTheme();
-    }
     initMermaid();
     render();
   });
@@ -2482,8 +2559,6 @@ async function start() {
   applyLang(detectLang());
   buildThemeSelect();
 
-  const savedTheme = localStorage.getItem(STORE.theme);
-  el.themeSelect.value = savedTheme && MERMAID_THEMES.includes(savedTheme) ? savedTheme : defaultMermaidTheme();
 
   buildAppearanceSelects();
   setupToolbar();
@@ -2513,6 +2588,7 @@ async function start() {
 
   initMermaid();
   el.editor.addEventListener('input', () => {
+    historial.pendiente = 'tecleo';
     if (esOtroDiagrama(codigoPrevio, el.editor.value)) soltarDocActivo();
     codigoPrevio = el.editor.value;
     updateStatus();
@@ -2521,6 +2597,14 @@ async function start() {
     scheduleRender();
   });
   el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });
+  el.editor.addEventListener('keydown', (event) => {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    const tecla = event.key.toLowerCase();
+    if (tecla === 'z' && !event.shiftKey) { event.preventDefault(); restaurarHistorial(-1); }
+    else if (tecla === 'y' || (tecla === 'z' && event.shiftKey)) { event.preventDefault(); restaurarHistorial(1); }
+  });
+  $('btn-undo').addEventListener('click', () => restaurarHistorial(-1));
+  $('btn-redo').addEventListener('click', () => restaurarHistorial(1));
   el.errorBox.addEventListener('click', () => { if (errorLine) goToLine(errorLine); });
 
   // Si llega un enlace nuevo sin recargar la página (se pega en la barra de
