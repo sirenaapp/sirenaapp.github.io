@@ -840,7 +840,13 @@ function initMermaid() {
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
     htmlLabels: conFormulas,
-    flowchart: { useMaxWidth: false, htmlLabels: conFormulas },
+    // Con los rótulos en HTML, Mermaid reparte el texto en 120 píxeles y con
+    // ellos calcula la caja; se le da más sitio para que los textos normales
+    // quepan. En el modo de siempre no se toca, para no cambiar los diagramas
+    // que ya existen.
+    flowchart: conFormulas
+      ? { useMaxWidth: false, htmlLabels: true, wrappingWidth: 300 }
+      : { useMaxWidth: false, htmlLabels: false },
     sequence: { useMaxWidth: false },
     gantt: { useMaxWidth: false },
     er: { useMaxWidth: false },
@@ -954,49 +960,43 @@ function anchoDeMedida() {
   document.documentElement.style.setProperty('--ancho-medida', (ancho > 200 ? ancho : 800) + 'px');
 }
 
-// Con los rótulos en HTML (los diagramas con fórmulas), Mermaid 12 deja el
-// hueco del texto en 120 píxeles fijos aunque la caja sea mayor, y además lo
-// dibuja como tabla, de modo que el texto largo ni se parte ni cabe: se sale
-// por el lado. El tamaño de la caja sí lo calcula bien, así que el rótulo se
-// estira hasta ahí y se deja que el texto se reparta en líneas.
+// Con los rótulos en HTML, Mermaid dibuja el texto como una tabla: en vez de
+// repartirlo en líneas lo alarga, y lo que sobresale del hueco se corta. Ya
+// dibujado, se le da al rótulo el ancho de su caja y se compone en bloque,
+// que es lo que hace que el texto se reparta.
 function ajustarRotulosHtml() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;
   let ajustado = false;
-  svg.querySelectorAll('foreignObject').forEach((hueco) => {
+  svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
     const nodo = hueco.closest('g.node') || hueco.closest('g[class*="node"]');
     const forma = nodo && nodo.querySelector('rect, polygon, ellipse, circle, path');
     const dentro = hueco.firstElementChild;
     if (!forma || !dentro || !forma.getBBox) return;
     const caja = forma.getBBox();
-    // Un rombo aprovecha menos anchura que un rectángulo, porque los lados
-    // se cierran hacia arriba y hacia abajo.
-    const rombo = forma.tagName === 'polygon' && forma.points && forma.points.length === 4;
-    const margen = rombo ? caja.width * 0.28 : 14;
-    const disponible = Math.floor(caja.width - margen);
+    // Un rombo o un círculo solo ofrecen toda su anchura en el centro.
+    const estrecha = forma.tagName === 'polygon' || forma.tagName === 'circle' || forma.tagName === 'ellipse';
+    const disponible = Math.floor(estrecha ? caja.width * 0.72 : caja.width - 8);
     if (disponible < 40) return;
     const ancho = parseFloat(hueco.getAttribute('width')) || 0;
     const alto = parseFloat(hueco.getAttribute('height')) || 0;
     const x = parseFloat(hueco.getAttribute('x')) || 0;
     const y = parseFloat(hueco.getAttribute('y')) || 0;
-    // En bloque, el ancho manda y el texto se reparte en líneas; como tabla
-    // crecía a lo ancho y se salía.
     dentro.style.display = 'block';
     dentro.style.width = disponible + 'px';
     dentro.style.maxWidth = disponible + 'px';
     dentro.style.overflowWrap = 'break-word';
-    if (disponible !== ancho) {
+    dentro.style.transform = '';
+    if (Math.abs(disponible - ancho) > 1) {
       hueco.setAttribute('width', disponible);
       hueco.setAttribute('x', x + (ancho - disponible) / 2);
     }
-    // Si aun así no cabe (una fórmula no se parte en dos líneas), se encoge
-    // un poco la letra antes que cortar el texto.
-    dentro.style.transform = '';
+    // Si aun así no cabe (una fórmula no se parte), se encoge un poco la
+    // letra antes que cortar el texto.
     const sobra = dentro.scrollWidth - disponible;
     if (sobra > 1) {
-      const encoge = Math.max(0.7, disponible / dentro.scrollWidth);
       dentro.style.transformOrigin = 'center center';
-      dentro.style.transform = 'scale(' + encoge.toFixed(3) + ')';
+      dentro.style.transform = 'scale(' + Math.max(0.6, disponible / dentro.scrollWidth).toFixed(3) + ')';
     }
     const altoNuevo = Math.ceil(dentro.scrollHeight);
     if (altoNuevo > alto + 1) {

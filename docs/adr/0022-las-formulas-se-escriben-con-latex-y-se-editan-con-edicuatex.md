@@ -41,15 +41,20 @@ El botón aparece solo en los tipos que las dibujan, comprobados uno a uno:
 flujo (y mapa conceptual), estados, clases, secuencia, bloques, kanban y
 entidad-relación. En los demás el `$$…$$` saldría tal cual.
 
-Con los rótulos en HTML, Mermaid 12 deja el hueco del texto en 120 píxeles
-fijos aunque la caja sea mayor, y lo dibuja como tabla, de modo que el texto
-largo ni se parte en líneas ni cabe: se sale por el lado y queda cortado
-(medido el 22-09-2026, también fuera de Sirena, así que es cosa suya). El
-tamaño de la caja sí lo calcula bien, de modo que después de dibujar se estira
-cada rótulo hasta el ancho de su caja (menos un margen, mayor en los rombos,
-que se cierran por arriba y por abajo), se dibuja en bloque para que el texto
-se reparta en líneas y, si aun así no cabe porque lleva una fórmula, que no se
-puede partir, se encoge un poco la letra antes que cortar nada.
+Con los rótulos en HTML aparecieron dos problemas, medidos el 22-09-2026
+también fuera de Sirena, así que vienen de Mermaid 12:
+
+- Reparte el texto en 120 píxeles (`flowchart.wrappingWidth`, que es su valor
+  de serie) y con esa medida calcula el tamaño de la caja, así que un texto
+  normal ya no cabía. Se sube a 300 solo en este modo; en el de siempre no se
+  toca, para no cambiar los diagramas que ya existen.
+- Dibuja el rótulo como una tabla, de modo que el texto no se reparte en
+  líneas sino que se alarga, y lo que sobresale del hueco se corta. Ya
+  dibujado, se le da al rótulo el ancho de su caja (menos un margen, mayor en
+  rombos y círculos, que solo ofrecen toda su anchura en el centro) y se
+  compone en bloque, que es lo que hace que el texto se reparta. Si aun así no
+  cabe, porque una fórmula no se puede partir en dos líneas, se encoge un poco
+  la letra antes que cortar nada.
 
 ## Alternativas descartadas
 
