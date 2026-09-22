@@ -424,6 +424,82 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'ishikawa',
+        label: { es: 'Diagrama de Ishikawa', ca: "Diagrama d'Ishikawa", gl: 'Diagrama de Ishikawa', eu: 'Ishikawa diagrama', en: 'Ishikawa diagram' },
+        code: {
+          es: `ishikawa-beta
+    Bajo rendimiento en un examen
+        Estudio
+            Poco tiempo
+            Sin planificación
+        Aula
+            Ruido
+            Explicaciones rápidas
+        Materiales
+            Apuntes incompletos
+            Ejercicios sin corregir
+        Descanso
+            Pocas horas de sueño
+            Nervios`,
+          ca: `ishikawa-beta
+    Baix rendiment en un examen
+        Estudi
+            Poc temps
+            Sense planificació
+        Aula
+            Soroll
+            Explicacions ràpides
+        Materials
+            Apunts incomplets
+            Exercicis sense corregir
+        Descans
+            Poques hores de son
+            Nervis`,
+          gl: `ishikawa-beta
+    Baixo rendemento nun exame
+        Estudo
+            Pouco tempo
+            Sen planificación
+        Aula
+            Ruído
+            Explicacións rápidas
+        Materiais
+            Apuntamentos incompletos
+            Exercicios sen corrixir
+        Descanso
+            Poucas horas de sono
+            Nervios`,
+          eu: `ishikawa-beta
+    Errendimendu baxua azterketa batean
+        Ikasketa
+            Denbora gutxi
+            Plangintzarik ez
+        Ikasgela
+            Zarata
+            Azalpen azkarrak
+        Materialak
+            Apunte osatugabeak
+            Zuzendu gabeko ariketak
+        Atsedena
+            Lo-ordu gutxi
+            Urduritasuna`,
+          en: `ishikawa-beta
+    Poor exam performance
+        Study
+            Little time
+            No planning
+        Classroom
+            Noise
+            Rushed explanations
+        Materials
+            Incomplete notes
+            Uncorrected exercises
+        Rest
+            Too little sleep
+            Nerves`
+        }
+      },
+      {
         id: 'gitgraph',
         label: { es: 'Ramas de Git', ca: 'Branques de Git', gl: 'Ramas de Git', eu: 'Git adarrak', en: 'Git branches' },
         code: {
@@ -815,6 +891,37 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'venn',
+        label: { es: 'Diagrama de Venn', ca: 'Diagrama de Venn', gl: 'Diagrama de Venn', eu: 'Venn diagrama', en: 'Venn diagram' },
+        code: {
+          es: `venn-beta
+    title Reptiles y aves
+    set A ["Reptiles"]
+    set B ["Aves"]
+    union A,B ["Ponen huevos"]`,
+          ca: `venn-beta
+    title Rèptils i ocells
+    set A ["Rèptils"]
+    set B ["Ocells"]
+    union A,B ["Ponen ous"]`,
+          gl: `venn-beta
+    title Réptiles e aves
+    set A ["Réptiles"]
+    set B ["Aves"]
+    union A,B ["Poñen ovos"]`,
+          eu: `venn-beta
+    title Narrastiak eta hegaztiak
+    set A ["Narrastiak"]
+    set B ["Hegaztiak"]
+    union A,B ["Arrautzak jartzen dituzte"]`,
+          en: `venn-beta
+    title Reptiles and birds
+    set A ["Reptiles"]
+    set B ["Birds"]
+    union A,B ["Lay eggs"]`
+        }
+      },
+      {
         id: 'class',
         label: { es: 'Diagrama de clases', ca: 'Diagrama de classes', gl: 'Diagrama de clases', eu: 'Klase-diagrama', en: 'Class diagram' },
         code: {
@@ -1112,6 +1219,72 @@ window.SIRENA_EXAMPLES = [
     y-axis "Mark" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`
+        }
+      },
+      {
+        id: 'radar',
+        label: { es: 'Gráfico de radar', ca: 'Gràfic de radar', gl: 'Gráfico de radar', eu: 'Radar-grafikoa', en: 'Radar chart' },
+        code: {
+          es: `radar-beta
+    accTitle: Perfil de competencias
+    accDescr: Gráfico de radar con cinco competencias valoradas de 0 a 10 al inicio y al final del curso.
+    title Perfil de competencias
+    axis a["Comunicación"], b["Trabajo en equipo"], c["Creatividad"], d["Pensamiento crítico"], e["Autonomía"]
+    curve p["Inicio de curso"]{4, 5, 6, 3, 4}
+    curve q["Final de curso"]{7, 8, 7, 6, 8}
+    max 10
+    min 0
+    showLegend true
+    graticule polygon
+    ticks 5`,
+          ca: `radar-beta
+    accTitle: Perfil de competències
+    accDescr: Gràfic de radar amb cinc competències valorades de 0 a 10 a l'inici i al final del curs.
+    title Perfil de competències
+    axis a["Comunicació"], b["Treball en equip"], c["Creativitat"], d["Pensament crític"], e["Autonomia"]
+    curve p["Inici de curs"]{4, 5, 6, 3, 4}
+    curve q["Final de curs"]{7, 8, 7, 6, 8}
+    max 10
+    min 0
+    showLegend true
+    graticule polygon
+    ticks 5`,
+          gl: `radar-beta
+    accTitle: Perfil de competencias
+    accDescr: Gráfico de radar con cinco competencias valoradas de 0 a 10 ao inicio e ao final do curso.
+    title Perfil de competencias
+    axis a["Comunicación"], b["Traballo en equipo"], c["Creatividade"], d["Pensamento crítico"], e["Autonomía"]
+    curve p["Inicio de curso"]{4, 5, 6, 3, 4}
+    curve q["Final de curso"]{7, 8, 7, 6, 8}
+    max 10
+    min 0
+    showLegend true
+    graticule polygon
+    ticks 5`,
+          eu: `radar-beta
+    accTitle: Gaitasunen profila
+    accDescr: Radar-grafikoa, bost gaitasun 0tik 10era balioetsita ikasturtearen hasieran eta amaieran.
+    title Gaitasunen profila
+    axis a["Komunikazioa"], b["Talde-lana"], c["Sormena"], d["Pentsamendu kritikoa"], e["Autonomia"]
+    curve p["Ikasturte hasiera"]{4, 5, 6, 3, 4}
+    curve q["Ikasturte amaiera"]{7, 8, 7, 6, 8}
+    max 10
+    min 0
+    showLegend true
+    graticule polygon
+    ticks 5`,
+          en: `radar-beta
+    accTitle: Skills profile
+    accDescr: Radar chart with five skills rated from 0 to 10 at the start and at the end of the school year.
+    title Skills profile
+    axis a["Communication"], b["Teamwork"], c["Creativity"], d["Critical thinking"], e["Autonomy"]
+    curve p["Start of year"]{4, 5, 6, 3, 4}
+    curve q["End of year"]{7, 8, 7, 6, 8}
+    max 10
+    min 0
+    showLegend true
+    graticule polygon
+    ticks 5`
         }
       },
       {

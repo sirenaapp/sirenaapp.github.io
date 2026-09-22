@@ -12,7 +12,7 @@ propia dirección.
 ## Qué permite hacer
 
 - Escribir el diagrama como texto y verlo dibujado al momento.
-- Elegir entre 18 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
+- Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en el menú de
   aspecto, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
