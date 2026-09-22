@@ -119,8 +119,9 @@ Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,
 y el código resultante la enseña. La barra lleva además deshacer y rehacer con
 historial propio (Ctrl+Z y Ctrl+Y), porque el del navegador se pierde cada vez
 que un botón escribe en el código; lo tecleado seguido se agrupa en una sola
-entrada y el historial empieza de cero al cambiar de documento. La barra ocupa una línea encima del código y
-en pantalla estrecha se desplaza en horizontal. Donde los ADR anteriores
+entrada y el historial empieza de cero al cambiar de documento. La barra va encima del código y crece en
+filas cuando no caben los botones (el autor prevé seguir añadiendo); en
+pantalla estrecha se desplaza en horizontal. Donde los ADR anteriores
 hablan del «menú de aspecto» hay que leer ahora estos menús de la barra del
 editor. Al añadir un tipo de diagrama
 nuevo a los ejemplos hay que darle también su línea de definición en

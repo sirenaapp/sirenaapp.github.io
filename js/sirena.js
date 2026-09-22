@@ -2487,7 +2487,7 @@ function setupSplitter() {
   el.splitter.addEventListener('pointercancel', stop);
 
   el.splitter.addEventListener('keydown', (event) => {
-    const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--editor-width')) || 44;
+    const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--editor-width')) || 38;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       const next = Math.min(75, Math.max(15, current + (event.key === 'ArrowLeft' ? -2 : 2)));

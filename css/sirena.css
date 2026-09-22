@@ -269,7 +269,9 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   padding: 4px 8px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
+  /* Cuantos botones hagan falta: la barra crece en filas. */
   flex-wrap: wrap;
+  row-gap: 3px;
 }
 
 .editor-tools .tb { height: 28px; min-width: 28px; padding: 0 5px; flex: none; }
@@ -282,12 +284,6 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 
 .tb-texto { gap: 6px; padding: 0 9px 0 7px; font-size: 13px; white-space: nowrap; }
 .tb-texto span { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
-/* En pantallas medianas el nombre del tipo se queda en el rótulo emergente,
-   para que la barra siga cabiendo en una línea. */
-@media (max-width: 1200px) and (min-width: 901px) {
-  .tb-texto span { display: none; }
-  .tb-texto { padding: 0 5px; }
-}
 
 .menu-direccion { min-width: 200px; white-space: nowrap; }
 .menu-opciones { min-width: 160px; white-space: nowrap; }
@@ -425,7 +421,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   overflow: hidden;
 }
 
-.pane-editor { flex: 0 0 var(--editor-width, 44%); }
+.pane-editor { flex: 0 0 var(--editor-width, 38%); }
 .pane-preview { flex: 1; }
 
 .editor-wrap {
