@@ -31,7 +31,8 @@ propia dirección.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
   flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
   editor a su línea. En pantalla táctil, la pulsación larga; con Mayús se deja
-  pasar el menú del navegador.
+  pasar el menú del navegador. Un aviso flotante sobre el lienzo lo
+  cuenta hasta que se usa por primera vez.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de

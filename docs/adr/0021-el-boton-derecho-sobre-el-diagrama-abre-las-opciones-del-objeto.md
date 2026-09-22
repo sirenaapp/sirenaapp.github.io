@@ -47,6 +47,11 @@ navegador para guardar o copiar la imagen. En pantalla táctil lo abre la
 pulsación larga. En el modo visor ([ADR 5](0005-modo-visor-para-incrustar.md))
 no aparece, porque ahí no se edita.
 
+Como un menú contextual no se ve, sobre el lienzo aparece un aviso flotante
+que lo cuenta (con el texto de la pulsación larga en pantalla táctil). Se
+retira al usar el menú por primera vez o al cerrarlo a mano, y queda anotado
+en el navegador para no repetirlo. No aparece en el modo visor.
+
 ## Alternativas descartadas
 
 - **Editar sobre el dibujo (arrastrar, escribir dentro de la caja).**
@@ -55,6 +60,8 @@ no aparece, porque ahí no se edita.
   garantiza.
 - **Un panel lateral de propiedades.** Descartado: ocupa sitio permanente y
   Sirena ya tiene la barra del editor.
+- **Explicar el botón derecho solo en la ayuda.** Descartado: quien no abre la
+  ayuda no llega a enterarse de que existe.
 - **Duplicar en el menú contextual todas las opciones de la barra.**
   Descartado: lo que cuesta una sola pulsación se resuelve ahí; para lo
   demás (formas, tema) el menú lleva al de la barra, sin mantener dos listas.

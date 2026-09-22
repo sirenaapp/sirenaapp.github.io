@@ -17,6 +17,7 @@ const STORE = {
   docs: 'sirena.docs',
   docActivo: 'sirena.docActivo',
   limite: 'sirena.limite',
+  pistaFormato: 'sirena.pistaFormato',
   pngEscala: 'sirena.pngEscala',
   pngFondo: 'sirena.pngFondo'
 };
@@ -138,6 +139,7 @@ const el = {
   shapeModal: $('shape-modal'),
   shapeGrid: $('shape-grid'),
   contextMenu: $('context-menu'),
+  pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
@@ -578,6 +580,9 @@ function applyLang(code) {
   buildAppearanceSelects();
   buildExportSelects();
   buildLangMenu();
+  if (el.pistaFormato && !el.pistaFormato.hidden) {
+    $('pista-formato-texto').textContent = t(window.matchMedia('(hover: none)').matches ? 'hintTouch' : 'hintMouse');
+  }
   buildTypeMenu();
   updateEditorTools();
   updateStatus();
@@ -2744,6 +2749,7 @@ function abrirContextual(event) {
   const objeto = objetoDelDiagrama(event);
   if (objeto.tipo !== 'fondo') irAlObjeto(objeto);
   event.preventDefault();
+  ocultarPista(true);
   cerrarMenusEditor();
   cerrarContextual();
   construirContextual(objeto);
@@ -2758,8 +2764,32 @@ function abrirContextual(event) {
   menu.style.top = Math.max(8, y) + 'px';
 }
 
+/* --- Aviso del botón derecho --- */
+
+// Se enseña hasta que se usa el menú contextual por primera vez, o hasta que
+// se cierra a mano; entonces no vuelve a salir en ese navegador.
+function ocultarPista(recordar) {
+  const pista = el.pistaFormato;
+  if (pista.hidden) return;
+  if (recordar) localStorage.setItem(STORE.pistaFormato, 'visto');
+  pista.classList.add('saliendo');
+  setTimeout(() => { pista.hidden = true; pista.classList.remove('saliendo'); }, 320);
+}
+
+function mostrarPista() {
+  if (viewer || localStorage.getItem(STORE.pistaFormato)) return;
+  // En pantalla táctil no hay botón derecho: ahí es la pulsación larga.
+  const tactil = window.matchMedia('(hover: none)').matches;
+  $('pista-formato-texto').textContent = t(tactil ? 'hintTouch' : 'hintMouse');
+  el.pistaFormato.hidden = false;
+}
+
 function setupContextual() {
   el.viewport.addEventListener('contextmenu', abrirContextual);
+  $('pista-formato-cerrar').addEventListener('click', (event) => {
+    event.stopPropagation();
+    ocultarPista(true);
+  });
   el.contextMenu.addEventListener('click', (event) => event.stopPropagation());
   el.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
   document.addEventListener('click', cerrarContextual);
@@ -3634,6 +3664,8 @@ async function start() {
   renderGutter();
   readAppearance();
   await render();
+  // Al final, cuando ya se sabe si la página va en modo visor.
+  mostrarPista();
 }
 
 start();

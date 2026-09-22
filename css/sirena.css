@@ -476,6 +476,64 @@ body > div[id^="dsirena-diagram-"] {
   pointer-events: none;
 }
 
+/* Aviso flotante sobre el lienzo: cuenta lo del botón derecho hasta que se
+   usa por primera vez. Va encima del dibujo, sin desplazar nada. */
+.pista {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(420px, calc(100% - 28px));
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.35;
+  animation: pista-entra .45s ease both .6s;
+}
+
+.pista > svg { width: 17px; height: 17px; flex: none; color: var(--accent); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.pista button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.pista button:hover { background: var(--accent-soft); color: var(--text); }
+.pista button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+
+@keyframes pista-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.pista.saliendo { animation: pista-sale .3s ease both; }
+
+@keyframes pista-sale {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista, .pista.saliendo { animation: none; }
+}
+
 /* --- Pestañas en pantalla pequeña --- */
 
 .tabs { display: none; background: var(--surface); border-bottom: 1px solid var(--border); }
