@@ -493,6 +493,46 @@ body > div[id^="dsirena-diagram-"] {
   pointer-events: none;
 }
 
+/* Puntos de anclaje de una caja: salen al pasar el ratón y de ellos se
+   arrastra para trazar una flecha nueva. */
+.anclas { position: fixed; z-index: 50; pointer-events: none; }
+
+.ancla {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+  cursor: crosshair;
+  pointer-events: auto;
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.anclas:not([hidden]) .ancla { opacity: 1; transform: none; }
+.ancla:hover { transform: scale(1.25); }
+
+/* La caja a la que se va a conectar se resalta mientras se arrastra. */
+.trazando .node.destino > :is(rect, polygon, circle, ellipse, path) {
+  stroke: var(--accent) !important;
+  stroke-width: 3px !important;
+}
+
+.trazando { cursor: crosshair; }
+
+/* Línea guía del arrastre. */
+.guia { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 49; pointer-events: none; }
+.guia line { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ancla { transition: none; }
+}
+
 /* Campo para escribir el texto encima del propio elemento del diagrama. */
 .editor-sitio {
   position: fixed;

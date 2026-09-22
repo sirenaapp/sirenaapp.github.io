@@ -140,6 +140,8 @@ const el = {
   contextMenu: $('context-menu'),
   contextSubmenu: $('context-submenu'),
   editorSitio: $('editor-sitio'),
+  anclas: $('anclas'),
+  guia: $('guia'),
   pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
@@ -965,6 +967,7 @@ async function renderOnce() {
     if (token !== renderToken) return;
     currentSvg = opaqueEdgeLabels(svg, id);
     el.canvas.innerHTML = currentSvg;
+    ocultarAnclas();
     hideEmpty();
     hideError();
     fitToWindow();
@@ -2790,7 +2793,13 @@ function setupEditorSitio() {
   campo.addEventListener('blur', () => cerrarEditorSitio(true));
   el.viewport.addEventListener('dblclick', (event) => {
     const objeto = objetoDelDiagrama(event);
-    if (objeto.tipo === 'fondo') return;
+    if (objeto.tipo === 'fondo') {
+      // En el lienzo vacío, el doble clic crea una caja y la deja lista.
+      if (diagramKind() !== 'flowchart') return;
+      event.preventDefault();
+      editarCajaCuandoAparezca(crearCaja(''));
+      return;
+    }
     event.preventDefault();
     const bajo = document.elementFromPoint(event.clientX, event.clientY);
     const destino = objeto.tipo === 'nodo'
@@ -2825,6 +2834,218 @@ function rotuloDeLaFlecha(indice) {
   pt.x = q.x; pt.y = q.y;
   const centro = pt.matrixTransform(path.getScreenCTM());
   return { getBoundingClientRect: () => ({ left: centro.x - 45, top: centro.y - 13, width: 90, height: 26 }) };
+}
+
+/* --- Crear cajas y flechas sobre el dibujo --- */
+
+// Identificador libre para una caja nueva: primero las letras sueltas y,
+// cuando se agotan, A1, A2… Así el código se sigue leyendo bien.
+function idLibre() {
+  const usados = new Set(allNodes());
+  for (let i = 0; i < 26; i += 1) {
+    const letra = String.fromCharCode(65 + i);
+    if (!usados.has(letra)) return letra;
+  }
+  for (let n = 1; ; n += 1) {
+    const id = 'A' + n;
+    if (!usados.has(id)) return id;
+  }
+}
+
+// Las flechas nuevas se escriben con las demás, antes del bloque de estilos,
+// para no dejar el código desordenado.
+function posicionParaFlecha(lineas) {
+  for (let i = lineas.length - 1; i >= 0; i -= 1) {
+    const linea = lineas[i].trim();
+    if (!linea) continue;
+    if (/^(style|classDef|class|cssClass|linkStyle|click)\b/.test(linea)) continue;
+    return i + 1;
+  }
+  return lineas.length;
+}
+
+// Escribe una flecha entre dos cajas, creando la de destino si hace falta.
+function crearFlecha(origen, destino, textoNuevo) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const trozo = textoNuevo !== undefined
+    ? `${origen} --> ${nodeDefWith(destino, formaGeneral(), textoNuevo || destino)}`
+    : `${origen} --> ${destino}`;
+  lineas.splice(posicionParaFlecha(lineas), 0, sangria + trozo);
+  aplicarCodigo(lineas);
+}
+
+// Crea una caja suelta con la forma general del diagrama.
+function crearCaja(texto) {
+  const id = idLibre();
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  lineas.splice(posicionParaFlecha(lineas), 0, sangriaDelCodigo(lineas) + nodeDefWith(id, formaGeneral(), texto || id));
+  aplicarCodigo(lineas);
+  return id;
+}
+
+// Tras dibujar de nuevo, deja el campo de texto abierto sobre una caja.
+function editarCajaCuandoAparezca(id) {
+  const intentar = (queda) => {
+    const svg = el.canvas.querySelector('svg');
+    const nodo = svg && [...svg.querySelectorAll('g.node')].find((n) => {
+      const m = /-flowchart-(.+)-\d+$/.exec(n.id || '');
+      return m && m[1] === id;
+    });
+    if (nodo) {
+      editarEnElSitio({ tipo: 'nodo', id }, nodo.getBoundingClientRect());
+      return;
+    }
+    if (queda > 0) setTimeout(() => intentar(queda - 1), 120);
+  };
+  setTimeout(() => intentar(12), 120);
+}
+
+// Caja del diagrama sobre la que está el puntero.
+function cajaBajoPuntero(x, y) {
+  const bajo = document.elementFromPoint(x, y);
+  const nodo = bajo && bajo.closest && bajo.closest('g.node');
+  if (!nodo) return null;
+  const m = /-flowchart-(.+)-\d+$/.exec(nodo.id || '');
+  const id = m && m[1];
+  return id && allNodes().includes(id) ? { id, nodo } : null;
+}
+
+let anclasDe = null;
+let anclasRect = null;
+
+// Coloca los cuatro puntos de anclaje alrededor de una caja.
+function mostrarAnclas(nodo, id) {
+  const caja = el.anclas;
+  const r = nodo.getBoundingClientRect();
+  const port = el.viewport.getBoundingClientRect();
+  // Si la caja queda fuera de la vista, no se ofrecen.
+  if (r.right < port.left || r.left > port.right || r.bottom < port.top || r.top > port.bottom) {
+    ocultarAnclas();
+    return;
+  }
+  anclasDe = id;
+  anclasRect = r;
+  caja.style.left = Math.round(r.left) + 'px';
+  caja.style.top = Math.round(r.top) + 'px';
+  caja.style.width = Math.round(r.width) + 'px';
+  caja.style.height = Math.round(r.height) + 'px';
+  const sitios = {
+    arriba: ['50%', '0'],
+    derecha: ['100%', '50%'],
+    abajo: ['50%', '100%'],
+    izquierda: ['0', '50%']
+  };
+  caja.querySelectorAll('.ancla').forEach((ancla) => {
+    const [x, y] = sitios[ancla.dataset.lado];
+    ancla.style.left = x;
+    ancla.style.top = y;
+    ancla.title = t('newArrow');
+    ancla.setAttribute('aria-label', t('newArrow'));
+  });
+  caja.hidden = false;
+}
+
+// Cerca de la caja (o de sus anclas) siguen estando a mano.
+function cercaDeLasAnclas(x, y) {
+  if (!anclasRect) return false;
+  const margen = 16;
+  return x >= anclasRect.left - margen && x <= anclasRect.right + margen
+    && y >= anclasRect.top - margen && y <= anclasRect.bottom + margen;
+}
+
+function ocultarAnclas() {
+  anclasDe = null;
+  anclasRect = null;
+  el.anclas.hidden = true;
+}
+
+function setupCrear() {
+  const guia = el.guia;
+  const linea = $('guia-linea');
+  let trazando = null;
+
+  // En un elemento SVG la propiedad «hidden» no refleja el atributo, así que
+  // se pone y se quita a mano.
+  const verGuia = (visible) => {
+    if (visible) guia.removeAttribute('hidden');
+    else guia.setAttribute('hidden', '');
+  };
+
+  const pintarGuia = (x, y) => {
+    linea.setAttribute('x2', x);
+    linea.setAttribute('y2', y);
+  };
+
+  const limpiarResalte = () => {
+    el.canvas.querySelectorAll('.destino').forEach((n) => n.classList.remove('destino'));
+  };
+
+  const mover = (event) => {
+    if (!trazando) return;
+    pintarGuia(event.clientX, event.clientY);
+    limpiarResalte();
+    const caja = cajaBajoPuntero(event.clientX, event.clientY);
+    if (caja && caja.id !== trazando.origen) caja.nodo.classList.add('destino');
+  };
+
+  const cancelar = () => {
+    trazando = null;
+    verGuia(false);
+    document.body.classList.remove('trazando');
+    limpiarResalte();
+    document.removeEventListener('pointermove', mover);
+    document.removeEventListener('pointerup', soltar);
+  };
+
+  function soltar(event) {
+    if (!trazando) return;
+    const origen = trazando.origen;
+    const destino = cajaBajoPuntero(event.clientX, event.clientY);
+    cancelar();
+    if (destino && destino.id === origen) return;
+    if (destino) {
+      crearFlecha(origen, destino.id);
+      return;
+    }
+    // Soltar en el vacío crea la caja de destino y deja escribir su texto.
+    const id = idLibre();
+    crearFlecha(origen, id, '');
+    editarCajaCuandoAparezca(id);
+  }
+
+  el.anclas.querySelectorAll('.ancla').forEach((ancla) => {
+    ancla.addEventListener('pointerdown', (event) => {
+      if (!anclasDe || diagramKind() !== 'flowchart') return;
+      event.preventDefault();
+      event.stopPropagation();
+      const r = ancla.getBoundingClientRect();
+      trazando = { origen: anclasDe };
+      linea.setAttribute('x1', r.left + r.width / 2);
+      linea.setAttribute('y1', r.top + r.height / 2);
+      pintarGuia(event.clientX, event.clientY);
+      verGuia(true);
+      document.body.classList.add('trazando');
+      el.anclas.hidden = true;
+      document.addEventListener('pointermove', mover);
+      document.addEventListener('pointerup', soltar);
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && trazando) cancelar();
+  });
+
+  // Las anclas siguen al ratón de caja en caja.
+  el.viewport.addEventListener('pointermove', (event) => {
+    if (trazando || event.pointerType === 'touch' || diagramKind() !== 'flowchart') return;
+    const caja = cajaBajoPuntero(event.clientX, event.clientY);
+    if (caja) mostrarAnclas(caja.nodo, caja.id);
+    else if (anclasDe && !cercaDeLasAnclas(event.clientX, event.clientY)) ocultarAnclas();
+  });
+  el.viewport.addEventListener('pointerleave', (event) => {
+    if (!trazando && !cercaDeLasAnclas(event.clientX, event.clientY)) ocultarAnclas();
+  });
 }
 
 /* --- Menú del botón derecho sobre el diagrama --- */
@@ -3239,6 +3460,11 @@ function construirContextual(objeto) {
         const nodo = el.canvas.querySelector('[id$="-flowchart-' + objeto.id + '-' + '"], [id*="-flowchart-' + objeto.id + '-"]');
         editarEnElSitio(objeto, nodo && nodo.getBoundingClientRect());
       });
+      accionContextual(menu, t('ctxAddLinked'), 'i-plus', () => {
+        const id = idLibre();
+        crearFlecha(objeto.id, id, '');
+        editarCajaCuandoAparezca(id);
+      });
       accionContextual(menu, t('ctxDeleteBox'), 'i-trash', () => borrarNodo(objeto.id));
     }
     return;
@@ -3318,6 +3544,13 @@ function construirContextual(objeto) {
     });
   }
   entradaSubmenu(menu, objeto, 'direccion');
+  if (diagramKind() === 'flowchart') {
+    menu.appendChild(document.createElement('hr'));
+    accionContextual(menu, t('ctxAddBox'), 'i-plus', () => {
+      const id = crearCaja('');
+      editarCajaCuandoAparezca(id);
+    });
+  }
   accionContextual(menu, t('a11y'), 'i-a11y', abrirAccesibilidad);
 }
 
@@ -4119,6 +4352,7 @@ function setupToolbar() {
   setupEditorTools();
   setupContextual();
   setupEditorSitio();
+  setupCrear();
 
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();

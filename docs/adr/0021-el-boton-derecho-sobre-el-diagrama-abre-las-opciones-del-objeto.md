@@ -102,6 +102,27 @@ El motor de todo esto es el troceo de una línea de flujo: se enmascaran los
 textos (para que un guion dentro de una caja no se confunda con una flecha) y
 se localizan las flechas con su rótulo y su posición.
 
+## Crear cajas y flechas (22-09-2026)
+
+Al pasar el ratón sobre una caja de un diagrama de flujo aparecen cuatro
+puntos de anclaje; arrastrando de uno de ellos sale una línea guía y la caja
+bajo el cursor se resalta. Al soltar sobre otra caja se escribe `A --> B`; al
+soltar en el vacío se crea la caja de destino con la forma general del
+diagrama y se abre el campo para escribir su texto, que es lo que permite
+construir un diagrama entero sin tocar el código. El arrastre sale solo de los
+puntos, nunca del cuerpo de la caja, para no estorbar al desplazamiento del
+lienzo, y Escape lo cancela.
+
+El doble clic en el lienzo vacío añade una caja suelta, y el menú del botón
+derecho ofrece «Añadir una caja» sobre el fondo y «Añadir una caja conectada»
+sobre una caja, que es la vía en pantalla táctil, donde no hay puntos de
+anclaje.
+
+Las cajas nuevas toman la primera letra libre (A, B, C… y luego A1, A2…) para
+que el código siga leyéndose, y las flechas se escriben junto a las demás,
+antes del bloque de estilos; como van al final, no alteran la numeración de
+los `linkStyle` existentes.
+
 ## Consecuencias
 
 Se puede dar formato mirando el dibujo, sin buscar la línea en el código, y

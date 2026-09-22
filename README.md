@@ -33,8 +33,11 @@ propia dirección.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
   flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
-  flecha permite escribirlo encima del propio dibujo. Desde ese menú también se
-  borra una caja (con sus flechas) o una flecha suelta. En pantalla táctil, la pulsación larga; con Mayús se deja
+  flecha permite escribirlo encima del propio dibujo. En los diagramas de flujo
+  se trazan flechas arrastrando desde los puntos que aparecen al pasar el ratón
+  sobre una caja (soltando en el vacío se crea la caja de destino), el doble
+  clic en el lienzo vacío añade una caja, y desde el menú se borra una caja
+  (con sus flechas) o una flecha suelta. En pantalla táctil, la pulsación larga; con Mayús se deja
   pasar el menú del navegador. Un aviso flotante sobre el lienzo lo
   cuenta al entrar, y se retira al usarlo o al cerrarlo.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
