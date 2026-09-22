@@ -56,9 +56,15 @@ también fuera de Sirena, así que vienen de Mermaid 12:
   cabe, porque una fórmula no se puede partir en dos líneas, se encoge un poco
   la letra antes que cortar nada. Si el texto ocupa más líneas de las que
   Mermaid contaba, la caja se estira para que no se salga.
-- En un rótulo con fórmula rehace el contenido como una fila y se come los
-  `<br>`. Antes de dibujar se cambian por una marca invisible, que viaja como
-  texto normal, y después se vuelven a poner como saltos de verdad.
+- El rótulo que lleva una fórmula lo arma además como una fila que no deja
+  saltar de línea, así que un texto largo acompañado de una fórmula salía
+  cortado. Esa fila se pasa también a bloque, y entonces el texto se reparte y
+  la fórmula queda como una palabra más. Lo que sobresale se mide sobre los
+  elementos de dentro, no solo sobre el rótulo, porque lo que desborda de una
+  fila no cuenta en la medida del padre.
+- En un rótulo con fórmula se come los `<br>`. Antes de dibujar se cambian por
+  una marca invisible, que viaja como texto normal, y después se vuelven a
+  poner como saltos de verdad.
 
 ## Alternativas descartadas
 

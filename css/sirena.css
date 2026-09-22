@@ -533,6 +533,36 @@ body > div[id^="dsirena-diagram-"] {
   .ancla { transition: none; }
 }
 
+/* Botones de formato que acompañan al campo de escritura sobre el dibujo. */
+.editor-sitio-barra {
+  position: fixed;
+  z-index: 56;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.editor-sitio-barra button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.editor-sitio-barra button:hover { background: var(--accent-soft); color: var(--accent); }
+.editor-sitio-barra svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
 /* Campo para escribir el texto encima del propio elemento del diagrama. */
 .editor-sitio {
   position: fixed;

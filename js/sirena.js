@@ -140,6 +140,7 @@ const el = {
   contextMenu: $('context-menu'),
   contextSubmenu: $('context-submenu'),
   editorSitio: $('editor-sitio'),
+  editorSitioBarra: $('editor-sitio-barra'),
   anclas: $('anclas'),
   guia: $('guia'),
   pistaFormato: $('pista-formato'),
@@ -840,6 +841,27 @@ function marcarSaltos(codigo) {
   )).join('');
 }
 
+// Cuando el rótulo lleva una fórmula, Mermaid lo arma como una fila que no
+// deja saltar de línea: se pasa a bloque para que el texto se reparta y la
+// fórmula quede como una palabra más.
+function soltarFilas(dentro) {
+  dentro.querySelectorAll('div').forEach((caja) => {
+    if (getComputedStyle(caja).display !== 'flex') return;
+    caja.style.display = 'block';
+    caja.style.whiteSpace = 'normal';
+    caja.style.textAlign = 'center';
+  });
+}
+
+// Lo que ocupa de ancho el rótulo, contando lo que se salga de su hueco.
+function anchoDelRotulo(dentro) {
+  let ancho = dentro.scrollWidth;
+  dentro.querySelectorAll('*').forEach((hijo) => {
+    if (hijo.scrollWidth > ancho) ancho = hijo.scrollWidth;
+  });
+  return ancho;
+}
+
 function restaurarSaltos(dentro) {
   const textos = [];
   const paseo = document.createTreeWalker(dentro, NodeFilter.SHOW_TEXT);
@@ -857,13 +879,7 @@ function restaurarSaltos(dentro) {
     nodo.replaceWith(piezas);
   });
   if (!hubo) return false;
-  // La fila que arma Mermaid no deja saltar de línea: se pasa a bloque.
-  dentro.querySelectorAll('div').forEach((caja) => {
-    if (getComputedStyle(caja).display !== 'flex') return;
-    caja.style.display = 'block';
-    caja.style.whiteSpace = 'normal';
-    caja.style.textAlign = 'center';
-  });
+  soltarFilas(dentro);
   return true;
 }
 
@@ -1010,7 +1026,10 @@ function ajustarRotulosHtml() {
   let ajustado = false;
   svg.querySelectorAll('.edgeLabel foreignObject, .edgeLabels foreignObject').forEach((hueco) => {
     const dentro = hueco.firstElementChild;
-    if (dentro && restaurarSaltos(dentro)) ajustado = true;
+    if (!dentro) return;
+    restaurarSaltos(dentro);
+    soltarFilas(dentro);
+    ajustado = true;
   });
   svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
     const nodo = hueco.closest('g.node') || hueco.closest('g[class*="node"]');
@@ -1027,6 +1046,7 @@ function ajustarRotulosHtml() {
     const x = parseFloat(hueco.getAttribute('x')) || 0;
     const y = parseFloat(hueco.getAttribute('y')) || 0;
     restaurarSaltos(dentro);
+    soltarFilas(dentro);
     dentro.style.display = 'block';
     dentro.style.width = disponible + 'px';
     dentro.style.maxWidth = disponible + 'px';
@@ -1038,10 +1058,12 @@ function ajustarRotulosHtml() {
     }
     // Si aun así no cabe (una fórmula no se parte), se encoge un poco la
     // letra antes que cortar el texto.
-    const sobra = dentro.scrollWidth - disponible;
-    if (sobra > 1) {
+    const ancho2 = anchoDelRotulo(dentro);
+    if (ancho2 - disponible > 1) {
+      // Lo que no se puede partir (una fórmula larga) se encoge antes que
+      // quedar cortado.
       dentro.style.transformOrigin = 'center center';
-      dentro.style.transform = 'scale(' + Math.max(0.6, disponible / dentro.scrollWidth).toFixed(3) + ')';
+      dentro.style.transform = 'scale(' + Math.max(0.6, disponible / ancho2).toFixed(3) + ')';
     }
     const altoNuevo = Math.ceil(dentro.scrollHeight);
     if (altoNuevo > alto + 1) {
@@ -1745,6 +1767,9 @@ function updateEditorTools() {
   el.nodeColorBox.hidden = !COLORABLE.includes(kind);
   $('btn-salto').hidden = !CON_SALTO.includes(tipo);
   $('btn-formula').hidden = !CON_FORMULA.includes(tipo);
+  const conFormato = CON_SALTO.includes(tipo);
+  $('btn-negrita').hidden = !conFormato;
+  $('btn-cursiva').hidden = !conFormato;
   updateAppearanceVisibility();
 }
 
@@ -1899,7 +1924,10 @@ function rotuloDeFlecha(flecha) {
 
 // La misma flecha con otro rótulo, conservando su forma de escribirse.
 function flechaConRotulo(flecha, texto) {
-  const limpio = texto.trim();
+  // El Markdown de Mermaid (acentos graves) pide el rótulo entre comillas.
+  const limpio = /`/.test(texto) && !/^".*"$/.test(texto.trim())
+    ? '"' + texto.trim().replace(/"/g, '#quot;') + '"'
+    : texto.trim();
   const barras = /^(.*?)\|[^|]*\|(.*)$/.exec(flecha);
   if (barras) return limpio ? barras[1] + '|' + limpio + '|' + barras[2] : barras[1] + barras[2];
   const medio = /^(-{2,}|={2,}|-\.)\s[\s\S]*?\s(-{2,}[>xo]?|={2,}[>xo]?|\.-{1,}[>xo]?)$/.exec(flecha);
@@ -2229,7 +2257,7 @@ function nodeDefWith(id, forma, texto) {
   const info = shapeInfo(forma);
   if (info && info.classic) {
     const mitad = info.classic.length / 2;
-    const seguro = /[\[\](){}|"<>#&;]/.test(texto) ? '"' + texto.replace(/"/g, '#quot;') + '"' : texto;
+    const seguro = /[\[\](){}|"<>#&;`]/.test(texto) ? '"' + texto.replace(/"/g, '#quot;') + '"' : texto;
     return id + info.classic.slice(0, mitad) + seguro + info.classic.slice(mitad);
   }
   const rotulo = texto === id ? '' : ', label: "' + texto.replace(/"/g, '#quot;') + '"';
@@ -2697,6 +2725,56 @@ function insertarEnElCursor(texto) {
   render();
 }
 
+// La negrita y la cursiva se escriben con el Markdown de Mermaid, que pide
+// el rótulo entre acentos graves: A["`Texto **en negrita**`"].
+const MARCAS = { negrita: '**', cursiva: '*' };
+
+function llevaMarkdown(texto) {
+  return /^`[\s\S]*`$/.test(texto.trim());
+}
+
+// Envuelve lo elegido con las marcas del formato. Si había algo elegido, el
+// cursor queda detrás, listo para seguir escribiendo sin formato; si no,
+// queda en medio de las marcas, para escribir ya con él.
+function marcarTexto(texto, inicio, fin, marca) {
+  const elegido = texto.slice(inicio, fin);
+  const nuevo = marca + elegido + marca;
+  const cursor = elegido ? inicio + nuevo.length : inicio + marca.length;
+  return { texto: texto.slice(0, inicio) + nuevo + texto.slice(fin), cursor };
+}
+
+// Aplica negrita o cursiva a lo que haya elegido en el editor, pasando el
+// rótulo a Markdown si aún no lo estaba.
+function aplicarFormato(formato) {
+  const marca = MARCAS[formato];
+  const rotulo = cursorEnRotulo();
+  const codigo = el.editor.value;
+  // Mermaid no aplica el Markdown en un rótulo que lleva una fórmula.
+  if (rotulo && codigo.slice(rotulo.inicio, rotulo.fin).includes('$$')) {
+    toast(t('formatNoFormula'));
+    return;
+  }
+  let inicio = el.editor.selectionStart;
+  let fin = el.editor.selectionEnd;
+  if (rotulo && !llevaMarkdown(codigo.slice(rotulo.inicio, rotulo.fin))) {
+    // Se entrecomilla y se marca como Markdown, y se recolocan las posiciones.
+    const contenido = codigo.slice(rotulo.inicio, rotulo.fin);
+    const envuelto = (rotulo.entrecomillado ? '' : '"') + '`' + contenido + '`' + (rotulo.entrecomillado ? '' : '"');
+    const desplazo = rotulo.entrecomillado ? 1 : 2;
+    el.editor.value = codigo.slice(0, rotulo.inicio) + envuelto + codigo.slice(rotulo.fin);
+    inicio += desplazo;
+    fin += desplazo;
+  }
+  const hecho = marcarTexto(el.editor.value, inicio, fin, marca);
+  el.editor.value = hecho.texto;
+  el.editor.focus();
+  el.editor.setSelectionRange(hecho.cursor, hecho.cursor);
+  codigoPrevio = el.editor.value;
+  updateStatus();
+  renderGutter();
+  render();
+}
+
 // Un salto de línea dentro de un rótulo: en Mermaid se escribe <br>.
 function insertarSalto() {
   insertarEnElCursor('<br>');
@@ -2706,6 +2784,8 @@ function setupEditorTools() {
   buildTypeMenu();
   $('btn-salto').addEventListener('click', insertarSalto);
   $('btn-formula').addEventListener('click', abrirEditorFormulas);
+  $('btn-negrita').addEventListener('click', () => aplicarFormato('negrita'));
+  $('btn-cursiva').addEventListener('click', () => aplicarFormato('cursiva'));
 
   $('btn-type').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2831,11 +2911,14 @@ function setupEditorTools() {
 
 // Los saltos se guardan como <br>, que es como los escribe Mermaid.
 function textoAEditor(texto) {
-  return texto.replace(/<br\s*\/?>/gi, '\n');
+  // Los acentos graves que marcan el Markdown se quitan de la vista: se
+  // vuelven a poner al guardar si el texto lleva negrita o cursiva.
+  return texto.replace(/^`([\s\S]*)`$/, '$1').replace(/<br\s*\/?>/gi, '\n');
 }
 
 function textoACodigo(texto) {
-  return texto.trim().replace(/\s*\n\s*/g, '<br>');
+  const limpio = texto.trim().replace(/\s*\n\s*/g, '<br>');
+  return /\*[^*]+\*/.test(limpio) ? '`' + limpio + '`' : limpio;
 }
 
 // Texto que tiene ahora el objeto señalado.
@@ -2892,6 +2975,7 @@ function escribirTextoDelObjeto(objeto, texto) {
 
 // Abre el campo encima del objeto, a su medida y con el zoom del lienzo.
 let editandoObjeto = null;
+let esperandoFormulaSitio = false;
 
 function editarEnElSitio(objeto, caja) {
   if (viewer || !caja) return;
@@ -2906,8 +2990,43 @@ function editarEnElSitio(objeto, caja) {
   campo.style.height = Math.round(alto) + 'px';
   campo.style.fontSize = Math.max(11, Math.round(14 * view.scale)) + 'px';
   campo.hidden = false;
+  colocarBarraSitio();
   campo.focus();
   campo.select();
+}
+
+// Los botones de formato van pegados al campo, encima o debajo si no cabe.
+function colocarBarraSitio() {
+  const campo = el.editorSitio;
+  const barra = el.editorSitioBarra;
+  barra.hidden = false;
+  const caja = campo.getBoundingClientRect();
+  const suya = barra.getBoundingClientRect();
+  const arriba = caja.top - suya.height - 6;
+  barra.style.top = Math.round(arriba > 8 ? arriba : caja.bottom + 6) + 'px';
+  barra.style.left = Math.round(Math.min(Math.max(8, caja.left), window.innerWidth - suya.width - 8)) + 'px';
+}
+
+// Escribe algo en el campo de sobre el dibujo, donde esté el cursor.
+function insertarEnElSitio(texto) {
+  const campo = el.editorSitio;
+  const inicio = campo.selectionStart;
+  const fin = campo.selectionEnd;
+  campo.value = campo.value.slice(0, inicio) + texto + campo.value.slice(fin);
+  campo.focus();
+  campo.setSelectionRange(inicio + texto.length, inicio + texto.length);
+}
+
+function formatoEnElSitio(formato) {
+  const campo = el.editorSitio;
+  if (campo.value.includes('$$')) {
+    toast(t('formatNoFormula'));
+    return;
+  }
+  const hecho = marcarTexto(campo.value, campo.selectionStart, campo.selectionEnd, MARCAS[formato]);
+  campo.value = hecho.texto;
+  campo.focus();
+  campo.setSelectionRange(hecho.cursor, hecho.cursor);
 }
 
 function cerrarEditorSitio(guardar) {
@@ -2916,7 +3035,9 @@ function cerrarEditorSitio(guardar) {
   const objeto = editandoObjeto;
   const texto = campo.value;
   editandoObjeto = null;
+  esperandoFormulaSitio = false;
   campo.hidden = true;
+  el.editorSitioBarra.hidden = true;
   if (guardar) escribirTextoDelObjeto(objeto, textoACodigo(texto));
 }
 
@@ -2926,7 +3047,28 @@ function setupEditorSitio() {
     if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); cerrarEditorSitio(true); }
     else if (event.key === 'Escape') { event.preventDefault(); cerrarEditorSitio(false); }
   });
-  campo.addEventListener('blur', () => cerrarEditorSitio(true));
+  campo.addEventListener('blur', () => {
+    // Al ir a por una fórmula el campo pierde el foco, pero sigue abierto.
+    if (esperandoFormulaSitio) return;
+    cerrarEditorSitio(true);
+  });
+  // El lienzo se queda con el ratón al empezar a arrastrar, así que el campo
+  // no pierde el foco solo: se cierra aquí al pulsar fuera.
+  document.addEventListener('pointerdown', (event) => {
+    if (campo.hidden) return;
+    if (event.target === campo || event.target.closest('#editor-sitio-barra')) return;
+    cerrarEditorSitio(true);
+  }, true);
+  // Pulsar un botón no debe quitarle el foco al campo.
+  el.editorSitioBarra.addEventListener('mousedown', (event) => event.preventDefault());
+  el.editorSitioBarra.addEventListener('click', (event) => {
+    const boton = event.target.closest('button');
+    if (!boton) return;
+    const accion = boton.dataset.formato;
+    if (accion === 'salto') insertarEnElSitio('\n');
+    else if (accion === 'formula') { esperandoFormulaSitio = true; abrirEditorFormulas(); }
+    else formatoEnElSitio(accion);
+  });
   el.viewport.addEventListener('dblclick', (event) => {
     const objeto = objetoDelDiagrama(event);
     if (objeto.tipo === 'fondo') {
@@ -3008,6 +3150,11 @@ function insertarFormula(latex) {
   const limpio = (latex || '').trim();
   if (!limpio) return;
   const formula = '$$' + limpio + '$$';
+  if (!el.editorSitio.hidden && editandoObjeto) {
+    esperandoFormulaSitio = false;
+    insertarEnElSitio(formula);
+    return;
+  }
   const rotulo = cursorEnRotulo();
   if (rotulo) {
     // Una fórmula lleva llaves y paréntesis: el rótulo tiene que ir entre

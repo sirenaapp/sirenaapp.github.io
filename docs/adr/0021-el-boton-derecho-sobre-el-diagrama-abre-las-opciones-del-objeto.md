@@ -86,7 +86,17 @@ En los diagramas de flujo (y con ellos el mapa conceptual), el doble clic
 sobre una caja o sobre el texto de una flecha abre un campo encima del propio
 elemento, a su medida y con el tamaño de letra del zoom. Intro confirma,
 Mayús+Intro añade un salto, que se guarda como `<br>`, Escape cancela y pulsar
-fuera confirma. El texto se reescribe conservando la forma de la caja y el
+fuera confirma. Ese pulsar fuera se atiende a mano: el lienzo se queda con el
+ratón para desplazar el diagrama, de modo que el campo no perdía el foco solo y
+solo se salía con Intro.
+
+Pegada al campo va una barra con cuatro botones, que es lo que se puede
+necesitar escribiendo un rótulo: negrita, cursiva, salto de línea y fórmula
+(que abre Edicuatex, [ADR 22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md)).
+Se coloca encima del campo, o debajo si no cabe arriba, y no le quita el foco al
+pulsarla. Los acentos graves que marcan el Markdown ([ADR 20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md))
+no se enseñan ahí: se quitan al abrir el campo y se vuelven a poner al guardar
+si el texto lleva marcado. El texto se reescribe conservando la forma de la caja y el
 estilo de la flecha (`A -- Sí -->` sigue siendo así, y `-->|Sí|` también).
 
 Borrar tiene su cuidado: los estilos de las flechas van por número

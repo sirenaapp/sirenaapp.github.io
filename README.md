@@ -28,12 +28,13 @@ propia dirección.
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
   numeración de mensajes; valores en sectores), en flujo un botón con las 52
   formas de caja que dibuja Mermaid, para el elemento donde está el cursor, y
-  un botón que inserta un salto de línea (`<br>`) en los tipos cuyos rótulos lo
-  admiten. El botón de título y descripción accesibles está también aquí.
+  un botón que inserta un salto de línea (`<br>`) y otros dos que ponen el
+  texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
   flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
-  flecha permite escribirlo encima del propio dibujo. En los diagramas de flujo
+  flecha permite escribirlo encima del propio dibujo, con una barrita de
+  botones para la negrita, la cursiva, el salto de línea y la fórmula. En los diagramas de flujo
   se trazan flechas arrastrando desde los puntos que aparecen al pasar el ratón
   sobre una caja (soltando en el vacío se crea la caja de destino), el doble
   clic en el lienzo vacío añade una caja, y desde el menú se borra una caja
@@ -59,7 +60,9 @@ propia dirección.
   orientación de la forma del diagrama.
 - Escribir fórmulas matemáticas en los rótulos, con LaTeX entre `$$…$$`, a mano
   o con el editor [Edicuatex](https://edicuatex.github.io/), que se abre desde
-  la barra y devuelve la fórmula al diagrama.
+  la barra y devuelve la fórmula al diagrama. La negrita y la cursiva no se
+  pueden combinar con una fórmula en el mismo rótulo, porque Mermaid deja el
+  marcado a la vista.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla. En los tipos que no los admiten (mapa mental,
   kanban, línea del tiempo, bloques, Sankey, Venn e Ishikawa) se guardan como

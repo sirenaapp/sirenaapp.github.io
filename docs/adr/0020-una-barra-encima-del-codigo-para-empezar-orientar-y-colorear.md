@@ -149,6 +149,19 @@ sintaxis. Los iconos son de Lucide y los rótulos están en los cinco idiomas.
   Descartado: un botón deshabilitado no muestra su rótulo en todos los
   navegadores. El menú se abre igual y explica dónde poner el cursor.
 
+## Negrita y cursiva (22-09-2026)
+
+La barra lleva dos botones más, negrita y cursiva, que envuelven lo elegido
+en `**` y `*`. Mermaid solo atiende ese marcado si el rótulo entero va entre
+acentos graves (`A["`Uno **dos**`"]`), así que al aplicarlo por primera vez se
+pasa el rótulo a esa forma, y como los acentos graves obligan a entrecomillar,
+se entrecomilla también. Comprobado en cajas, en rombos y en los rótulos de
+flecha, con los rótulos en texto SVG y en HTML.
+
+Lo que no se puede es juntar el marcado con una fórmula: Mermaid deja los
+asteriscos a la vista. Si el rótulo lleva `$$…$$`, los botones no hacen nada y
+lo dicen con un aviso, en vez de escribir algo que saldría mal.
+
 ## Consecuencias
 
 Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,
