@@ -932,7 +932,16 @@ function opaqueEdgeLabels(svg, id) {
   return svg.replace('</style>', extra + '</style>');
 }
 
+// El elemento donde Mermaid mide toma el ancho del panel del diagrama, para
+// que lo que se dibuje a ese ancho quepa tal cual.
+function anchoDeMedida() {
+  const port = el.viewport.getBoundingClientRect();
+  const ancho = Math.round(port.width - 24);
+  document.documentElement.style.setProperty('--ancho-medida', (ancho > 200 ? ancho : 800) + 'px');
+}
+
 async function renderOnce() {
+  anchoDeMedida();
   const code = el.editor.value.trim();
   codigoPrevio = el.editor.value;
   localStorage.setItem(STORE.code, el.editor.value);

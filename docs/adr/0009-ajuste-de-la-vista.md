@@ -49,6 +49,14 @@ Lo que sí reparte bien el diagrama es la dirección: el mismo código en
 horizontal pasa de 476 × 1949 a 2838 × 334, conservando el orden de lectura. Por
 eso la página propone ese cambio en lugar de tocar el motor de trazado.
 
+Hay tipos, como el diagrama de Gantt, que Mermaid dibuja al ancho del sitio
+donde los mide, no a su contenido. Para que salgan a la medida del panel donde
+se van a ver, el elemento de medida toma ese ancho (`--ancho-medida`) antes de
+cada dibujo. El 22-09-2026 ese elemento se sacó del flujo de la página, porque
+la empujaba mientras Mermaid medía, y al perder su ancho el Gantt salió
+comprimido a 300 píxeles y luego ampliado por el ajuste; de ahí que ahora se le
+dé el ancho de forma explícita.
+
 ## Consecuencias
 
 Un diagrama largo ya no se ve entero de un vistazo al abrirlo. El botón del
