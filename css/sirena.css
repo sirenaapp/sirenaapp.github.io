@@ -290,7 +290,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
 .menu-tamano { min-width: 200px; }
-.menu-formas { min-width: 400px; max-width: min(92vw, 460px); }
+.menu-formas { width: 440px; max-width: min(92vw, 460px); }
 .menu-formas .segmentos-menu { margin: 6px 8px 8px; }
 /* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
 .formas-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 4px 4px; }
