@@ -17,7 +17,6 @@ const STORE = {
   docs: 'sirena.docs',
   docActivo: 'sirena.docActivo',
   limite: 'sirena.limite',
-  pistaFormato: 'sirena.pistaFormato',
   pngEscala: 'sirena.pngEscala',
   pngFondo: 'sirena.pngFondo'
 };
@@ -2796,7 +2795,7 @@ function abrirContextual(event) {
   const objeto = objetoDelDiagrama(event);
   if (objeto.tipo !== 'fondo') irAlObjeto(objeto);
   event.preventDefault();
-  ocultarPista(true);
+  ocultarPista();
   cerrarMenusEditor();
   cerrarContextual();
   construirContextual(objeto);
@@ -2813,18 +2812,20 @@ function abrirContextual(event) {
 
 /* --- Aviso del botón derecho --- */
 
-// Se enseña hasta que se usa el menú contextual por primera vez, o hasta que
-// se cierra a mano; entonces no vuelve a salir en ese navegador.
-function ocultarPista(recordar) {
+// Se enseña al entrar y se retira al usar el menú contextual o al cerrarla a
+// mano. Solo dura esa visita: al volver a la página vuelve a salir, porque no
+// se guarda nada en el navegador.
+function ocultarPista() {
   const pista = el.pistaFormato;
   if (pista.hidden) return;
-  if (recordar) localStorage.setItem(STORE.pistaFormato, 'visto');
   pista.classList.add('saliendo');
   setTimeout(() => { pista.hidden = true; pista.classList.remove('saliendo'); }, 320);
 }
 
 function mostrarPista() {
-  if (viewer || localStorage.getItem(STORE.pistaFormato)) return;
+  if (viewer) return;
+  // Hubo una versión que la daba por vista para siempre: se limpia el rastro.
+  localStorage.removeItem('sirena.pistaFormato');
   // En pantalla táctil no hay botón derecho: ahí es la pulsación larga.
   const tactil = window.matchMedia('(hover: none)').matches;
   $('pista-formato-texto').textContent = t(tactil ? 'hintTouch' : 'hintMouse');
@@ -2835,7 +2836,7 @@ function setupContextual() {
   el.viewport.addEventListener('contextmenu', abrirContextual);
   $('pista-formato-cerrar').addEventListener('click', (event) => {
     event.stopPropagation();
-    ocultarPista(true);
+    ocultarPista();
   });
   el.contextMenu.addEventListener('click', (event) => event.stopPropagation());
   el.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());

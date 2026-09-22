@@ -51,8 +51,10 @@ no aparece, porque ahí no se edita.
 
 Como un menú contextual no se ve, sobre el lienzo aparece un aviso flotante
 que lo cuenta (con el texto de la pulsación larga en pantalla táctil). Se
-retira al usar el menú por primera vez o al cerrarlo a mano, y queda anotado
-en el navegador para no repetirlo. No aparece en el modo visor.
+retira al usar el menú o al cerrarlo a mano, pero solo durante esa visita: al
+volver a entrar o al recargar vuelve a salir, porque no se guarda nada en el
+navegador. Así lo pidió el autor, para que un menú que no se ve no se olvide.
+No aparece en el modo visor.
 
 ## Alternativas descartadas
 
