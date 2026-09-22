@@ -27,6 +27,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [19](0019-los-ejemplos-incluyen-tipos-de-diagrama-en-beta.md) | Los ejemplos incluyen tipos de diagrama en beta (radar, Venn e Ishikawa) | aceptado |
 | [20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md) | Una barra encima del código para empezar, orientar y colorear | aceptado |
 | [21](0021-el-boton-derecho-sobre-el-diagrama-abre-las-opciones-del-objeto.md) | El botón derecho sobre el diagrama abre las opciones del objeto | aceptado |
+| [22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md) | Las fórmulas se escriben con LaTeX y se editan con Edicuatex | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

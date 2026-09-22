@@ -14,6 +14,11 @@ bien.
 Descargar el diagrama en PNG es una de las razones de ser de Sirena, así que esa
 limitación no es aceptable.
 
+*(22-09-2026: al añadir las fórmulas matemáticas se midió que el PNG sí sale
+cuando el SVG se le da al navegador como dirección de datos en vez de como
+blob. Ver [ADR 22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md);
+el texto SVG sigue siendo lo normal, y el HTML solo se usa donde hace falta.)*
+
 ## Decisión
 
 Se dibuja con `htmlLabels: false`, de modo que los rótulos son texto SVG. El

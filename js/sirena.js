@@ -192,6 +192,7 @@ let strings = window.SIRENA_LANG.es;
 let renderTimer = null;
 let renderToken = 0;
 let currentSvg = '';
+let mermaidConFormulas = false;
 let viewer = false;
 let errorLine = 0;
 const coloresTocados = new Set();
@@ -818,7 +819,17 @@ function updateStatus(extra) {
 
 /* --- Dibujo del diagrama --- */
 
+// Las fórmulas se escriben entre $$ y Mermaid solo las dibuja con los rótulos
+// en HTML, que es lo que Sirena evita por lo demás (ver ADR 3).
+const FORMULA_RE = /\$\$[\s\S]+?\$\$/;
+
+function hayFormulas(codigo) {
+  return FORMULA_RE.test(codigo === undefined ? el.editor.value : codigo);
+}
+
 function initMermaid() {
+  const conFormulas = hayFormulas();
+  mermaidConFormulas = conFormulas;
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
@@ -828,14 +839,14 @@ function initMermaid() {
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
-    htmlLabels: false,
-    flowchart: { useMaxWidth: false, htmlLabels: false },
+    htmlLabels: conFormulas,
+    flowchart: { useMaxWidth: false, htmlLabels: conFormulas },
     sequence: { useMaxWidth: false },
     gantt: { useMaxWidth: false },
     er: { useMaxWidth: false },
     journey: { useMaxWidth: false },
-    class: { useMaxWidth: false, htmlLabels: false },
-    state: { useMaxWidth: false, htmlLabels: false },
+    class: { useMaxWidth: false, htmlLabels: conFormulas },
+    state: { useMaxWidth: false, htmlLabels: conFormulas },
     pie: { useMaxWidth: false },
     mindmap: { useMaxWidth: false }
   });
@@ -946,6 +957,7 @@ function anchoDeMedida() {
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
+  if (hayFormulas(code) !== mermaidConFormulas) initMermaid();
   codigoPrevio = el.editor.value;
   localStorage.setItem(STORE.code, el.editor.value);
   guardarDocActivo();
@@ -1532,6 +1544,10 @@ function isConceptMap(code) {
   return nombres.some((n) => titulo[1].toLowerCase().includes(n.toLowerCase()));
 }
 
+// Tipos cuyos rótulos dibujan las fórmulas, comprobados uno a uno: en los
+// demás el $$…$$ saldría tal cual, como texto.
+const CON_FORMULA = ['flowchart', 'concept', 'state', 'class', 'sequence', 'block', 'kanban', 'er'];
+
 // Tipos cuyos rótulos admiten <br> como salto de línea. Comprobado uno a uno
 // con Mermaid 12: en los que faltan (Gantt, sectores, radar, Venn, mapa de
 // árbol, ramas de Git) el <br> se dibujaría tal cual, como texto.
@@ -1615,6 +1631,7 @@ function updateEditorTools() {
   if (conDireccion) readDirection();
   el.nodeColorBox.hidden = !COLORABLE.includes(kind);
   $('btn-salto').hidden = !CON_SALTO.includes(tipo);
+  $('btn-formula').hidden = !CON_FORMULA.includes(tipo);
   updateAppearanceVisibility();
 }
 
@@ -2553,23 +2570,29 @@ function ajustarMenuAlPanel(menu) {
   if (r.right > panel.right - 8) menu.style.left = Math.round(panel.right - 8 - r.right) + 'px';
 }
 
-// Un salto de línea dentro de un rótulo: en Mermaid se escribe <br>.
-function insertarSalto() {
+// Escribe algo donde esté el cursor, sin tocar nada más.
+function insertarEnElCursor(texto) {
   const inicio = el.editor.selectionStart;
   const fin = el.editor.selectionEnd;
-  const texto = el.editor.value;
-  el.editor.value = texto.slice(0, inicio) + '<br>' + texto.slice(fin);
+  const codigo = el.editor.value;
+  el.editor.value = codigo.slice(0, inicio) + texto + codigo.slice(fin);
   el.editor.focus();
-  el.editor.setSelectionRange(inicio + 4, inicio + 4);
+  el.editor.setSelectionRange(inicio + texto.length, inicio + texto.length);
   codigoPrevio = el.editor.value;
   updateStatus();
   renderGutter();
   render();
 }
 
+// Un salto de línea dentro de un rótulo: en Mermaid se escribe <br>.
+function insertarSalto() {
+  insertarEnElCursor('<br>');
+}
+
 function setupEditorTools() {
   buildTypeMenu();
   $('btn-salto').addEventListener('click', insertarSalto);
+  $('btn-formula').addEventListener('click', abrirEditorFormulas);
 
   $('btn-type').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2834,6 +2857,95 @@ function rotuloDeLaFlecha(indice) {
   pt.x = q.x; pt.y = q.y;
   const centro = pt.matrixTransform(path.getScreenCTM());
   return { getBoundingClientRect: () => ({ left: centro.x - 45, top: centro.y - 13, width: 90, height: 26 }) };
+}
+
+/* --- Fórmulas matemáticas --- */
+
+// Edicuatex (edicuatex.github.io), el editor de fórmulas de la misma casa, se
+// abre en una ventana aparte y devuelve el LaTeX por postMessage. Solo se
+// abre cuando se pide, así que quien no lo use no sale de esta página.
+const EDICUATEX = 'https://edicuatex.github.io/';
+let ventanaFormulas = null;
+
+// ¿Está el cursor dentro del texto de un rótulo? Devuelve dónde empieza y
+// acaba ese texto; si no lo está, null y la fórmula irá en una caja nueva.
+function cursorEnRotulo() {
+  const texto = el.editor.value;
+  const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
+  let hasta = texto.indexOf('\n', el.editor.selectionStart);
+  if (hasta === -1) hasta = texto.length;
+  const linea = texto.slice(desde, hasta);
+  const columna = el.editor.selectionStart - desde;
+  const zonas = /"[^"]*"|\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\|[^|]*\|/g;
+  let m;
+  while ((m = zonas.exec(linea))) {
+    if (columna > m.index && columna < m.index + m[0].length) {
+      return {
+        inicio: desde + m.index + 1,
+        fin: desde + m.index + m[0].length - 1,
+        cursor: el.editor.selectionStart,
+        entrecomillado: m[0][0] === '"'
+      };
+    }
+  }
+  return null;
+}
+
+function insertarFormula(latex) {
+  const limpio = (latex || '').trim();
+  if (!limpio) return;
+  const formula = '$$' + limpio + '$$';
+  const rotulo = cursorEnRotulo();
+  if (rotulo) {
+    // Una fórmula lleva llaves y paréntesis: el rótulo tiene que ir entre
+    // comillas para que Mermaid no lo tome por sintaxis suya.
+    const codigo = el.editor.value;
+    const actual = codigo.slice(rotulo.inicio, rotulo.fin);
+    const corte = rotulo.cursor - rotulo.inicio;
+    const nuevo = actual.slice(0, corte) + formula + actual.slice(corte);
+    const escrito = rotulo.entrecomillado ? nuevo : '"' + nuevo.replace(/"/g, '#quot;') + '"';
+    el.editor.value = codigo.slice(0, rotulo.inicio) + escrito + codigo.slice(rotulo.fin);
+    const cursor = rotulo.inicio + escrito.length;
+    el.editor.focus();
+    el.editor.setSelectionRange(cursor, cursor);
+    codigoPrevio = el.editor.value;
+    updateStatus();
+    renderGutter();
+    render();
+    return;
+  }
+  if (!CON_FORMULA.includes(editorType())) {
+    insertSnippet(formula);
+    return;
+  }
+  if (diagramKind() === 'flowchart') {
+    const id = idLibre();
+    const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+    lineas.splice(posicionParaFlecha(lineas), 0, sangriaDelCodigo(lineas) + nodeDefWith(id, formaGeneral(), formula));
+    aplicarCodigo(lineas);
+    toast(t('formulaInBox'));
+    return;
+  }
+  insertSnippet(formula);
+}
+
+function abrirEditorFormulas() {
+  const direccion = EDICUATEX + '?pm=1&origin=' + encodeURIComponent(location.origin);
+  if (ventanaFormulas && !ventanaFormulas.closed) {
+    ventanaFormulas.focus();
+    return;
+  }
+  ventanaFormulas = window.open(direccion, 'edicuatex', 'width=900,height=700,noopener=no');
+  if (!ventanaFormulas) toast(t('formulaBlocked'));
+}
+
+function setupFormulas() {
+  window.addEventListener('message', (event) => {
+    if (event.origin !== new URL(EDICUATEX).origin) return;
+    const datos = event.data;
+    if (!datos || datos.type !== 'edicuatex:result') return;
+    insertarFormula(datos.latex);
+  });
 }
 
 /* --- Crear cajas y flechas sobre el dibujo --- */
@@ -3734,6 +3846,9 @@ function flattenForeignObjects(copy, original) {
   target.forEach((node, index) => {
     const from = source[index];
     const content = from || node;
+    // Una fórmula se queda tal cual: convertirla en texto la echaría a perder,
+    // y el navegador la dibuja igual al pasar el diagrama a PNG (comprobado).
+    if (content.querySelector('.katex')) return;
     const text = (content.textContent || '').trim();
     const inner = content.querySelector('div, span, p');
     const style = inner ? getComputedStyle(inner) : null;
@@ -3794,7 +3909,13 @@ async function svgToCanvas(scale, fondo) {
   const relleno = fondo === undefined ? pngFondo() : fondo;
   const data = svgForExport();
   if (!data) return null;
-  const url = URL.createObjectURL(new Blob([data.markup], { type: 'image/svg+xml;charset=utf-8' }));
+  // Un SVG servido como blob contamina el lienzo cuando lleva HTML dentro
+  // (las fórmulas), y entonces el navegador no deja sacar el PNG. Escrito
+  // como dirección de datos no ocurre, así que esos van por ahí.
+  const conHtml = data.markup.includes('<foreignObject');
+  const url = conHtml
+    ? 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(data.markup)
+    : URL.createObjectURL(new Blob([data.markup], { type: 'image/svg+xml;charset=utf-8' }));
   try {
     const image = await new Promise((resolve, reject) => {
       const img = new Image();
@@ -3814,7 +3935,7 @@ async function svgToCanvas(scale, fondo) {
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     return canvas;
   } finally {
-    URL.revokeObjectURL(url);
+    if (!conHtml) URL.revokeObjectURL(url);
   }
 }
 
@@ -4353,6 +4474,7 @@ function setupToolbar() {
   setupContextual();
   setupEditorSitio();
   setupCrear();
+  setupFormulas();
 
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();

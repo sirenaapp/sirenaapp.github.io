@@ -57,6 +57,9 @@ propia dirección.
   fondo blanco, transparente o el del editor.
 - Imprimir el diagrama o guardarlo en PDF, en una hoja A4 que toma la
   orientación de la forma del diagrama.
+- Escribir fórmulas matemáticas en los rótulos, con LaTeX entre `$$…$$`, a mano
+  o con el editor [Edicuatex](https://edicuatex.github.io/), que se abre desde
+  la barra y devuelve la fórmula al diagrama.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
   leen los lectores de pantalla. En los tipos que no los admiten (mapa mental,
   kanban, línea del tiempo, bloques, Sankey, Venn e Ishikawa) se guardan como
