@@ -19,8 +19,12 @@ propia dirección.
   el menú de colores, con el color principal de todo el diagrama y el color
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto o solo del borde, escrito en el código como línea `style` o
-  clase `classDef`; el menú de trazo y texto; y el de ajustes del dibujo, con
-  lo propio de cada tipo.
+  clase `classDef`; el menú de trazo y texto; el motor de distribución (dagre
+  y los nueve algoritmos de ELK que trae Mermaid, cada uno con una línea que
+  dice cómo reparte los elementos); y un botón por cada ajuste que ese motor y
+  ese tipo de diagrama atienden (forma de las líneas y separación con dagre,
+  unir flechas con ELK por capas, márgenes, numeración de mensajes, valores en
+  sectores). El botón de título y descripción accesibles está también aquí.
 - Elegir entre 24 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: los cinco temas de Mermaid y, en la barra
@@ -37,7 +41,9 @@ propia dirección.
 - Imprimir el diagrama o guardarlo en PDF, en una hoja A4 que toma la
   orientación de la forma del diagrama.
 - Poner título y descripción accesibles al diagrama, que quedan dentro del SVG y
-  leen los lectores de pantalla.
+  leen los lectores de pantalla. En los tipos que no los admiten (mapa mental,
+  kanban, línea del tiempo, bloques, Sankey, Venn e Ishikawa) se guardan como
+  comentario `%% accTitle:` en el código, para que viajen con él.
 - Consultar la sintaxis del tipo de diagrama que se está escribiendo, en la
   ventana de ayuda, e insertar los fragmentos con una pulsación.
 - Abrir y guardar archivos `.mmd`, también arrastrándolos sobre la ventana.

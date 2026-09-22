@@ -31,11 +31,15 @@ Medido con Mermaid sin código de Sirena, mismo diagrama en las dos versiones:
 Sirena respeta el motor por defecto de Mermaid 12, `elk`, de modo que un
 diagrama sin cabecera se ve igual que en cualquier otro editor de Mermaid.
 
-El menú «Ajustes del dibujo» de la barra del editor recupera «Forma de las
-líneas», con cuatro opciones: en
-ángulo recto (`elk`, la de serie), curvas, rectas y escalonadas. Las tres
-últimas cambian el motor a `dagre`, que es el único que las atiende, y hacen
-aparecer «Separación»; con `elk` ese control se oculta, porque no tiene efecto.
+La barra del editor tiene un botón de motor con todos los que trae Mermaid
+(`dagre` y los algoritmos de ELK) y, aparte, «Forma de las líneas» (curvas,
+rectas y escalonadas) y «Separación», que solo aparecen con `dagre`, el único
+motor que las atiende; con ELK se ocultan, porque no tienen efecto (se
+comprobó el 22-09-2026 que ni `flowchart.curve`, ni la curva por flecha, ni
+las opciones de enrutado de ELK cambian el trazado). Con ELK por capas aparece
+en cambio «Unir flechas» (`elk.mergeEdges`), que es lo que ese motor sí
+admite. Hasta ese día las dos cosas iban juntas en un solo selector de forma
+de las líneas cuya primera opción era «En ángulo recto (elk)».
 
 En los diagramas de flujo el motor se escribe siempre en la cabecera, también
 cuando es el de serie (`"layout":"elk"`). Es la excepción a la norma del ADR 8

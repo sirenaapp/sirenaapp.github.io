@@ -280,6 +280,11 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .tb-texto span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 
 .menu-direccion { min-width: 200px; white-space: nowrap; }
+.menu-opciones { min-width: 160px; white-space: nowrap; }
+.menu-opciones .menu-titulo { margin: 4px 10px 6px; }
+.menu-motores { min-width: 300px; }
+.menu-motores button[aria-current="true"] strong { color: var(--accent); }
+.modal-aviso { color: var(--accent); }
 .menu-direccion button { align-items: center; }
 
 /* Los menús de esta barra cuelgan por la izquierda, que es donde están sus botones. */

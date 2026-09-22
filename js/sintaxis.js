@@ -203,7 +203,7 @@ window.SIRENA_SYNTAX = [
       { c: 'title Título', t: { es: 'Título del diagrama', ca: 'Títol del diagrama', gl: 'Título do diagrama', eu: 'Diagramaren izenburua', en: 'Diagram title' } },
       { c: 'set A ["Reptiles"]', t: { es: 'Conjunto, con su nombre', ca: 'Conjunt, amb el seu nom', gl: 'Conxunto, co seu nome', eu: 'Multzoa, bere izenarekin', en: 'Set, with its name' } },
       { c: 'union A,B ["Ponen huevos"]', t: { es: 'Intersección de dos conjuntos, con su texto', ca: 'Intersecció de dos conjunts, amb el seu text', gl: 'Intersección de dous conxuntos, co seu texto', eu: 'Bi multzoren ebakidura, bere testuarekin', en: 'Intersection of two sets, with its text' } },
-      { c: '%% Comentario', t: { es: 'Comentario; este tipo no admite accTitle ni accDescr', ca: 'Comentari; aquest tipus no admet accTitle ni accDescr', gl: 'Comentario; este tipo non admite accTitle nin accDescr', eu: 'Iruzkina; mota honek ez ditu accTitle eta accDescr onartzen', en: 'Comment; this type does not accept accTitle or accDescr' } }
+      { c: '%% accTitle: Título', t: { es: 'Título accesible como comentario: este tipo no admite accTitle', ca: 'Títol accessible com a comentari: aquest tipus no admet accTitle', gl: 'Título accesible como comentario: este tipo non admite accTitle', eu: 'Titulu irisgarria iruzkin gisa: mota honek ez du accTitle onartzen', en: 'Accessible title as a comment: this type does not accept accTitle' } }
     ]
   },
   {

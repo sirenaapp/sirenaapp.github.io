@@ -18,7 +18,9 @@ los cinco idiomas de la interfaz.
 El título y la descripción accesibles se editan en una ventana propia y se
 guardan en el código como `accTitle` y `accDescr`, que es el mecanismo estándar
 de Mermaid: acaban dentro del SVG, de modo que viajan con el diagrama a
-cualquier sitio donde se inserte.
+cualquier sitio donde se inserte. Desde el 22-09-2026 el botón está en la barra
+del editor y, en los tipos que no admiten esas dos órdenes, el título y la
+descripción se guardan como comentario (ver [ADR 20](0020-una-barra-encima-del-codigo-para-empezar-orientar-y-colorear.md)).
 
 Los ejemplos también están traducidos a los cinco idiomas, y al cambiar de
 idioma el ejemplo que esté cargado se sustituye por su versión traducida.

@@ -46,13 +46,30 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   (`color` o `stroke`) en la línea `style` del elemento, creándola si no
   existe, sin tocar el resto; para ellos la paleta ofrece los colores oscuros
   del borde, porque el relleno claro no se leería.
-- **Trazo y texto** y **Ajustes del dibujo.** El resto del antiguo menú de
-  aspecto de la barra superior, repartido por temas a petición del autor: el
-  trazo y el tamaño del texto en un botón, y en otro lo que depende del tipo
-  (forma de las líneas, separación y márgenes en flujo; numeración en
-  secuencia; valores en sectores), que solo aparece cuando algo aplica. La
-  barra superior se queda con los temas de Mermaid, que no se escriben en el
-  código.
+- **Trazo y texto.** El trazo y el tamaño del texto, en un botón.
+- **Motor de distribución.** Un botón que lista todos los motores que trae
+  Mermaid 12: dagre y los algoritmos de ELK (por capas, árbol, radial, por
+  tensión, por fuerzas, sin solapamientos, en cajas, empaquetado y por
+  partes), cada uno con una línea que dice cómo reparte los elementos. Se
+  excluye `elk.random`, que coloca al azar y solo sirve para pruebas. Aparece
+  en flujo, estados, clases y entidad-relación, y el motor elegido se escribe
+  en la cabecera (ADR 12).
+- **Un botón por ajuste.** El resto del antiguo menú de aspecto de la barra
+  superior, a petición del autor, con un botón por ajuste que solo aparece
+  cuando el tipo de diagrama y el motor lo atienden, comprobado uno a uno:
+  forma de las líneas y separación solo con dagre; unir las flechas que van
+  al mismo sitio (`elk.mergeEdges`) solo con ELK por capas; márgenes en flujo
+  con cualquier motor; numeración en secuencia; valores en sectores. La
+  orientación se oculta con los motores que no la atienden (tensión, fuerzas,
+  cajas y empaquetado). Cada botón abre la lista de opciones con la actual
+  marcada. La barra superior se queda con los temas de Mermaid, que no se
+  escriben en el código.
+- **Título y descripción accesibles.** El botón pasa de la barra superior a
+  esta, junto al resto de lo que se escribe en el código. En los tipos que
+  rechazan `accTitle` y `accDescr` o los ignoran (mapa mental, kanban, línea
+  del tiempo, bloques, Sankey, Venn e Ishikawa, comprobados uno a uno) se
+  escriben como comentario `%% accTitle:` y `%% accDescr:`, con las mismas
+  palabras, y la ventana avisa de que así no llegan al lector de pantalla.
 
 Todo se escribe en el propio código, como el resto de ajustes (ADR 8), de modo
 que el diagrama se ve igual en cualquier sitio y quien lo lee aprende la

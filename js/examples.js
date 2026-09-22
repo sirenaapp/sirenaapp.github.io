@@ -428,8 +428,8 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de Ishikawa', ca: "Diagrama d'Ishikawa", gl: 'Diagrama de Ishikawa', eu: 'Ishikawa diagrama', en: 'Ishikawa diagram' },
         code: {
           es: `ishikawa-beta
-    %% Diagrama de Ishikawa: bajo rendimiento en un examen
-    %% Espina de pescado con las posibles causas de un mal resultado en un examen, agrupadas en cuatro categorías.
+    %% accTitle: Diagrama de Ishikawa: bajo rendimiento en un examen
+    %% accDescr: Espina de pescado con las posibles causas de un mal resultado en un examen, agrupadas en cuatro categorías.
     Bajo rendimiento en un examen
         Estudio
             Poco tiempo
@@ -444,8 +444,8 @@ window.SIRENA_EXAMPLES = [
             Pocas horas de sueño
             Nervios`,
           ca: `ishikawa-beta
-    %% Diagrama d'Ishikawa: baix rendiment en un examen
-    %% Espina de peix amb les possibles causes d'un mal resultat en un examen, agrupades en quatre categories.
+    %% accTitle: Diagrama d'Ishikawa: baix rendiment en un examen
+    %% accDescr: Espina de peix amb les possibles causes d'un mal resultat en un examen, agrupades en quatre categories.
     Baix rendiment en un examen
         Estudi
             Poc temps
@@ -460,8 +460,8 @@ window.SIRENA_EXAMPLES = [
             Poques hores de son
             Nervis`,
           gl: `ishikawa-beta
-    %% Diagrama de Ishikawa: baixo rendemento nun exame
-    %% Espiña de peixe coas posibles causas dun mal resultado nun exame, agrupadas en catro categorías.
+    %% accTitle: Diagrama de Ishikawa: baixo rendemento nun exame
+    %% accDescr: Espiña de peixe coas posibles causas dun mal resultado nun exame, agrupadas en catro categorías.
     Baixo rendemento nun exame
         Estudo
             Pouco tempo
@@ -476,8 +476,8 @@ window.SIRENA_EXAMPLES = [
             Poucas horas de sono
             Nervios`,
           eu: `ishikawa-beta
-    %% Ishikawa diagrama: errendimendu baxua azterketa batean
-    %% Arrain-hezurra, azterketa bateko emaitza txar baten balizko arrazoiekin, lau kategoriatan bilduta.
+    %% accTitle: Ishikawa diagrama: errendimendu baxua azterketa batean
+    %% accDescr: Arrain-hezurra, azterketa bateko emaitza txar baten balizko arrazoiekin, lau kategoriatan bilduta.
     Errendimendu baxua azterketa batean
         Ikasketa
             Denbora gutxi
@@ -492,8 +492,8 @@ window.SIRENA_EXAMPLES = [
             Lo-ordu gutxi
             Urduritasuna`,
           en: `ishikawa-beta
-    %% Ishikawa diagram: poor exam performance
-    %% Fishbone diagram with the possible causes of a poor exam result, grouped into four categories.
+    %% accTitle: Ishikawa diagram: poor exam performance
+    %% accDescr: Fishbone diagram with the possible causes of a poor exam result, grouped into four categories.
     Poor exam performance
         Study
             Little time
@@ -905,36 +905,36 @@ window.SIRENA_EXAMPLES = [
         label: { es: 'Diagrama de Venn', ca: 'Diagrama de Venn', gl: 'Diagrama de Venn', eu: 'Venn diagrama', en: 'Venn diagram' },
         code: {
           es: `venn-beta
-    %% Diagrama de Venn: reptiles y aves
-    %% Dos conjuntos con lo que comparten en la intersección. Este tipo no admite accTitle ni accDescr; el comentario hace su papel.
+    %% accTitle: Diagrama de Venn: reptiles y aves
+    %% accDescr: Dos conjuntos con lo que comparten en la intersección.
     title Reptiles y aves
     set A ["Reptiles"]
     set B ["Aves"]
     union A,B ["Ponen huevos"]`,
           ca: `venn-beta
-    %% Diagrama de Venn: rèptils i ocells
-    %% Dos conjunts amb el que comparteixen a la intersecció. Aquest tipus no admet accTitle ni accDescr; el comentari en fa el paper.
+    %% accTitle: Diagrama de Venn: rèptils i ocells
+    %% accDescr: Dos conjunts amb el que comparteixen a la intersecció.
     title Rèptils i ocells
     set A ["Rèptils"]
     set B ["Ocells"]
     union A,B ["Ponen ous"]`,
           gl: `venn-beta
-    %% Diagrama de Venn: réptiles e aves
-    %% Dous conxuntos co que comparten na intersección. Este tipo non admite accTitle nin accDescr; o comentario fai o seu papel.
+    %% accTitle: Diagrama de Venn: réptiles e aves
+    %% accDescr: Dous conxuntos co que comparten na intersección.
     title Réptiles e aves
     set A ["Réptiles"]
     set B ["Aves"]
     union A,B ["Poñen ovos"]`,
           eu: `venn-beta
-    %% Venn diagrama: narrastiak eta hegaztiak
-    %% Bi multzo, ebakiduran partekatzen dutenarekin. Mota honek ez ditu accTitle eta accDescr onartzen; iruzkinak betetzen du haien lekua.
+    %% accTitle: Venn diagrama: narrastiak eta hegaztiak
+    %% accDescr: Bi multzo, ebakiduran partekatzen dutenarekin.
     title Narrastiak eta hegaztiak
     set A ["Narrastiak"]
     set B ["Hegaztiak"]
     union A,B ["Arrautzak jartzen dituzte"]`,
           en: `venn-beta
-    %% Venn diagram: reptiles and birds
-    %% Two sets with what they share in the intersection. This type does not accept accTitle or accDescr; the comment plays their role.
+    %% accTitle: Venn diagram: reptiles and birds
+    %% accDescr: Two sets with what they share in the intersection.
     title Reptiles and birds
     set A ["Reptiles"]
     set B ["Birds"]

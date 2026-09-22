@@ -63,7 +63,17 @@ const SIZES = [['14', 'sizeS'], ['16', 'sizeM'], ['20', 'sizeL'], ['26', 'sizeXL
 // Las líneas y la separación solo las atiende el motor dagre. Mermaid 12 usa elk
 // por defecto, que las ignora y traza en ángulo recto. Sirena lo respeta y, en
 // los diagramas de flujo, escribe siempre el motor en la cabecera (ADR 12).
-const CURVES = [['elk', 'curveElk'], ['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
+const CURVES = [['basis', 'curveBasis'], ['linear', 'curveLinear'], ['step', 'curveStep']];
+// Motores de distribución que trae Mermaid: dagre y los algoritmos de ELK.
+// Se ha comprobado cuáles atienden la dirección y cuáles unen flechas.
+const ENGINES = [
+  ['elk', 'engElk', 'engElkD'], ['dagre', 'engDagre', 'engDagreD'], ['elk.mrtree', 'engMrtree', 'engMrtreeD'],
+  ['elk.radial', 'engRadial', 'engRadialD'], ['elk.stress', 'engStress', 'engStressD'], ['elk.force', 'engForce', 'engForceD'],
+  ['elk.sporeOverlap', 'engSpore', 'engSporeD'], ['elk.box', 'engBox', 'engBoxD'], ['elk.rectpacking', 'engRect', 'engRectD'],
+  ['elk.disco', 'engDisco', 'engDiscoD']
+];
+const ENGINES_SIN_DIRECCION = ['elk.stress', 'elk.force', 'elk.box', 'elk.rectpacking'];
+const CON_MOTOR = ['flowchart', 'state', 'class', 'er'];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
@@ -115,8 +125,10 @@ const el = {
   shareMenu: $('share-menu'),
   colorMenu: $('color-menu'),
   strokeMenu: $('stroke-menu'),
-  drawMenu: $('draw-menu'),
-  drawWrap: $('draw-wrap'),
+  engineSelect: $('engine-select'),
+  mergeSelect: $('merge-select'),
+  engineMenu: $('menu-engine'),
+  a11yCommentNote: $('a11y-comment-note'),
   lookSelect: $('look-select'),
   sizeSelect: $('size-select'),
   colorSelect: $('color-select'),
@@ -569,7 +581,9 @@ function buildAppearanceSelects() {
   fillSelect(el.lookSelect, LOOKS, localStorage.getItem(STORE.look));
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
-  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'elk');
+  fillSelect(el.engineSelect, ENGINES.map(([v, k]) => [v, k]), localStorage.getItem(STORE.layout), 'elk');
+  fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'basis');
+  fillSelect(el.mergeSelect, YESNO, null, 'no');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
@@ -607,15 +621,24 @@ function diagramKind() {
   return 'otro';
 }
 
+// Cada ajuste tiene su botón, que solo aparece cuando el tipo de diagrama y el
+// motor elegido lo atienden.
 function updateAppearanceVisibility() {
   const tipo = diagramKind();
   const esFlujo = tipo === 'flowchart';
-  $('ajuste-curve').hidden = !esFlujo;
-  $('ajuste-spacing').hidden = !esFlujo || el.curveSelect.value === 'elk';
-  $('ajuste-padding').hidden = !esFlujo;
-  $('ajuste-numbering').hidden = tipo !== 'sequence';
-  $('ajuste-showdata').hidden = tipo !== 'pie';
-  el.drawWrap.hidden = !(esFlujo || tipo === 'sequence' || tipo === 'pie');
+  const conMotor = CON_MOTOR.includes(tipo);
+  const motor = el.engineSelect.value || 'elk';
+  const visibles = {
+    engine: conMotor,
+    curve: esFlujo && motor === 'dagre',
+    spacing: esFlujo && motor === 'dagre',
+    padding: esFlujo,
+    merge: conMotor && motor === 'elk',
+    numbering: tipo === 'sequence',
+    showdata: tipo === 'pie'
+  };
+  Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  $('sep-ajustes').hidden = !Object.values(visibles).some(Boolean);
   readShowData();
 }
 
@@ -1037,16 +1060,19 @@ function appearanceConfig() {
   const flowchart = {};
   const curva = el.curveSelect.value;
   const separacion = el.spacingSelect.value;
-  const esFlujo = diagramKind() === 'flowchart';
-  if (esFlujo && curva === 'elk') {
-    config.layout = 'elk';
-  } else if (esFlujo) {
-    config.layout = 'dagre';
-    if (curva !== 'basis') flowchart.curve = curva;
-    if (separacion !== '50') {
-      flowchart.nodeSpacing = Number(separacion);
-      flowchart.rankSpacing = Number(separacion);
+  const tipo = diagramKind();
+  const esFlujo = tipo === 'flowchart';
+  if (CON_MOTOR.includes(tipo)) {
+    const motor = el.engineSelect.value || 'elk';
+    config.layout = motor;
+    if (esFlujo && motor === 'dagre') {
+      if (curva !== 'basis') flowchart.curve = curva;
+      if (separacion !== '50') {
+        flowchart.nodeSpacing = Number(separacion);
+        flowchart.rankSpacing = Number(separacion);
+      }
     }
+    if (motor === 'elk' && el.mergeSelect.value === 'yes') config.elk = { mergeEdges: true };
   }
   if (el.paddingSelect.value && el.paddingSelect.value !== '20') {
     flowchart.diagramPadding = Number(el.paddingSelect.value);
@@ -1129,7 +1155,10 @@ function readAppearance() {
   const variables = config.themeVariables || {};
   el.lookSelect.value = config.look || 'classic';
   const flujo = config.flowchart || {};
-  el.curveSelect.value = config.layout === 'dagre' ? (flujo.curve || 'basis') : 'elk';
+  const motor = config.layout || 'elk';
+  el.engineSelect.value = ENGINES.some(([v]) => v === motor) ? motor : (motor === 'elk.layered' ? 'elk' : 'elk');
+  el.curveSelect.value = CURVES.some(([v]) => v === flujo.curve) ? flujo.curve : 'basis';
+  el.mergeSelect.value = config.elk && config.elk.mergeEdges ? 'yes' : 'no';
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
@@ -1240,7 +1269,7 @@ function conceptHints() {
 
 function isConceptMap(code) {
   if (conceptHints().some((pista) => code.includes(pista))) return true;
-  const titulo = /^[ \t]*accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
+  const titulo = /^[ \t]*(?:%%[ \t]*)?accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
   if (!titulo) return false;
   const ejemplo = findExample('concept');
   const nombres = ejemplo ? Object.values(ejemplo.label) : [];
@@ -1318,7 +1347,7 @@ function updateEditorTools() {
   const tipo = editorType();
   el.typeLabel.textContent = tipo && TYPE_HEADERS[tipo] ? typeLabelFor(tipo) : t('typeBtn');
   const kind = diagramKind();
-  const conDireccion = ['flowchart', 'state', 'class', 'er'].includes(kind);
+  const conDireccion = CON_MOTOR.includes(kind) && !ENGINES_SIN_DIRECCION.includes(el.engineSelect.value);
   el.dirGroup.hidden = !conDireccion;
   $('dir-sep').hidden = !conDireccion;
   if (conDireccion) readDirection();
@@ -1531,10 +1560,54 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'drawMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
+  document.querySelectorAll('.menu-opciones').forEach((menu) => { menu.hidden = true; });
+}
+
+// Menú con las opciones de un selector: al elegir una se cambia el selector,
+// que es quien escribe el ajuste en el código.
+function buildOptionMenu(menu, select, titulo) {
+  menu.innerHTML = '';
+  const cabecera = document.createElement('p');
+  cabecera.className = 'menu-titulo';
+  cabecera.textContent = titulo;
+  menu.appendChild(cabecera);
+  [...select.options].forEach((opcion) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = opcion.textContent;
+    boton.setAttribute('aria-current', opcion.value === select.value ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      menu.hidden = true;
+      select.value = opcion.value;
+      select.dispatchEvent(new Event('change'));
+    });
+    menu.appendChild(boton);
+  });
+}
+
+// Menú de motores, cada uno con una línea que dice cómo reparte los elementos.
+function buildEngineMenu() {
+  el.engineMenu.innerHTML = '';
+  ENGINES.forEach(([valor, nombre, descripcion]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.setAttribute('aria-current', valor === el.engineSelect.value ? 'true' : 'false');
+    const fuerte = document.createElement('strong');
+    fuerte.textContent = t(nombre);
+    const detalle = document.createElement('small');
+    detalle.textContent = t(descripcion);
+    boton.append(fuerte, detalle);
+    boton.addEventListener('click', () => {
+      el.engineMenu.hidden = true;
+      el.engineSelect.value = valor;
+      el.engineSelect.dispatchEvent(new Event('change'));
+    });
+    el.engineMenu.appendChild(boton);
+  });
 }
 
 // Abre un menú de la barra del editor cerrando los demás; «antes» prepara su
@@ -1574,10 +1647,24 @@ function setupEditorTools() {
     event.stopPropagation();
     alternarMenuEditor(el.strokeMenu, $('btn-stroke'));
   });
-  $('btn-draw').addEventListener('click', (event) => {
-    event.stopPropagation();
-    alternarMenuEditor(el.drawMenu, $('btn-draw'), updateAppearanceVisibility);
+  // Un botón por ajuste: su menú lista las opciones del selector y marca la actual.
+  document.querySelectorAll('.menu-opciones[data-select]').forEach((menu) => {
+    const select = $(menu.dataset.select);
+    const wrap = menu.parentElement;
+    const boton = wrap.querySelector('button');
+    boton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      alternarMenuEditor(menu, boton, () => buildOptionMenu(menu, select, boton.title));
+    });
+    menu.addEventListener('click', (event) => event.stopPropagation());
   });
+
+  $('btn-engine').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.engineMenu, $('btn-engine'), buildEngineMenu);
+  });
+  el.engineMenu.addEventListener('click', (event) => event.stopPropagation());
+
   MENUS_EDITOR.forEach((clave) => {
     el[clave].addEventListener('click', (event) => event.stopPropagation());
   });
@@ -1611,10 +1698,19 @@ function setupEditorTools() {
 
 /* --- Título y descripción accesibles (accTitle y accDescr de Mermaid) --- */
 
+// Tipos que no admiten accTitle ni accDescr (dan error o los ignoran): en ellos
+// el título y la descripción se guardan como comentario, con las mismas
+// palabras, para que viajen con el código aunque no lleguen al SVG.
+const ACC_COMENTARIO = ['mindmap', 'kanban', 'timeline', 'block', 'sankey', 'venn', 'ishikawa'];
+
+function accEsComentario() {
+  return ACC_COMENTARIO.includes(editorType());
+}
+
 function readAccessibility() {
   const code = el.editor.value;
-  const titulo = /^[ \t]*accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
-  const descr = /^[ \t]*accDescr[ \t]*:[ \t]*(.*)$/m.exec(code);
+  const titulo = /^[ \t]*(?:%%[ \t]*)?accTitle[ \t]*:[ \t]*(.*)$/m.exec(code);
+  const descr = /^[ \t]*(?:%%[ \t]*)?accDescr[ \t]*:[ \t]*(.*)$/m.exec(code);
   return { titulo: titulo ? titulo[1].trim() : '', descr: descr ? descr[1].trim() : '' };
 }
 
@@ -1622,13 +1718,14 @@ function readAccessibility() {
 // Mermaid las espera, con la misma sangría que el resto del código.
 function writeAccessibility(titulo, descr) {
   const lineas = el.editor.value.split('\n')
-    .filter((linea) => !/^[ \t]*acc(Title|Descr)[ \t]*:/.test(linea));
+    .filter((linea) => !/^[ \t]*(?:%%[ \t]*)?acc(Title|Descr)[ \t]*:/.test(linea));
   const primera = lineas.findIndex((linea) => linea.trim());
   if (primera === -1) return;
   const sangria = (lineas[primera + 1] || '').match(/^[ \t]*/)[0] || '    ';
+  const prefijo = accEsComentario() ? '%% ' : '';
   const nuevas = [];
-  if (titulo.trim()) nuevas.push(`${sangria}accTitle: ${titulo.trim()}`);
-  if (descr.trim()) nuevas.push(`${sangria}accDescr: ${descr.trim()}`);
+  if (titulo.trim()) nuevas.push(`${sangria}${prefijo}accTitle: ${titulo.trim()}`);
+  if (descr.trim()) nuevas.push(`${sangria}${prefijo}accDescr: ${descr.trim()}`);
   lineas.splice(primera + 1, 0, ...nuevas);
   el.editor.value = lineas.join('\n');
   render();
@@ -2233,6 +2330,7 @@ function setupToolbar() {
     const actual = readAccessibility();
     el.a11yTitle.value = actual.titulo;
     el.a11yDescr.value = actual.descr;
+    el.a11yCommentNote.hidden = !accEsComentario();
     el.a11yModal.hidden = false;
     el.a11yTitle.focus();
   });
@@ -2267,7 +2365,7 @@ function setupToolbar() {
   });
 
   [[el.lookSelect, STORE.look], [el.sizeSelect, STORE.size], [el.colorSelect, STORE.color],
-   [el.curveSelect, STORE.curve]].forEach(([select, clave]) => {
+   [el.curveSelect, STORE.curve], [el.engineSelect, STORE.layout]].forEach(([select, clave]) => {
     select.addEventListener('change', () => {
       localStorage.setItem(clave, select.value);
       if (select === el.colorSelect && select.value === 'custom') {
@@ -2275,7 +2373,7 @@ function setupToolbar() {
         deriveColors();
       }
       updateColorInput();
-      updateAppearanceVisibility();
+      updateEditorTools();
       writeAppearance();
     });
   });
@@ -2302,7 +2400,7 @@ function setupToolbar() {
     render();
   });
 
-  [el.spacingSelect, el.paddingSelect, el.numberingSelect].forEach((select) => {
+  [el.spacingSelect, el.paddingSelect, el.numberingSelect, el.mergeSelect].forEach((select) => {
     select.addEventListener('change', () => writeAppearance());
   });
 
@@ -2418,7 +2516,6 @@ async function start() {
     updateStatus();
     renderGutter();
     readAppearance();
-    if (!el.drawMenu.hidden) updateAppearanceVisibility();
     scheduleRender();
   });
   el.editor.addEventListener('scroll', () => { el.gutter.scrollTop = el.editor.scrollTop; });
