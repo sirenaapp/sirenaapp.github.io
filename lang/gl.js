@@ -137,6 +137,7 @@ window.SIRENA_LANG.gl = {
   ctxArrowText: 'Texto da frecha',
   ctxTextClear: 'Quitar a cor do texto',
   ctxArrowProps: 'Propiedades da frecha',
+  back: 'Volver',
   ctxBox: 'Caixa',
   ctxArrow: 'Frecha',
   ctxAll: 'Todo o diagrama',

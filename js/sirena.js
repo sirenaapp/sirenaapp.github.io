@@ -135,7 +135,8 @@ const el = {
   borderWidthCustom: $('border-width-custom'),
   linesMenu: $('lines-menu'),
   sizeMenu: $('size-menu'),
-  shapeMenu: $('shape-menu'),
+  shapeModal: $('shape-modal'),
+  shapeGrid: $('shape-grid'),
   contextMenu: $('context-menu'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
@@ -1935,10 +1936,22 @@ function currentShape(id) {
 // Alcance del cambio de forma: la caja del cursor o todas las del diagrama.
 let formaAlcance = 'esta';
 
-function buildShapeMenu() {
+function abrirFormas() {
+  cerrarMenusEditor();
+  cerrarContextual();
+  buildShapeMenu();
+  el.shapeModal.hidden = false;
+}
+
+function cerrarFormas() {
+  el.shapeModal.hidden = true;
+}
+
+function buildShapeMenu(destino) {
+  const caja = destino || el.shapeGrid;
   const enCursor = targetNodes();
   const ids = formaAlcance === 'todas' ? nodosConFormaGeneral() : enCursor;
-  el.shapeMenu.innerHTML = '';
+  caja.innerHTML = '';
   const alcance = document.createElement('div');
   alcance.className = 'segmentos segmentos-menu';
   [['esta', 'shapeThis'], ['todas', 'shapeAll']].forEach(([valor, clave]) => {
@@ -1946,15 +1959,15 @@ function buildShapeMenu() {
     boton.type = 'button';
     boton.textContent = t(clave);
     boton.setAttribute('aria-current', valor === formaAlcance ? 'true' : 'false');
-    boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(); });
+    boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(caja); });
     alcance.appendChild(boton);
   });
-  el.shapeMenu.appendChild(alcance);
+  caja.appendChild(alcance);
   const titulo = document.createElement('p');
   titulo.className = 'menu-titulo';
   if (!ids.length) {
     titulo.textContent = t(formaAlcance === 'todas' ? 'shapeNoneAll' : 'shapeNone');
-    el.shapeMenu.appendChild(titulo);
+    caja.appendChild(titulo);
     return;
   }
   if (formaAlcance === 'todas') {
@@ -1965,16 +1978,16 @@ function buildShapeMenu() {
     codigo.textContent = ids.join(', ');
     titulo.appendChild(codigo);
   }
-  el.shapeMenu.appendChild(titulo);
+  caja.appendChild(titulo);
   const actual = formaAlcance === 'todas' ? formaGeneral() : currentShape(ids[0]);
   (window.SIRENA_SHAPES || []).forEach((grupo) => {
     const cabecera = document.createElement('p');
     cabecera.className = 'menu-grupo';
     cabecera.textContent = grupo.group[lang] || grupo.group.es;
-    el.shapeMenu.appendChild(cabecera);
+    caja.appendChild(cabecera);
     const rejilla = document.createElement('div');
     rejilla.className = 'formas-rejilla';
-    el.shapeMenu.appendChild(rejilla);
+    caja.appendChild(rejilla);
     grupo.items.forEach((item) => {
       const boton = document.createElement('button');
       boton.type = 'button';
@@ -1991,7 +2004,7 @@ function buildShapeMenu() {
       boton.title = (item.label[lang] || item.label.es) + ' · ' + sintaxis;
       boton.append(icono, nombre);
       boton.addEventListener('click', () => {
-        el.shapeMenu.hidden = true;
+        cerrarFormas();
         applyShape(ids, item.id, formaAlcance === 'todas');
       });
       rejilla.appendChild(boton);
@@ -2211,7 +2224,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -2331,7 +2344,11 @@ function setupEditorTools() {
   });
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();
-    alternarMenuEditor(el.shapeMenu, $('btn-shape'), buildShapeMenu);
+    abrirFormas();
+  });
+  $('shape-close').addEventListener('click', cerrarFormas);
+  el.shapeModal.addEventListener('click', (event) => {
+    if (event.target === el.shapeModal) cerrarFormas();
   });
   $('btn-lines').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2392,7 +2409,7 @@ function setupEditorTools() {
   // Al mover el cursor cambia qué elemento se colorearía: si el menú de color
   // está abierto, se cierra para no colorear otra cosa sin querer.
   ['keyup', 'click'].forEach((evento) => {
-    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; el.linesMenu.hidden = true; el.shapeMenu.hidden = true; });
+    el.editor.addEventListener(evento, () => { el.colorMenu.hidden = true; el.linesMenu.hidden = true; });
   });
 }
 
@@ -2528,7 +2545,7 @@ function segmentosDe(contenedor, opciones, actual, alElegir) {
   contenedor.appendChild(caja);
 }
 
-function accionContextual(contenedor, texto, icono, alPulsar, mantener) {
+function accionContextual(contenedor, texto, icono, alPulsar, mantener, conPaso) {
   const boton = document.createElement('button');
   boton.type = 'button';
   boton.className = 'accion-menu';
@@ -2536,18 +2553,57 @@ function accionContextual(contenedor, texto, icono, alPulsar, mantener) {
   const span = document.createElement('span');
   span.textContent = texto;
   boton.appendChild(span);
+  if (conPaso) {
+    const paso = document.createElement('span');
+    paso.className = 'chevron';
+    paso.textContent = '›';
+    boton.appendChild(paso);
+  }
   boton.addEventListener('click', () => { if (!mantener) cerrarContextual(); alPulsar(); });
   contenedor.appendChild(boton);
 }
 
-// Abre uno de los menús de la barra del editor, si su botón está visible.
-function abrirDesdeContextual(idBoton) {
-  const boton = $(idBoton);
-  if (!boton || boton.closest('[hidden]')) return;
-  boton.click();
+// Los submenús del menú contextual no repiten los controles de la barra: se
+// los prestan. El menú se mueve al contextual y vuelve a su sitio al cerrar.
+let menuPrestado = null;
+let vigilante = null;
+
+function devolverMenu() {
+  if (vigilante) { vigilante.disconnect(); vigilante = null; }
+  if (!menuPrestado) return;
+  const { nodo, padre, siguiente } = menuPrestado;
+  menuPrestado = null;
+  nodo.hidden = true;
+  nodo.classList.remove('prestado');
+  padre.insertBefore(nodo, siguiente);
 }
 
+function prestarMenu(nodo, destino) {
+  devolverMenu();
+  menuPrestado = { nodo, padre: nodo.parentNode, siguiente: nodo.nextSibling };
+  nodo.classList.add('prestado');
+  nodo.style.left = '';
+  nodo.style.top = '';
+  nodo.hidden = false;
+  destino.appendChild(nodo);
+  // Al elegir una opción, esos menús se ocultan solos: entonces se cierra
+  // también el contextual que los está mostrando.
+  vigilante = new MutationObserver(() => { if (nodo.hidden) cerrarContextual(); });
+  vigilante.observe(nodo, { attributes: true, attributeFilter: ['hidden'] });
+}
+
+// Submenús disponibles: cada uno presta el menú de la barra que le toca.
+const SUBMENUS = {
+  colores: { titulo: 'colorMenu', icono: 'i-palette', boton: 'btn-color', menu: () => el.colorMenu, preparar: buildNodeColorSection },
+  lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
+  trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
+  tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
+  motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
+  direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu }
+};
+
 function cerrarContextual() {
+  devolverMenu();
   el.contextMenu.hidden = true;
 }
 
@@ -2555,9 +2611,42 @@ function grosorDeBorde(ids) {
   return getPropLine('style ' + ids[0], 'stroke-width').replace('px', '');
 }
 
+// Entrada que abre un submenú dentro del propio menú contextual.
+function entradaSubmenu(contenedor, objeto, clave, texto) {
+  const submenu = SUBMENUS[clave];
+  const boton = $(submenu.boton);
+  const wrap = boton && boton.closest('.menu-wrap');
+  if (!boton || (wrap && wrap.hidden) || boton.hidden) return;
+  accionContextual(contenedor, texto || t(submenu.titulo), submenu.icono, () => {
+    construirContextual({ ...objeto, submenu: clave });
+  }, true, true);
+}
+
 function construirContextual(objeto) {
   const menu = el.contextMenu;
+  devolverMenu();
   menu.innerHTML = '';
+
+  if (objeto.submenu && SUBMENUS[objeto.submenu]) {
+    const submenu = SUBMENUS[objeto.submenu];
+    const cabecera = document.createElement('div');
+    cabecera.className = 'submenu-cabecera';
+    const volver = document.createElement('button');
+    volver.type = 'button';
+    volver.className = 'submenu-volver';
+    volver.title = t('back');
+    volver.setAttribute('aria-label', t('back'));
+    volver.innerHTML = '<svg aria-hidden="true"><use href="#i-arrow-left"></use></svg>';
+    volver.addEventListener('click', () => construirContextual({ ...objeto, submenu: null }));
+    const nombre = document.createElement('strong');
+    nombre.textContent = t(submenu.titulo);
+    cabecera.append(volver, nombre);
+    menu.appendChild(cabecera);
+    if (submenu.preparar) submenu.preparar();
+    prestarMenu(submenu.menu(), menu);
+    return;
+  }
+
   const titulo = document.createElement('p');
   titulo.className = 'menu-titulo';
   menu.appendChild(titulo);
@@ -2591,7 +2680,7 @@ function construirContextual(objeto) {
       cerrarContextual();
       escribirGrosor('borde', ids, [], valor);
     });
-    accionContextual(menu, t('ctxShape'), 'i-square', () => abrirDesdeContextual('btn-shape'));
+    accionContextual(menu, t('ctxShape'), 'i-square', abrirFormas);
     return;
   }
 
@@ -2605,7 +2694,7 @@ function construirContextual(objeto) {
     accionContextual(menu, t('ctxTextClear'), 'i-trash', () => applyLinkColor(flechas, null, true));
     menu.appendChild(document.createElement('hr'));
     // El fondo del rótulo solo se puede cambiar para todos a la vez.
-    accionContextual(menu, t('colorLabelBg'), 'i-palette', () => abrirDesdeContextual('btn-color'));
+    entradaSubmenu(menu, objeto, 'colores', t('colorLabelBg'));
     accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
       construirContextual({ tipo: 'flecha', indice: objeto.indice });
     }, true);
@@ -2640,13 +2729,13 @@ function construirContextual(objeto) {
 
 
   titulo.textContent = t('ctxAll');
-  [['colorMenu', 'btn-color', 'i-palette'], ['lines', 'btn-lines', 'i-spline'], ['shapeAll', 'btn-shape', 'i-square'],
-   ['strokeMenu', 'btn-stroke', 'i-brush'], ['fontSize', 'btn-size', 'i-text-size'],
-   ['engine', 'btn-engine', 'i-workflow'], ['direction', 'btn-dir', 'i-arrow-down']].forEach(([clave, boton, icono]) => {
-    const wrap = $(boton) && $(boton).closest('.menu-wrap');
-    if (!wrap || wrap.hidden) return;
-    accionContextual(menu, t(clave), icono, () => abrirDesdeContextual(boton));
-  });
+  entradaSubmenu(menu, objeto, 'colores');
+  entradaSubmenu(menu, objeto, 'lineas');
+  if (!$('wrap-shape').hidden) accionContextual(menu, t('shapeAll'), 'i-square', abrirFormas);
+  entradaSubmenu(menu, objeto, 'trazo');
+  entradaSubmenu(menu, objeto, 'tamano');
+  entradaSubmenu(menu, objeto, 'motor');
+  entradaSubmenu(menu, objeto, 'direccion');
 }
 
 function abrirContextual(event) {
@@ -2656,6 +2745,7 @@ function abrirContextual(event) {
   if (objeto.tipo !== 'fondo') irAlObjeto(objeto);
   event.preventDefault();
   cerrarMenusEditor();
+  cerrarContextual();
   construirContextual(objeto);
   const menu = el.contextMenu;
   menu.hidden = false;
@@ -3458,6 +3548,7 @@ function setupToolbar() {
       el.downloadMenu.hidden = true;
       cerrarMenusEditor();
       cerrarContextual();
+      cerrarFormas();
       el.libraryModal.hidden = true;
     }
   });

@@ -212,7 +212,6 @@
       </div>
       <div class="menu-wrap" id="wrap-shape" hidden>
         <button type="button" id="btn-shape" class="tb" data-i18n-title="shapeBtn"><svg><use href="#i-square"></use></svg></button>
-        <div class="menu menu-izq menu-tipos menu-formas" id="shape-menu" hidden></div>
       </div>
       <div class="menu-wrap" id="wrap-spacing" hidden>
         <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>
@@ -290,6 +289,14 @@
 </footer>
 
 <div class="menu menu-contextual" id="context-menu" hidden></div>
+
+<div class="modal-overlay" id="shape-modal" hidden>
+  <div class="modal modal-formas" role="dialog" aria-modal="true">
+    <h2 data-i18n="ctxShape">Forma de la caja</h2>
+    <div id="shape-grid"></div>
+    <div class="modal-actions"><button type="button" id="shape-close" class="btn" data-i18n="helpClose">Cerrar</button></div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="help-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true">

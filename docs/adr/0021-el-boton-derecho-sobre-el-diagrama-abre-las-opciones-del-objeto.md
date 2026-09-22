@@ -23,9 +23,17 @@ que los botones de la barra pasan a actuar sobre él.
   la línea), quitarlo, el fondo de los rótulos (que en Mermaid solo se puede
   cambiar para todos a la vez, `edgeLabelBackground`) y el paso a las
   propiedades de la flecha.
-- **Sobre el fondo**: los menús generales de la barra que apliquen al tipo de
-  diagrama (colores, líneas, forma de todas las cajas, trazo, tamaño del
-  texto, motor y orientación).
+- **Sobre el fondo**: lo general que aplique al tipo de diagrama (colores,
+  líneas, forma de todas las cajas, trazo, tamaño del texto, motor y
+  orientación).
+
+Las opciones que no caben en una pulsación se abren dentro del propio menú,
+como submenú con su paso atrás, y no llevando al menú de la barra, que el
+autor consideró poco profesional (22-09-2026). Para no mantener dos juegos de
+controles, el submenú toma prestado el menú de la barra que le toca: se mueve
+al menú contextual, se muestra sin su marco y vuelve a su sitio al cerrar. Las
+formas de caja, que son cincuenta y dos, se abren en una ventana, que es
+también la que abre el botón de la barra.
 
 El objeto se identifica en el SVG que dibuja Mermaid: las cajas llevan su
 identificador en el id (`…-flowchart-A-0`) y las flechas van en el mismo orden

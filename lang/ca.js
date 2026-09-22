@@ -137,6 +137,7 @@ window.SIRENA_LANG.ca = {
   ctxArrowText: 'Text de la fletxa',
   ctxTextClear: 'Treure el color del text',
   ctxArrowProps: 'Propietats de la fletxa',
+  back: 'Tornar',
   ctxBox: 'Caixa',
   ctxArrow: 'Fletxa',
   ctxAll: 'Tot el diagrama',

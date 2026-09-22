@@ -137,6 +137,7 @@ window.SIRENA_LANG.eu = {
   ctxArrowText: 'Geziaren testua',
   ctxTextClear: 'Testuaren kolorea kendu',
   ctxArrowProps: 'Geziaren propietateak',
+  back: 'Itzuli',
   ctxBox: 'Kutxa',
   ctxArrow: 'Gezia',
   ctxAll: 'Diagrama osoa',

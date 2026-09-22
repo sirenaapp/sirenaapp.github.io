@@ -137,6 +137,7 @@ window.SIRENA_LANG.en = {
   ctxArrowText: 'Arrow text',
   ctxTextClear: 'Remove the text colour',
   ctxArrowProps: 'Arrow properties',
+  back: 'Back',
   ctxBox: 'Box',
   ctxArrow: 'Arrow',
   ctxAll: 'Whole diagram',

@@ -137,6 +137,7 @@ window.SIRENA_LANG.es = {
   ctxArrowText: 'Texto de la flecha',
   ctxTextClear: 'Quitar el color del texto',
   ctxArrowProps: 'Propiedades de la flecha',
+  back: 'Volver',
   ctxBox: 'Caja',
   ctxArrow: 'Flecha',
   ctxAll: 'Todo el diagrama',

@@ -309,12 +309,54 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-contextual .menu-grupo { margin: 2px 2px 4px; }
 .menu-contextual .accion-menu { display: flex; align-items: center; gap: 8px; }
 .menu-contextual .accion-menu svg { width: 16px; height: 16px; flex: none; color: var(--text-soft); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.menu-formas { width: 440px; max-width: min(92vw, 460px); }
+.menu-contextual .accion-menu .chevron { margin-left: auto; color: var(--text-soft); }
+
+/* Cabecera de un submenú, con el paso atrás. */
+.submenu-cabecera { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.menu .submenu-volver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.submenu-volver svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.submenu-cabecera strong { font-size: 13px; }
+
+/* Un menú de la barra prestado al menú contextual: se muestra sin su marco. */
+.menu.prestado {
+  position: static;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  max-height: 60vh;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow-y: auto;
+}
+.menu.prestado .menu-seccion:first-child { margin-top: 0; }
+.modal-formas { max-width: 620px; }
+.segmentos-menu { margin: 0 0 10px; }
 .menu-ajustes .color-elemento .tamano-propio { margin: 0 0 6px; padding-top: 0; border-top: 0; }
-.menu-formas .segmentos-menu { margin: 6px 8px 8px; }
+
 /* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
+.formas-rejilla button:hover { background: var(--accent-soft); }
+.formas-rejilla button[aria-current="true"] { color: var(--accent); font-weight: 600; }
 .formas-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 4px 4px; }
-.menu .formas-rejilla button {
+.formas-rejilla button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -325,12 +367,14 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   line-height: 1.2;
   text-align: center;
 }
-.menu .formas-rejilla .forma-nombre { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: normal; max-width: 100%; }
+.formas-rejilla .forma-nombre { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: normal; max-width: 100%; }
 .forma-icono { display: inline-flex; width: 44px; height: 26px; flex: none; align-items: center; justify-content: center; color: var(--accent); }
 .forma-icono svg { width: 44px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linejoin: round; stroke-linecap: round; }
 .forma-icono svg * { vector-effect: non-scaling-stroke; }
 .forma-icono svg text { stroke: none; }
-.menu-formas .menu-titulo { margin: 6px 10px 4px; }
+#shape-grid .menu-titulo { margin: 0 0 10px; }
+#shape-grid .menu-grupo { margin: 14px 2px 4px; color: var(--text-soft); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+#shape-grid .menu-grupo:first-of-type { margin-top: 6px; }
 .tamano-propio {
   display: flex;
   align-items: center;
@@ -384,7 +428,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .color-elemento { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--border); }
 .menu-titulo { margin: 0 0 8px; color: var(--text-soft); font-size: 12px; line-height: 1.4; }
 .segmentos { display: flex; gap: 4px; margin-bottom: 8px; }
-.menu .segmentos button {
+.segmentos button {
   flex: 1;
   width: auto;
   padding: 4px 6px;
@@ -395,7 +439,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   text-align: center;
   white-space: nowrap;
 }
-.menu .segmentos button[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.segmentos button[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 .menu-titulo code { color: var(--accent); }
 .swatches { display: flex; gap: 6px; margin-bottom: 8px; }
 .swatches button {
