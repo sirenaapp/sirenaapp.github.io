@@ -312,6 +312,11 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-contextual .accion-menu { display: flex; align-items: center; gap: 8px; }
 .menu-contextual .accion-menu svg { width: 16px; height: 16px; flex: none; color: var(--text-soft); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .menu-contextual .accion-menu .chevron { margin-left: auto; color: var(--text-soft); }
+.menu-contextual .accion-menu[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+
+/* El submenú cuelga al lado de su opción, como en cualquier menú de escritorio. */
+.menu-cascada { min-width: 240px; max-width: min(380px, 92vw); }
+.menu-cascada .submenu-cabecera { margin-bottom: 8px; }
 .menu-contextual .accion-menu .marca { margin-left: auto; color: var(--accent); display: inline-flex; }
 .menu-contextual .accion-menu .marca svg { width: 15px; height: 15px; color: var(--accent); }
 .menu-contextual .accion-menu[aria-pressed="true"] { color: var(--accent); font-weight: 600; }

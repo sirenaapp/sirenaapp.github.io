@@ -29,9 +29,12 @@ que los botones de la barra pasan a actuar sobre él.
   interruptor, con su marca cuando está puesto, igual que su botón de la
   barra.
 
-Las opciones que no caben en una pulsación se abren dentro del propio menú,
-como submenú con su paso atrás, y no llevando al menú de la barra, que el
-autor consideró poco profesional (22-09-2026). Para no mantener dos juegos de
+Las opciones que no caben en una pulsación se abren como submenú propio, y no
+llevando al menú de la barra, que el autor consideró poco profesional
+(22-09-2026). El submenú cuelga al lado de su opción, como en cualquier menú
+de escritorio, y se abre al pasar el ratón o al pulsar; si no cabe a la
+derecha, sale a la izquierda. En pantalla estrecha, donde no cabe al lado, se
+entra y se vuelve dentro del mismo menú. Para no mantener dos juegos de
 controles, el submenú toma prestado el menú de la barra que le toca: se mueve
 al menú contextual, se muestra sin su marco y vuelve a su sitio al cerrar. Las
 formas de caja, que son cincuenta y dos, se abren en una ventana, que es

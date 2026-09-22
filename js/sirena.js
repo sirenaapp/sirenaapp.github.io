@@ -138,6 +138,7 @@ const el = {
   shapeModal: $('shape-modal'),
   shapeGrid: $('shape-grid'),
   contextMenu: $('context-menu'),
+  contextSubmenu: $('context-submenu'),
   pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
@@ -2605,7 +2606,9 @@ function accionContextual(contenedor, texto, icono, alPulsar, mantener, conPaso)
     boton.appendChild(paso);
   }
   boton.addEventListener('click', () => { if (!mantener) cerrarContextual(); alPulsar(); });
+  boton.addEventListener('mouseenter', () => { if (!boton.hasAttribute('aria-expanded')) cerrarSubmenu(); });
   contenedor.appendChild(boton);
+  return boton;
 }
 
 // Los submenús del menú contextual no repiten los controles de la barra: se
@@ -2647,9 +2650,52 @@ const SUBMENUS = {
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu }
 };
 
-function cerrarContextual() {
+function cerrarSubmenu() {
   devolverMenu();
+  el.contextSubmenu.hidden = true;
+  el.contextMenu.querySelectorAll('[aria-expanded="true"]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+}
+
+function cerrarContextual() {
+  cerrarSubmenu();
   el.contextMenu.hidden = true;
+}
+
+// En pantalla estrecha no cabe un submenú al lado: allí se entra y se vuelve
+// dentro del mismo menú.
+function submenuEnCascada() {
+  return window.innerWidth > 720;
+}
+
+// Abre el submenú colgando de su opción, a la derecha si cabe y si no a la
+// izquierda, y alineado con ella.
+function abrirSubmenuCascada(clave, boton) {
+  const submenu = SUBMENUS[clave];
+  const caja = el.contextSubmenu;
+  const abierto = boton.getAttribute('aria-expanded') === 'true';
+  cerrarSubmenu();
+  if (abierto) return;
+  caja.innerHTML = '';
+  const cabecera = document.createElement('div');
+  cabecera.className = 'submenu-cabecera';
+  const nombre = document.createElement('strong');
+  nombre.textContent = t(submenu.titulo);
+  cabecera.appendChild(nombre);
+  caja.appendChild(cabecera);
+  if (submenu.preparar) submenu.preparar();
+  prestarMenu(submenu.menu(), caja);
+  boton.setAttribute('aria-expanded', 'true');
+  caja.style.left = '0px';
+  caja.style.top = '0px';
+  caja.hidden = false;
+  const padre = el.contextMenu.getBoundingClientRect();
+  const fila = boton.getBoundingClientRect();
+  const propia = caja.getBoundingClientRect();
+  let x = padre.right + 2;
+  if (x + propia.width > window.innerWidth - 8) x = padre.left - propia.width - 2;
+  const y = Math.min(Math.max(8, fila.top - 6), window.innerHeight - propia.height - 8);
+  caja.style.left = Math.max(8, x) + 'px';
+  caja.style.top = y + 'px';
 }
 
 function grosorDeBorde(ids) {
@@ -2662,14 +2708,22 @@ function entradaSubmenu(contenedor, objeto, clave, texto) {
   const boton = $(submenu.boton);
   const wrap = boton && boton.closest('.menu-wrap');
   if (!boton || (wrap && wrap.hidden) || boton.hidden) return;
-  accionContextual(contenedor, texto || t(submenu.titulo), submenu.icono, () => {
-    construirContextual({ ...objeto, submenu: clave });
+  const entrada = accionContextual(contenedor, texto || t(submenu.titulo), submenu.icono, () => {
+    if (submenuEnCascada()) abrirSubmenuCascada(clave, entrada);
+    else construirContextual({ ...objeto, submenu: clave });
   }, true, true);
+  if (submenuEnCascada()) {
+    entrada.setAttribute('aria-expanded', 'false');
+    // Como en cualquier menú de escritorio, basta con pasar el ratón.
+    entrada.addEventListener('mouseenter', () => {
+      if (entrada.getAttribute('aria-expanded') !== 'true') abrirSubmenuCascada(clave, entrada);
+    });
+  }
 }
 
 function construirContextual(objeto) {
   const menu = el.contextMenu;
-  devolverMenu();
+  cerrarSubmenu();
   menu.innerHTML = '';
 
   if (objeto.submenu && SUBMENUS[objeto.submenu]) {
@@ -2838,8 +2892,10 @@ function setupContextual() {
     event.stopPropagation();
     ocultarPista();
   });
-  el.contextMenu.addEventListener('click', (event) => event.stopPropagation());
-  el.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
+  [el.contextMenu, el.contextSubmenu].forEach((caja) => {
+    caja.addEventListener('click', (event) => event.stopPropagation());
+    caja.addEventListener('contextmenu', (event) => event.stopPropagation());
+  });
   document.addEventListener('click', cerrarContextual);
   el.viewport.addEventListener('pointerdown', (event) => { if (event.button !== 2) cerrarContextual(); });
   window.addEventListener('blur', cerrarContextual);
