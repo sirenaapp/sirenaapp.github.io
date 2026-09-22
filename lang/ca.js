@@ -116,6 +116,7 @@ window.SIRENA_LANG.ca = {
   linesAll: 'Totes les línies',
   arrowWidth: 'Gruix de les fletxes',
   borderWidth: 'Gruix de les vores',
+  widthCustom: 'Un altre gruix',
   widthThin: 'Fi',
   widthNormal: 'Normal',
   widthThick: 'Gruixut',

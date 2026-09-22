@@ -77,7 +77,9 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   stroke-width`) y de los bordes (`classDef default stroke-width`); y para la
   flecha o el elemento de la línea del cursor, su grosor en su `linkStyle N`
   o `style A`, fundido con el color que ya tengan; separación solo con dagre; unir las flechas que van
-  al mismo sitio (`elk.mergeEdges`) solo con ELK por capas; márgenes en flujo
+  al mismo sitio (`elk.mergeEdges`) solo con ELK por capas; cada grosor
+  ofrece además un campo para escribir cualquier valor entre 0,5 y 20
+  píxeles, como el tamaño del texto; márgenes en flujo
   con cualquier motor; numeración en secuencia; valores en sectores. La
   orientación se oculta con los motores que no la atienden (tensión, fuerzas,
   cajas y empaquetado). Cada botón abre la lista de opciones con la actual

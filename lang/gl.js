@@ -116,6 +116,7 @@ window.SIRENA_LANG.gl = {
   linesAll: 'Todas as liñas',
   arrowWidth: 'Grosor das frechas',
   borderWidth: 'Grosor dos bordos',
+  widthCustom: 'Outro grosor',
   widthThin: 'Fino',
   widthNormal: 'Normal',
   widthThick: 'Groso',

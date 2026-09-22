@@ -116,6 +116,7 @@ window.SIRENA_LANG.eu = {
   linesAll: 'Lerro guztiak',
   arrowWidth: 'Gezien lodiera',
   borderWidth: 'Ertzen lodiera',
+  widthCustom: 'Beste lodiera bat',
   widthThin: 'Mehea',
   widthNormal: 'Normala',
   widthThick: 'Lodia',

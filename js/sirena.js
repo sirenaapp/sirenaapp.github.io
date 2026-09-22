@@ -131,6 +131,8 @@ const el = {
   engineSelect: $('engine-select'),
   arrowWidthSelect: $('arrow-width-select'),
   borderWidthSelect: $('border-width-select'),
+  arrowWidthCustom: $('arrow-width-custom'),
+  borderWidthCustom: $('border-width-custom'),
   linesMenu: $('lines-menu'),
   sizeMenu: $('size-menu'),
   shapeMenu: $('shape-menu'),
@@ -141,6 +143,7 @@ const el = {
   lineTarget: $('line-target'),
   linePartes: $('line-partes'),
   lineWidths: $('line-widths'),
+  lineWidthCustom: $('line-width-custom'),
   mergeSelect: $('merge-select'),
   engineMenu: $('menu-engine'),
   a11yCommentNote: $('a11y-comment-note'),
@@ -2000,11 +2003,54 @@ function buildShapeMenu() {
 
 // De todas: linkStyle default para las flechas y classDef default para los
 // bordes, que Mermaid aplica a todo el diagrama de flujo.
+function setGrosorValor(select, valor) {
+  const texto = String(valor);
+  if (texto && ![...select.options].some((o) => o.value === texto)) {
+    select.appendChild(new Option(texto + ' px', texto));
+  }
+  select.value = texto;
+}
+
 function readLineWidths() {
   const flecha = getPropLine('linkStyle default', 'stroke-width').replace('px', '');
   const borde = getPropLine('classDef default', 'stroke-width').replace('px', '');
-  el.arrowWidthSelect.value = ARROW_WIDTHS.some(([v]) => v === flecha) ? flecha : '';
-  el.borderWidthSelect.value = BORDER_WIDTHS.some(([v]) => v === borde) ? borde : '';
+  setGrosorValor(el.arrowWidthSelect, flecha);
+  setGrosorValor(el.borderWidthSelect, borde);
+  el.arrowWidthCustom.value = flecha;
+  el.borderWidthCustom.value = borde;
+}
+
+// Un grosor escrito a mano: entre 0,5 y 20 píxeles.
+function grosorValido(valor) {
+  const n = Number(String(valor).replace(',', '.'));
+  return n >= 0.5 && n <= 20 ? String(Math.round(n * 10) / 10) : null;
+}
+
+// Campo para escribir un grosor que no esté entre los ofrecidos.
+function campoGrosor(contenedor, actual, alAplicar) {
+  const label = document.createElement('label');
+  label.className = 'tamano-propio';
+  const texto = document.createElement('span');
+  texto.textContent = t('widthCustom');
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0.5';
+  input.max = '20';
+  input.step = '0.5';
+  input.inputMode = 'decimal';
+  input.value = actual || '';
+  const px = document.createElement('span');
+  px.textContent = 'px';
+  const aplicar = () => {
+    const valor = grosorValido(input.value);
+    if (valor) alAplicar(valor);
+  };
+  input.addEventListener('change', aplicar);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); aplicar(); }
+  });
+  label.append(texto, input, px);
+  contenedor.appendChild(label);
 }
 
 function writeLineWidths() {
@@ -2054,17 +2100,27 @@ function buildLineTargetSection() {
     boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
     boton.addEventListener('click', () => {
       el.linesMenu.hidden = true;
-      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
-      const sangria = sangriaDelCodigo(lineas);
-      const px = valor ? valor + 'px' : null;
-      if (lineaParte === 'flecha') setPropLine(lineas, 'linkStyle ' + flechas.join(','), 'stroke-width', px, sangria);
-      else ids.forEach((id) => setStyleProp(lineas, id, 'stroke-width', px, sangria));
-      el.editor.value = lineas.join('\n') + '\n';
-      renderGutter();
-      render();
+      escribirGrosor(lineaParte, ids, flechas, valor);
     });
     el.lineWidths.appendChild(boton);
   });
+  el.lineWidthCustom.innerHTML = '';
+  campoGrosor(el.lineWidthCustom, actual, (valor) => {
+    el.linesMenu.hidden = true;
+    escribirGrosor(lineaParte, ids, flechas, valor);
+  });
+}
+
+// Escribe el grosor de la flecha o del borde elegidos.
+function escribirGrosor(parte, ids, flechas, valor) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const px = valor ? valor + 'px' : null;
+  if (parte === 'flecha') setPropLine(lineas, 'linkStyle ' + flechas.join(','), 'stroke-width', px, sangria);
+  else ids.forEach((id) => setStyleProp(lineas, id, 'stroke-width', px, sangria));
+  el.editor.value = lineas.join('\n') + '\n';
+  renderGutter();
+  render();
 }
 
 function applyNodeColor(ids, relleno, borde, nombre) {
@@ -2290,6 +2346,19 @@ function setupEditorTools() {
   [el.arrowWidthSelect, el.borderWidthSelect].forEach((select) => {
     select.addEventListener('change', () => writeLineWidths());
   });
+
+  [[el.arrowWidthCustom, el.arrowWidthSelect], [el.borderWidthCustom, el.borderWidthSelect]].forEach(([input, select]) => {
+    const aplicar = () => {
+      const valor = grosorValido(input.value);
+      if (!valor) return;
+      setGrosorValor(select, valor);
+      writeLineWidths();
+    };
+    input.addEventListener('change', aplicar);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') { event.preventDefault(); aplicar(); }
+    });
+  });
   el.engineMenu.addEventListener('click', (event) => event.stopPropagation());
 
   MENUS_EDITOR.forEach((clave) => {
@@ -2513,13 +2582,14 @@ function construirContextual(objeto) {
     grupoGrosor.className = 'menu-grupo';
     grupoGrosor.textContent = t('borderWidth');
     menu.appendChild(grupoGrosor);
-    segmentosDe(menu, BORDER_WIDTHS.map(([v, k]) => [v, t(k)]), grosorDeBorde(ids), (valor) => {
+    const grosorActual = grosorDeBorde(ids);
+    segmentosDe(menu, BORDER_WIDTHS.map(([v, k]) => [v, t(k)]), grosorActual, (valor) => {
       cerrarContextual();
-      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
-      setStyleProp(lineas, ids[0], 'stroke-width', valor ? valor + 'px' : null, sangriaDelCodigo(lineas));
-      el.editor.value = lineas.join('\n') + '\n';
-      renderGutter();
-      render();
+      escribirGrosor('borde', ids, [], valor);
+    });
+    campoGrosor(menu, grosorActual, (valor) => {
+      cerrarContextual();
+      escribirGrosor('borde', ids, [], valor);
     });
     accionContextual(menu, t('ctxShape'), 'i-square', () => abrirDesdeContextual('btn-shape'));
     return;
@@ -2541,11 +2611,11 @@ function construirContextual(objeto) {
     const actual = getPropLine('linkStyle ' + objeto.indice, 'stroke-width').replace('px', '');
     segmentosDe(menu, ARROW_WIDTHS.map(([v, k]) => [v, t(k)]), actual, (valor) => {
       cerrarContextual();
-      const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
-      setPropLine(lineas, 'linkStyle ' + objeto.indice, 'stroke-width', valor ? valor + 'px' : null, sangriaDelCodigo(lineas));
-      el.editor.value = lineas.join('\n') + '\n';
-      renderGutter();
-      render();
+      escribirGrosor('flecha', [], flechas, valor);
+    });
+    campoGrosor(menu, actual, (valor) => {
+      cerrarContextual();
+      escribirGrosor('flecha', [], flechas, valor);
     });
     return;
   }

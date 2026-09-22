@@ -303,12 +303,14 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 }
 .menu-contextual .menu-titulo { margin: 2px 2px 8px; }
 .menu-contextual .segmentos { margin-bottom: 8px; }
+.menu-contextual .tamano-propio { margin: 0 2px 8px; padding-top: 0; border-top: 0; }
 .menu-contextual .swatches { margin-bottom: 8px; }
 .menu-contextual hr { margin: 8px 0; border: 0; border-top: 1px solid var(--border); }
 .menu-contextual .menu-grupo { margin: 2px 2px 4px; }
 .menu-contextual .accion-menu { display: flex; align-items: center; gap: 8px; }
 .menu-contextual .accion-menu svg { width: 16px; height: 16px; flex: none; color: var(--text-soft); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .menu-formas { width: 440px; max-width: min(92vw, 460px); }
+.menu-ajustes .color-elemento .tamano-propio { margin: 0 0 6px; padding-top: 0; border-top: 0; }
 .menu-formas .segmentos-menu { margin: 6px 8px 8px; }
 /* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
 .formas-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 4px 4px; }

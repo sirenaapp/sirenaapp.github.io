@@ -116,6 +116,7 @@ window.SIRENA_LANG.en = {
   linesAll: 'All lines',
   arrowWidth: 'Arrow thickness',
   borderWidth: 'Border thickness',
+  widthCustom: 'Other thickness',
   widthThin: 'Thin',
   widthNormal: 'Normal',
   widthThick: 'Thick',

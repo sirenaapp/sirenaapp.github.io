@@ -116,6 +116,7 @@ window.SIRENA_LANG.es = {
   linesAll: 'Todas las líneas',
   arrowWidth: 'Grosor de las flechas',
   borderWidth: 'Grosor de los bordes',
+  widthCustom: 'Otro grosor',
   widthThin: 'Fino',
   widthNormal: 'Normal',
   widthThick: 'Grueso',
