@@ -24,8 +24,8 @@ pequeño.
 - **Reducir el tamaño del texto para que quepa.** Descartada: el problema no es
   el texto, sino la forma que Mermaid da al diagrama.
 - **Cambiar la dirección por cuenta propia a horizontal.** Descartada: el código
-  es del usuario y no se toca sin pedirlo; el menú de aspecto tiene el control
-  de dirección para quien lo quiera.
+  es del usuario y no se toca sin pedirlo; la barra del editor tiene el botón
+  de orientación para quien lo quiera.
 
 ## Lo que se probó antes
 

@@ -30,18 +30,29 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   despliega las cuatro con su nombre, solo en los tipos que la admiten (flujo,
   estados, clases y entidad-relación); las cuatro flechas sueltas ocupaban
   sitio y se agruparon a petición del autor. Escribe
-  en el código como antes (`flowchart LR` o una línea `direction`). Sale del
-  menú de aspecto, donde estaba como desplegable, para no tener dos veces lo
-  mismo.
-- **Color del elemento.** Solo en flujo, estados, clases y bloques. Toma el
-  elemento de la línea del cursor (si hay varios, el que está bajo el cursor) o
-  los de las líneas seleccionadas, y ofrece la paleta de cinco colores del
-  menú de aspecto más un color propio; el borde y el texto se derivan del
-  relleno. Un elemento recibe una línea `style`; varios, una clase `classDef`
-  con su asignación (`class A,B nombre`, o `cssClass` en el diagrama de
-  clases), que es la forma que Mermaid recomienda para colorear por
-  categorías. Al volver a colorear o al quitar el color se retiran las líneas
-  anteriores de esos elementos y las clases de Sirena que queden sin uso.
+  en el código como antes (`flowchart LR` o una línea `direction`).
+- **Colores.** Un solo menú con dos secciones. «Todo el diagrama» es el color
+  principal de antes (paleta de cinco colores o colores propios de relleno,
+  borde, líneas y texto). «Color del elemento donde está el cursor», solo en
+  flujo, estados, clases y bloques, toma el elemento de la línea del cursor
+  (si hay varios, el que está bajo el cursor) o los de las líneas
+  seleccionadas, y deja elegir qué se colorea: toda la caja, solo el texto o
+  solo el borde. Toda la caja escribe relleno, borde y texto a juego: un
+  elemento recibe una línea `style`; varios, una clase `classDef` con su
+  asignación (`class A,B nombre`, o `cssClass` en el diagrama de clases), que
+  es la forma que Mermaid recomienda para colorear por categorías, y se
+  retiran las líneas anteriores de esos elementos y las clases de Sirena que
+  queden sin uso. Solo el texto o solo el borde cambian esa propiedad
+  (`color` o `stroke`) en la línea `style` del elemento, creándola si no
+  existe, sin tocar el resto; para ellos la paleta ofrece los colores oscuros
+  del borde, porque el relleno claro no se leería.
+- **Trazo y texto** y **Ajustes del dibujo.** El resto del antiguo menú de
+  aspecto de la barra superior, repartido por temas a petición del autor: el
+  trazo y el tamaño del texto en un botón, y en otro lo que depende del tipo
+  (forma de las líneas, separación y márgenes en flujo; numeración en
+  secuencia; valores en sectores), que solo aparece cuando algo aplica. La
+  barra superior se queda con los temas de Mermaid, que no se escriben en el
+  código.
 
 Todo se escribe en el propio código, como el resto de ajustes (ADR 8), de modo
 que el diagrama se ve igual en cualquier sitio y quien lo lee aprende la
@@ -49,6 +60,9 @@ sintaxis. Los iconos son de Lucide y los rótulos están en los cinco idiomas.
 
 ## Alternativas descartadas
 
+- **Mantener los ajustes del dibujo en la barra superior.** Descartado: el
+  autor los quiso junto al código, repartidos por temas, para que quien
+  empieza encuentre en un mismo sitio todo lo que cambia el dibujo.
 - **Una barra con fragmentos de cada tipo (caja, rombo, flecha…).** Descartada
   por ahora: repite la chuleta de la ayuda, que ya inserta cada fragmento al
   pulsarlo. Si la práctica lo pide, se añadirá sacando las filas de la propia
@@ -66,7 +80,9 @@ sintaxis. Los iconos son de Lucide y los rótulos están en los cinco idiomas.
 
 Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,
 y el código resultante la enseña. La barra ocupa una línea encima del código y
-en pantalla estrecha se desplaza en horizontal. Al añadir un tipo de diagrama
+en pantalla estrecha se desplaza en horizontal. Donde los ADR anteriores
+hablan del «menú de aspecto» hay que leer ahora estos menús de la barra del
+editor. Al añadir un tipo de diagrama
 nuevo a los ejemplos hay que darle también su línea de definición en
 `TYPE_HEADERS`, y si admite `style` o `classDef`, incluirlo en `COLORABLE` y en
 la detección de elementos de `targetNodes`.

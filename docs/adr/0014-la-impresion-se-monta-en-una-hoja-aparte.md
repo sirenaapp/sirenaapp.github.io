@@ -46,5 +46,6 @@ navegador, que manda sobre lo que pide la página.
 
 Un diagrama muy alargado se imprime pequeño en la dirección corta de la hoja,
 porque se conservan sus proporciones. En esos casos conviene cambiar antes la
-dirección del diagrama en el menú de aspecto, como ya recomienda el
+dirección del diagrama con el botón de orientación de la barra del editor,
+como ya recomienda el
 [ADR 10](0010-sugerencia-de-orientacion.md).

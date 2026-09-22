@@ -31,7 +31,8 @@ Medido con Mermaid sin código de Sirena, mismo diagrama en las dos versiones:
 Sirena respeta el motor por defecto de Mermaid 12, `elk`, de modo que un
 diagrama sin cabecera se ve igual que en cualquier otro editor de Mermaid.
 
-El menú de aspecto recupera «Forma de las líneas», con cuatro opciones: en
+El menú «Ajustes del dibujo» de la barra del editor recupera «Forma de las
+líneas», con cuatro opciones: en
 ángulo recto (`elk`, la de serie), curvas, rectas y escalonadas. Las tres
 últimas cambian el motor a `dagre`, que es el único que las atiende, y hacen
 aparecer «Separación»; con `elk` ese control se oculta, porque no tiene efecto.
@@ -55,7 +56,7 @@ vuelva a cambiar.
 
 La cabecera de un diagrama de flujo ya no desaparece al volver a los valores de
 serie: conserva al menos `%%{init: {"layout":"elk"}}%%`. Un diagrama que nunca
-ha pasado por el menú de aspecto no lleva cabecera y sigue el motor de la
+ha pasado por esos ajustes no lleva cabecera y sigue el motor de la
 versión de Mermaid con que se abra.
 
 En Mermaid 11, que no trae `elk`, esa cabecera no da error: el diagrama se

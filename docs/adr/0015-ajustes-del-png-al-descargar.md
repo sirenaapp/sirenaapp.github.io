@@ -29,8 +29,9 @@ así que quien no toque nada obtiene exactamente lo que obtenía.
 
 - **Un diálogo de opciones antes de cada descarga.** Descartada: añade un paso a
   la acción más frecuente para algo que casi nadie cambia.
-- **Llevar los ajustes al menú de aspecto.** Descartada: ese menú es cómo se
-  dibuja el diagrama, y todo lo que hay en él se escribe en el código
+- **Llevar los ajustes a los menús del dibujo de la barra del editor.**
+  Descartada: esos menús son cómo se dibuja el diagrama, y todo lo que hay en
+  ellos se escribe en el código
   ([ADR 8](0008-ajustes-escritos-en-el-codigo.md)). La resolución y el fondo no
   son del diagrama, sino de la copia que se descarga.
 - **Añadir JPG, WebP, DOCX o PPTX**, como hace MermaidExport. Descartada: para
