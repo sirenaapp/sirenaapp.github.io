@@ -607,8 +607,8 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 
 .syntax-row code {
   flex: 0 0 46%;
-  white-space: pre;
-  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 12.5px;
   color: var(--accent);

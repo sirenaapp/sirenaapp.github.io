@@ -117,5 +117,116 @@ window.SIRENA_SYNTAX = [
       { c: '  Pendiente', t: { es: 'Columna del tablero', ca: 'Columna del tauler', gl: 'Columna do taboleiro', eu: 'Taulako zutabea', en: 'Board column' } },
       { c: '    t1[Tarea]', t: { es: 'Tarjeta dentro de la columna', ca: 'Targeta dins de la columna', gl: 'Tarxeta dentro da columna', eu: 'Txartela zutabearen barruan', en: 'Card inside the column' } }
     ]
+  },
+  {
+    id: 'gitgraph',
+    detect: /^\s*gitGraph\b/m,
+    rows: [
+      { c: 'gitGraph', t: { es: 'Empezar un diagrama de ramas', ca: 'Començar un diagrama de branques', gl: 'Comezar un diagrama de ramas', eu: 'Adar-diagrama bat hasi', en: 'Start a branch diagram' } },
+      { c: 'commit id: "Versión inicial"', t: { es: 'Punto guardado, con su nombre', ca: 'Punt desat, amb el seu nom', gl: 'Punto gardado, co seu nome', eu: 'Gordetako puntua, bere izenarekin', en: 'Saved point, with its name' } },
+      { c: 'branch actividades', t: { es: 'Abrir una rama nueva', ca: 'Obrir una branca nova', gl: 'Abrir unha rama nova', eu: 'Adar berri bat ireki', en: 'Open a new branch' } },
+      { c: 'checkout main', t: { es: 'Volver a la rama principal', ca: 'Tornar a la branca principal', gl: 'Volver á rama principal', eu: 'Adar nagusira itzuli', en: 'Go back to the main branch' } },
+      { c: 'merge actividades', t: { es: 'Integrar esa rama en la actual', ca: 'Integrar aquesta branca en l\'actual', gl: 'Integrar esa rama na actual', eu: 'Adar hori unekoan integratu', en: 'Merge that branch into the current one' } }
+    ]
+  },
+  {
+    id: 'treemap',
+    detect: /^\s*treemap(-beta)?\b/m,
+    rows: [
+      { c: 'treemap-beta', t: { es: 'Empezar un mapa de árbol', ca: 'Començar un mapa d\'arbre', gl: 'Comezar un mapa de árbore', eu: 'Zuhaitz-mapa bat hasi', en: 'Start a treemap' } },
+      { c: '"Grupo"', t: { es: 'Bloque que contiene otros', ca: 'Bloc que en conté d\'altres', gl: 'Bloque que contén outros', eu: 'Beste batzuk dituen blokea', en: 'Block containing others' } },
+      { c: '    "Elemento": 4', t: { es: 'Elemento con su valor, con más sangría; el tamaño depende del valor', ca: 'Element amb el seu valor, amb més sagnat; la mida depèn del valor', gl: 'Elemento co seu valor, con máis sangría; o tamaño depende do valor', eu: 'Elementua bere balioarekin, koska handiagoarekin; tamaina balioaren araberakoa da', en: 'Item with its value, indented; its size depends on the value' } }
+    ]
+  },
+  {
+    id: 'xychart',
+    detect: /^\s*xychart(-beta)?\b/m,
+    rows: [
+      { c: 'xychart-beta', t: { es: 'Empezar un gráfico de ejes', ca: 'Començar un gràfic d\'eixos', gl: 'Comezar un gráfico de eixes', eu: 'Ardatz-grafiko bat hasi', en: 'Start an XY chart' } },
+      { c: 'title "Título"', t: { es: 'Título del gráfico', ca: 'Títol del gràfic', gl: 'Título do gráfico', eu: 'Grafikoaren izenburua', en: 'Chart title' } },
+      { c: 'x-axis [1r, 2o, 3r]', t: { es: 'Categorías del eje horizontal', ca: 'Categories de l\'eix horitzontal', gl: 'Categorías do eixe horizontal', eu: 'Ardatz horizontalaren kategoriak', en: 'Categories on the horizontal axis' } },
+      { c: 'y-axis "Nota" 0 --> 10', t: { es: 'Eje vertical, con su nombre y sus límites', ca: 'Eix vertical, amb el seu nom i els seus límits', gl: 'Eixe vertical, co seu nome e os seus límites', eu: 'Ardatz bertikala, bere izen eta mugekin', en: 'Vertical axis, with its name and range' } },
+      { c: 'bar [5.8, 6.4, 7.1]', t: { es: 'Serie dibujada en barras', ca: 'Sèrie dibuixada en barres', gl: 'Serie debuxada en barras', eu: 'Barretan marraztutako seriea', en: 'Series drawn as bars' } },
+      { c: 'line [5.8, 6.4, 7.1]', t: { es: 'Serie dibujada en línea', ca: 'Sèrie dibuixada en línia', gl: 'Serie debuxada en liña', eu: 'Lerroan marraztutako seriea', en: 'Series drawn as a line' } },
+      { c: 'xychart-beta horizontal', t: { es: 'Empezar con las barras tumbadas', ca: 'Començar amb les barres ajagudes', gl: 'Comezar coas barras deitadas', eu: 'Barrak etzanda hasi', en: 'Start with horizontal bars' } }
+    ]
+  },
+  {
+    id: 'quadrant',
+    detect: /^\s*quadrantChart\b/m,
+    rows: [
+      { c: 'quadrantChart', t: { es: 'Empezar un gráfico de cuadrantes', ca: 'Començar un gràfic de quadrants', gl: 'Comezar un gráfico de cuadrantes', eu: 'Koadrante-grafiko bat hasi', en: 'Start a quadrant chart' } },
+      { c: 'title Título', t: { es: 'Título del gráfico', ca: 'Títol del gràfic', gl: 'Título do gráfico', eu: 'Grafikoaren izenburua', en: 'Chart title' } },
+      { c: 'x-axis "Difícil" --> "Fácil"', t: { es: 'Eje horizontal, de izquierda a derecha', ca: 'Eix horitzontal, d\'esquerra a dreta', gl: 'Eixe horizontal, de esquerda a dereita', eu: 'Ardatz horizontala, ezkerretik eskuinera', en: 'Horizontal axis, left to right' } },
+      { c: 'y-axis "Poco útil" --> "Muy útil"', t: { es: 'Eje vertical, de abajo arriba', ca: 'Eix vertical, de baix a dalt', gl: 'Eixe vertical, de abaixo arriba', eu: 'Ardatz bertikala, behetik gora', en: 'Vertical axis, bottom to top' } },
+      { c: 'quadrant-1 Recomendables', t: { es: 'Nombre de un cuadrante: 1 arriba a la derecha, 2 arriba a la izquierda, 3 abajo a la izquierda, 4 abajo a la derecha', ca: 'Nom d\'un quadrant: 1 a dalt a la dreta, 2 a dalt a l\'esquerra, 3 a baix a l\'esquerra, 4 a baix a la dreta', gl: 'Nome dun cuadrante: 1 arriba á dereita, 2 arriba á esquerda, 3 abaixo á esquerda, 4 abaixo á dereita', eu: 'Koadrante baten izena: 1 goian eskuinean, 2 goian ezkerrean, 3 behean ezkerrean, 4 behean eskuinean', en: 'Name of a quadrant: 1 top right, 2 top left, 3 bottom left, 4 bottom right' } },
+      { c: 'Elemento: [0.6, 0.8]', t: { es: 'Punto, con coordenadas de 0 a 1', ca: 'Punt, amb coordenades de 0 a 1', gl: 'Punto, con coordenadas de 0 a 1', eu: 'Puntua, 0tik 1erako koordenatuekin', en: 'Point, with coordinates from 0 to 1' } }
+    ]
+  },
+  {
+    id: 'sankey',
+    detect: /^\s*sankey(-beta)?\b/m,
+    rows: [
+      { c: 'sankey-beta', t: { es: 'Empezar un diagrama de flujos', ca: 'Començar un diagrama de fluxos', gl: 'Comezar un diagrama de fluxos', eu: 'Fluxu-diagrama bat hasi', en: 'Start a flow (Sankey) diagram' } },
+      { c: 'Origen,Destino,72', t: { es: 'Flujo de origen a destino, con su cantidad; una línea por flujo', ca: 'Flux d\'origen a destinació, amb la seva quantitat; una línia per flux', gl: 'Fluxo de orixe a destino, coa súa cantidade; unha liña por fluxo', eu: 'Fluxua jatorritik helmugara, bere kantitatearekin; lerro bat fluxu bakoitzeko', en: 'Flow from source to target, with its amount; one line per flow' } },
+      { c: '"Nombre, con coma",Destino,5', t: { es: 'Nombre que lleva coma, entre comillas', ca: 'Nom que porta coma, entre cometes', gl: 'Nome que leva coma, entre comiñas', eu: 'Koma daraman izena, komatxo artean', en: 'Name containing a comma, in quotes' } }
+    ]
+  },
+  {
+    id: 'block',
+    detect: /^\s*block(-beta)?\b/m,
+    rows: [
+      { c: 'block-beta', t: { es: 'Empezar un diagrama de bloques', ca: 'Començar un diagrama de blocs', gl: 'Comezar un diagrama de bloques', eu: 'Bloke-diagrama bat hasi', en: 'Start a block diagram' } },
+      { c: 'columns 3', t: { es: 'Número de columnas de la rejilla', ca: 'Nombre de columnes de la graella', gl: 'Número de columnas da grella', eu: 'Sareta-zutabeen kopurua', en: 'Number of grid columns' } },
+      { c: 'a["Texto"]', t: { es: 'Bloque con texto', ca: 'Bloc amb text', gl: 'Bloque con texto', eu: 'Testudun blokea', en: 'Block with text' } },
+      { c: 'a["Texto"]:3', t: { es: 'Bloque que ocupa tres columnas', ca: 'Bloc que ocupa tres columnes', gl: 'Bloque que ocupa tres columnas', eu: 'Hiru zutabe hartzen dituen blokea', en: 'Block spanning three columns' } },
+      { c: 'space', t: { es: 'Hueco vacío en la rejilla', ca: 'Buit a la graella', gl: 'Oco baleiro na grella', eu: 'Hutsunea saretan', en: 'Empty gap in the grid' } },
+      { c: 'a --> b', t: { es: 'Flecha entre dos bloques', ca: 'Fletxa entre dos blocs', gl: 'Frecha entre dous bloques', eu: 'Gezia bi blokeren artean', en: 'Arrow between two blocks' } },
+      { c: 'r<["Red"]>(right)', t: { es: 'Bloque con forma de flecha (left, right, up, down)', ca: 'Bloc amb forma de fletxa (left, right, up, down)', gl: 'Bloque con forma de frecha (left, right, up, down)', eu: 'Gezi-formako blokea (left, right, up, down)', en: 'Arrow-shaped block (left, right, up, down)' } }
+    ]
+  },
+  {
+    id: 'architecture',
+    detect: /^\s*architecture(-beta)?\b/m,
+    rows: [
+      { c: 'architecture-beta', t: { es: 'Empezar un diagrama de arquitectura', ca: 'Començar un diagrama d\'arquitectura', gl: 'Comezar un diagrama de arquitectura', eu: 'Arkitektura-diagrama bat hasi', en: 'Start an architecture diagram' } },
+      { c: 'group centro(cloud)[Centro educativo]', t: { es: 'Grupo, con su icono y su nombre', ca: 'Grup, amb la seva icona i el seu nom', gl: 'Grupo, coa súa icona e o seu nome', eu: 'Taldea, bere ikono eta izenarekin', en: 'Group, with its icon and name' } },
+      { c: 'service aula(server)[Aula] in centro', t: { es: 'Servicio dentro del grupo; iconos: cloud, database, disk, internet, server', ca: 'Servei dins del grup; icones: cloud, database, disk, internet, server', gl: 'Servizo dentro do grupo; iconas: cloud, database, disk, internet, server', eu: 'Zerbitzua taldearen barruan; ikonoak: cloud, database, disk, internet, server', en: 'Service inside the group; icons: cloud, database, disk, internet, server' } },
+      { c: 'aula:R -- L:nas', t: { es: 'Conexión entre dos servicios, por el lado indicado (L, R, T, B)', ca: 'Connexió entre dos serveis, pel costat indicat (L, R, T, B)', gl: 'Conexión entre dous servizos, polo lado indicado (L, R, T, B)', eu: 'Bi zerbitzuren arteko konexioa, adierazitako aldetik (L, R, T, B)', en: 'Connection between two services, on the given side (L, R, T, B)' } }
+    ]
+  },
+  {
+    id: 'venn',
+    detect: /^\s*venn-beta\b/m,
+    rows: [
+      { c: 'venn-beta', t: { es: 'Empezar un diagrama de Venn', ca: 'Començar un diagrama de Venn', gl: 'Comezar un diagrama de Venn', eu: 'Venn diagrama bat hasi', en: 'Start a Venn diagram' } },
+      { c: 'title Título', t: { es: 'Título del diagrama', ca: 'Títol del diagrama', gl: 'Título do diagrama', eu: 'Diagramaren izenburua', en: 'Diagram title' } },
+      { c: 'set A ["Reptiles"]', t: { es: 'Conjunto, con su nombre', ca: 'Conjunt, amb el seu nom', gl: 'Conxunto, co seu nome', eu: 'Multzoa, bere izenarekin', en: 'Set, with its name' } },
+      { c: 'union A,B ["Ponen huevos"]', t: { es: 'Intersección de dos conjuntos, con su texto', ca: 'Intersecció de dos conjunts, amb el seu text', gl: 'Intersección de dous conxuntos, co seu texto', eu: 'Bi multzoren ebakidura, bere testuarekin', en: 'Intersection of two sets, with its text' } },
+      { c: '%% Comentario', t: { es: 'Comentario; este tipo no admite accTitle ni accDescr', ca: 'Comentari; aquest tipus no admet accTitle ni accDescr', gl: 'Comentario; este tipo non admite accTitle nin accDescr', eu: 'Iruzkina; mota honek ez ditu accTitle eta accDescr onartzen', en: 'Comment; this type does not accept accTitle or accDescr' } }
+    ]
+  },
+  {
+    id: 'ishikawa',
+    detect: /^\s*ishikawa(-beta)?\b/m,
+    rows: [
+      { c: 'ishikawa-beta', t: { es: 'Empezar una espina de pescado', ca: 'Començar una espina de peix', gl: 'Comezar unha espiña de peixe', eu: 'Arrain-hezur bat hasi', en: 'Start a fishbone diagram' } },
+      { c: '    Problema', t: { es: 'Primera línea: el problema, en la cabeza del pez', ca: 'Primera línia: el problema, al cap del peix', gl: 'Primeira liña: o problema, na cabeza do peixe', eu: 'Lehen lerroa: arazoa, arrainaren buruan', en: 'First line: the problem, at the fish head' } },
+      { c: '        Categoría', t: { es: 'Grupo de causas, con más sangría', ca: 'Grup de causes, amb més sagnat', gl: 'Grupo de causas, con máis sangría', eu: 'Arrazoi-taldea, koska handiagoarekin', en: 'Group of causes, indented further' } },
+      { c: '            Causa', t: { es: 'Causa concreta, con más sangría todavía', ca: 'Causa concreta, amb encara més sagnat', gl: 'Causa concreta, con aínda máis sangría', eu: 'Arrazoi zehatza, koska handiagoarekin oraindik', en: 'Specific cause, indented even further' } }
+    ]
+  },
+  {
+    id: 'radar',
+    detect: /^\s*radar-beta\b/m,
+    rows: [
+      { c: 'radar-beta', t: { es: 'Empezar un gráfico de radar', ca: 'Començar un gràfic de radar', gl: 'Comezar un gráfico de radar', eu: 'Radar-grafiko bat hasi', en: 'Start a radar chart' } },
+      { c: 'title Título', t: { es: 'Título del gráfico', ca: 'Títol del gràfic', gl: 'Título do gráfico', eu: 'Grafikoaren izenburua', en: 'Chart title' } },
+      { c: 'axis a["Comunicación"], b["Equipo"], c["Creatividad"]', t: { es: 'Ejes, uno por criterio', ca: 'Eixos, un per criteri', gl: 'Eixes, un por criterio', eu: 'Ardatzak, bat irizpide bakoitzeko', en: 'Axes, one per criterion' } },
+      { c: 'curve p["Inicio"]{4, 5, 6}', t: { es: 'Serie de valores, uno por eje y en el mismo orden', ca: 'Sèrie de valors, un per eix i en el mateix ordre', gl: 'Serie de valores, un por eixe e na mesma orde', eu: 'Balio-seriea, bat ardatz bakoitzeko eta ordena berean', en: 'Series of values, one per axis and in the same order' } },
+      { c: 'max 10', t: { es: 'Valor máximo de la escala (min para el mínimo)', ca: 'Valor màxim de l\'escala (min per al mínim)', gl: 'Valor máximo da escala (min para o mínimo)', eu: 'Eskalaren gehieneko balioa (min gutxienekorako)', en: 'Maximum value of the scale (min for the minimum)' } },
+      { c: 'showLegend true', t: { es: 'Mostrar la leyenda', ca: 'Mostrar la llegenda', gl: 'Amosar a lenda', eu: 'Legenda erakutsi', en: 'Show the legend' } },
+      { c: 'graticule polygon', t: { es: 'Rejilla poligonal (circle para circular)', ca: 'Graella poligonal (circle per a circular)', gl: 'Grella poligonal (circle para circular)', eu: 'Sareta poligonala (circle biribilerako)', en: 'Polygon grid (circle for a circular one)' } }
+    ]
   }
 ];

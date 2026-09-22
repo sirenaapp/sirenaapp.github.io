@@ -34,6 +34,8 @@ idioma el ejemplo que esté cargado se sustituye por su versión traducida.
 
 ## Consecuencias
 
-La chuleta cubre once tipos de diagrama, los más usados en clase. Para el resto,
-la ayuda remite a la referencia de Mermaid. Al añadir un tipo nuevo hay que
-escribir sus filas en los cinco idiomas.
+La chuleta cubre los veintiún tipos de diagrama que tienen ejemplo en el menú
+(empezó con once, los más usados en clase, y el 22-09-2026 se completó con los
+diez restantes). Para cualquier otro, la ayuda remite a la referencia de
+Mermaid. Al añadir un tipo nuevo a los ejemplos hay que escribir también sus
+filas en los cinco idiomas, para que ejemplos y chuleta vayan a la par.
