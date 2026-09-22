@@ -309,6 +309,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 #line-arrow-type .segmentos { flex-wrap: wrap; }
 .ajuste-flechas { margin: 6px 0 2px; }
 .menu-ajustes { max-height: calc(100vh - 120px); overflow-y: auto; }
+.menu-ayuda { grid-column: 1 / -1; margin: -4px 0 10px; color: var(--text-soft); font-size: 11.5px; }
 
 /* Lista de tipos de línea o de puntas: cada fila con su dibujo y su nombre. */
 .lista-flechas { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 0 0 6px 18px; }

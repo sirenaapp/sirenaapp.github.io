@@ -93,6 +93,12 @@ const BORDER_WIDTHS = [['', 'widthNormal'], ['2', 'widthThick'], ['4', 'widthXTh
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
 const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
+// Calendario del diagrama de Gantt: se escribe en el cuerpo del diagrama, como
+// dateFormat, no en la cabecera. Mermaid empieza la semana en domingo y
+// escribe las fechas como 2026-01-07, que no es lo habitual aquí.
+const AXIS_FORMATS = [['', 'axisDefault'], ['%d/%m', 'axisDM'], ['%d/%m/%Y', 'axisDMY'], ['%d/%m/%y', 'axisDMy']];
+const TICK_INTERVALS = [['', 'tickAuto'], ['1day', 'tickDay'], ['1week', 'tickWeek'], ['2week', 'tickTwoWeeks'], ['1month', 'tickMonth']];
+const WEEKDAYS = [['sunday', 'weekSunday'], ['monday', 'weekMonday']];
 // Máximo de diagramas en la biblioteca. Al llegar se borran los más antiguos.
 const LIMITES = [10, 25, 50, 100];
 const LIMITE_POR_DEFECTO = 50;
@@ -199,6 +205,12 @@ const el = {
   paddingSelect: $('padding-select'),
   numberingSelect: $('numbering-select'),
   showDataSelect: $('showdata-select'),
+  calendarMenu: $('calendar-menu'),
+  axisFormatSelect: $('axis-format-select'),
+  axisFormatCustom: $('axis-format-custom'),
+  tickIntervalSelect: $('tick-interval-select'),
+  weekdaySelect: $('weekday-select'),
+  weekendsSelect: $('weekends-select'),
   libraryModal: $('library-modal'),
   listaDocs: $('lista-docs'),
   limitSelect: $('limit-select'),
@@ -721,6 +733,10 @@ function buildAppearanceSelects() {
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
   fillSelect(el.showDataSelect, YESNO, null, 'no');
+  fillSelect(el.axisFormatSelect, AXIS_FORMATS, null, '');
+  fillSelect(el.tickIntervalSelect, TICK_INTERVALS, null, '');
+  fillSelect(el.weekdaySelect, WEEKDAYS, null, 'sunday');
+  fillSelect(el.weekendsSelect, YESNO, null, 'no');
 }
 
 function buildExportSelects() {
@@ -751,6 +767,7 @@ function diagramKind() {
   if (/^\s*sequenceDiagram\b/m.test(code)) return 'sequence';
   if (/^\s*pie\b/m.test(code)) return 'pie';
   if (/^\s*block(-beta)?\b/m.test(code)) return 'block';
+  if (/^\s*gantt\b/m.test(code)) return 'gantt';
   return 'otro';
 }
 
@@ -769,7 +786,8 @@ function updateAppearanceVisibility() {
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
     numbering: tipo === 'sequence',
-    showdata: tipo === 'pie'
+    showdata: tipo === 'pie',
+    calendar: tipo === 'gantt'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
   updateMergeButton();
@@ -1542,6 +1560,57 @@ function readShowData() {
   el.showDataSelect.value = /^[ \t]*pie[ \t]+showData\b/m.test(el.editor.value) ? 'yes' : 'no';
 }
 
+/* --- Calendario del diagrama de Gantt --- */
+
+// Valor de una directiva del cuerpo (axisFormat, tickInterval, weekday…), o ''.
+function directivaGantt(clave) {
+  const m = new RegExp('^[ \\t]*' + clave + '[ \\t]+(.+?)[ \\t]*$', 'm').exec(el.editor.value);
+  return m ? m[1].trim() : '';
+}
+
+// Escribe (o quita, con valor vacío) una directiva del cuerpo. Va detrás de
+// dateFormat, o de la cabecera del diagrama si no lo hay.
+function escribirDirectivaGantt(lineas, clave, valor) {
+  const re = new RegExp('^[ \\t]*' + clave + '\\b');
+  const i = lineas.findIndex((l) => re.test(l));
+  if (i >= 0) {
+    if (valor) lineas[i] = (lineas[i].match(/^[ \t]*/) || [''])[0] + clave + ' ' + valor;
+    else lineas.splice(i, 1);
+    return;
+  }
+  if (!valor) return;
+  let pos = lineas.findIndex((l) => /^[ \t]*dateFormat\b/.test(l));
+  if (pos < 0) {
+    pos = lineas.findIndex((l) => l.trim() && !/^\s*%%/.test(l));
+    while (pos + 1 < lineas.length && /^[ \t]*(?:%%[ \t]*)?(acc(Title|Descr)[ \t]*:|title\b)/.test(lineas[pos + 1])) pos += 1;
+  }
+  lineas.splice(pos + 1, 0, sangriaDelCodigo(lineas) + clave + ' ' + valor);
+}
+
+function readGantt() {
+  const formato = directivaGantt('axisFormat');
+  const conocido = AXIS_FORMATS.some(([v]) => v === formato);
+  el.axisFormatSelect.value = conocido ? formato : '';
+  el.axisFormatCustom.value = formato;
+  const marcas = directivaGantt('tickInterval');
+  el.tickIntervalSelect.value = TICK_INTERVALS.some(([v]) => v === marcas) ? marcas : '';
+  el.weekdaySelect.value = directivaGantt('weekday') === 'monday' ? 'monday' : 'sunday';
+  el.weekendsSelect.value = /\bweekends\b/.test(directivaGantt('excludes')) ? 'yes' : 'no';
+}
+
+function writeGantt() {
+  if (diagramKind() !== 'gantt') return;
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  escribirDirectivaGantt(lineas, 'axisFormat', el.axisFormatCustom.value.trim());
+  escribirDirectivaGantt(lineas, 'tickInterval', el.tickIntervalSelect.value);
+  escribirDirectivaGantt(lineas, 'weekday', el.weekdaySelect.value === 'monday' ? 'monday' : '');
+  // «excludes» puede llevar además fechas: solo se toca la palabra weekends.
+  const actual = directivaGantt('excludes').split(/\s*,\s*/).filter((x) => x && x !== 'weekends');
+  if (el.weekendsSelect.value === 'yes') actual.push('weekends');
+  escribirDirectivaGantt(lineas, 'excludes', actual.join(', '));
+  aplicarCodigo(lineas);
+}
+
 // Escribe (o quita) la cabecera de configuración al principio del código.
 function writeAppearance() {
   const config = appearanceConfig();
@@ -1575,6 +1644,8 @@ function readAppearance() {
   anchoCajas = String(flujo.wrappingWidth || 120);
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readShowData();
+  // Si el menú del calendario está abierto mientras cambia el código, se relee.
+  if (el.calendarMenu && !el.calendarMenu.hidden) readGantt();
   updateEditorTools();
   setSizeValue(variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16');
 
@@ -2646,7 +2717,8 @@ function dibujoDeFlecha(campo, valor) {
   const trazo = { x1, y1: 8, x2, y2: 8 };
   if (linea === 'punteada') trazo['stroke-dasharray'] = '2 3';
   if (linea === 'discontinua') trazo['stroke-dasharray'] = '6 3';
-  if (linea === 'rayapunto') trazo['stroke-dasharray'] = '7 2 2 2';
+  // Con los extremos redondeados los huecos pequeños se rellenan: rectos y más anchos.
+  if (linea === 'rayapunto') { trazo['stroke-dasharray'] = '6 3.5 1.5 3.5'; trazo['stroke-linecap'] = 'butt'; }
   if (linea === 'gruesa') trazo['stroke-width'] = 4;
   add('line', trazo);
   if (puntas === 'flecha' || puntas === 'doble') add('path', { d: 'M31 3l6 5-6 5z', class: 'relleno' });
@@ -2947,7 +3019,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -4056,6 +4128,7 @@ const SUBMENUS = {
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
   tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
+  calendario: { titulo: 'calendar', icono: 'i-calendar', boton: 'btn-calendar', menu: () => el.calendarMenu, preparar: readGantt },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
   lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
@@ -4303,6 +4376,7 @@ function construirContextual(objeto) {
   entradaSubmenu(menu, objeto, 'trazo');
   entradaSubmenu(menu, objeto, 'tamano');
   entradaSubmenu(menu, objeto, 'motor');
+  entradaSubmenu(menu, objeto, 'calendario');
   if (!$('wrap-merge').hidden) {
     interruptorContextual(menu, t('merge'), 'i-merge', unirFlechasPuesto(), () => {
       alternarUnirFlechas();
@@ -5151,6 +5225,22 @@ function setupToolbar() {
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();
     render();
+  });
+  $('btn-calendar').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.calendarMenu, $('btn-calendar'), readGantt);
+  });
+  el.axisFormatSelect.addEventListener('change', () => {
+    el.axisFormatCustom.value = el.axisFormatSelect.value;
+    writeGantt();
+  });
+  const aplicarFormatoEje = () => { writeGantt(); readGantt(); };
+  el.axisFormatCustom.addEventListener('change', aplicarFormatoEje);
+  el.axisFormatCustom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); aplicarFormatoEje(); }
+  });
+  [el.tickIntervalSelect, el.weekdaySelect, el.weekendsSelect].forEach((select) => {
+    select.addEventListener('change', writeGantt);
   });
 
   [el.spacingSelect, el.paddingSelect, el.numberingSelect, el.mergeSelect].forEach((select) => {

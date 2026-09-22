@@ -30,6 +30,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [22](0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md) | Las fórmulas se escriben con LaTeX y se editan con Edicuatex | aceptado |
 | [23](0023-los-archivos-propios-se-sirven-con-una-huella-en-la-direccion.md) | Los archivos propios se sirven con una huella en la dirección | aceptado |
 | [24](0024-tipo-de-linea-y-puntas-de-las-flechas-escritos-en-cada-flecha.md) | Tipo de línea y puntas de las flechas, escritos en cada flecha | aceptado |
+| [25](0025-el-calendario-del-diagrama-de-gantt-se-ajusta-desde-la-barra-y-se-escribe-en-el-cuerpo.md) | El calendario del diagrama de Gantt se ajusta desde la barra y se escribe en el cuerpo | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

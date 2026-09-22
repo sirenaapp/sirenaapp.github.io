@@ -81,7 +81,11 @@ window.SIRENA_SYNTAX = [
       { c: 'section Preparación', t: { es: 'Agrupar tareas en un apartado', ca: 'Agrupar tasques en un apartat', gl: 'Agrupar tarefas nun apartado', eu: 'Zereginak atal batean taldekatu', en: 'Group tasks into a section' } },
       { c: 'Tarea :a1, 2026-01-07, 10d', t: { es: 'Tarea con nombre, fecha de inicio y duración', ca: 'Tasca amb nom, data d\'inici i durada', gl: 'Tarefa con nome, data de inicio e duración', eu: 'Zeregina izenarekin, hasiera-datarekin eta iraupenarekin', en: 'Task with a name, start date and duration' } },
       { c: 'Otra :a2, after a1, 7d', t: { es: 'Tarea que empieza al acabar otra', ca: 'Tasca que comença en acabar una altra', gl: 'Tarefa que comeza ao rematar outra', eu: 'Beste bat amaitzean hasten den zeregina', en: 'Task starting when another ends' } },
-      { c: 'Hito :milestone, 2026-03-01, 0d', t: { es: 'Hito, sin duración', ca: 'Fita, sense durada', gl: 'Fito, sen duración', eu: 'Mugarria, iraupenik gabe', en: 'Milestone, with no duration' } }
+      { c: 'Hito :milestone, 2026-03-01, 0d', t: { es: 'Hito, sin duración', ca: 'Fita, sense durada', gl: 'Fito, sen duración', eu: 'Mugarria, iraupenik gabe', en: 'Milestone, with no duration' } },
+      { c: 'axisFormat %d/%m', t: { es: 'Formato de las fechas del eje (%d día, %m mes, %Y año)', ca: 'Format de les dates de l\'eix (%d dia, %m mes, %Y any)', gl: 'Formato das datas do eixe (%d día, %m mes, %Y ano)', eu: 'Ardatzeko daten formatua (%d eguna, %m hila, %Y urtea)', en: 'Format of the axis dates (%d day, %m month, %Y year)' } },
+      { c: 'tickInterval 1week', t: { es: 'Marcas del eje cada día, semana o mes', ca: 'Marques de l\'eix cada dia, setmana o mes', gl: 'Marcas do eixe cada día, semana ou mes', eu: 'Ardatzeko markak egunero, astero edo hilero', en: 'Axis ticks every day, week or month' } },
+      { c: 'weekday monday', t: { es: 'La semana empieza en lunes (Mermaid la empieza en domingo)', ca: 'La setmana comença en dilluns (Mermaid la comença en diumenge)', gl: 'A semana comeza en luns (Mermaid comézaa en domingo)', eu: 'Astea astelehenean hasten da (Mermaid-ek igandean hasten du)', en: 'The week starts on Monday (Mermaid starts it on Sunday)' } },
+      { c: 'excludes weekends', t: { es: 'Las tareas saltan los fines de semana', ca: 'Les tasques salten els caps de setmana', gl: 'As tarefas saltan as fins de semana', eu: 'Zereginek asteburuak saltatzen dituzte', en: 'Tasks skip the weekends' } }
     ]
   },
   {

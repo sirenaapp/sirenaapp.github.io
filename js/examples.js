@@ -580,6 +580,8 @@ window.SIRENA_EXAMPLES = [
     title Proyecto de trabajo por ámbitos
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
+    tickInterval 1week
+    weekday monday
     section Preparación
     Documentación      :a1, 2026-01-07, 10d
     Guion del proyecto :a2, after a1, 7d
@@ -592,6 +594,8 @@ window.SIRENA_EXAMPLES = [
     title Projecte de treball per àmbits
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
+    tickInterval 1week
+    weekday monday
     section Preparació
     Documentació       :a1, 2026-01-07, 10d
     Guió del projecte  :a2, after a1, 7d
@@ -604,6 +608,8 @@ window.SIRENA_EXAMPLES = [
     title Proxecto de traballo por ámbitos
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
+    tickInterval 1week
+    weekday monday
     section Preparación
     Documentación      :a1, 2026-01-07, 10d
     Guión do proxecto  :a2, after a1, 7d
@@ -616,6 +622,8 @@ window.SIRENA_EXAMPLES = [
     title Eremuka lan egiteko proiektua
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
+    tickInterval 1week
+    weekday monday
     section Prestaketa
     Dokumentazioa      :a1, 2026-01-07, 10d
     Proiektuaren gidoia :a2, after a1, 7d
@@ -628,6 +636,8 @@ window.SIRENA_EXAMPLES = [
     title Cross-curricular project
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
+    tickInterval 1week
+    weekday monday
     section Preparation
     Background reading :a1, 2026-01-07, 10d
     Project brief      :a2, after a1, 7d
