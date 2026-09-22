@@ -40,7 +40,11 @@ estrecha y alta. El botón de cajas abre un menú con dos entradas, la forma
 serie), medio (200), ancho (300), muy ancho (450) o un valor escrito a mano
 entre 60 y 800. Se puso primero en el botón de tamaño del texto y el autor lo
 pasó al de cajas, por ser una propiedad de la caja y no del texto
-(22-09-2026). El menú del botón derecho sobre el fondo lo ofrece como submenú. Se escribe en la cabecera como
+(22-09-2026). El menú del botón derecho sobre el fondo lo ofrece como submenú.
+En los diagramas de estados el mismo botón abre directamente el ancho
+(`state.wrappingWidth`), porque ahí no hay formas que elegir. El mapa mental
+tiene `mindmap.maxNodeWidth`, pero en Mermaid 12.0.0 no cambia nada
+(comprobado con 120, 300 y 450: la raíz mide igual), así que no se ofrece. Se escribe en la cabecera como
 `"flowchart": {"wrappingWidth": 300}` y solo cuando no es el de serie; se lee
 de ahí al cargar; y no aparece en otros tipos. Medido con un texto de veinte
 palabras: 152×117 a 120, 219×86 a 200, 317×71 a 300.

@@ -36,7 +36,7 @@ propia dirección.
   el lunes y fines de semana excluidos, escrito en el propio diagrama), en flujo un botón de cajas con
   dos entradas, las 52 formas que dibuja Mermaid (para el elemento donde está
   el cursor o para todas) y el ancho de las cajas (el punto en que Mermaid
-  corta el texto, `wrappingWidth`), y
+  corta el texto, `wrappingWidth`; en estados, solo el ancho), y
   un botón que inserta un salto de línea (`<br>`) y otros dos que ponen el
   texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una

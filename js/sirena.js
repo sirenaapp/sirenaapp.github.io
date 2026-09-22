@@ -827,7 +827,8 @@ function updateAppearanceVisibility() {
   const visibles = {
     engine: conMotor,
     lines: esFlujo,
-    shape: esFlujo,
+    // En estados no hay formas que elegir, pero sí el ancho de las cajas.
+    shape: esFlujo || tipo === 'state',
     spacing: esFlujo && motor === 'dagre',
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
@@ -836,6 +837,9 @@ function updateAppearanceVisibility() {
     calendar: tipo === 'gantt'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  const btnShape = $('btn-shape');
+  btnShape.title = t(esFlujo ? 'shapeBtn' : 'boxWidth');
+  btnShape.setAttribute('aria-label', btnShape.title);
   updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
   $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
@@ -1568,6 +1572,7 @@ function appearanceConfig() {
     flowchart.diagramPadding = Number(el.paddingSelect.value);
   }
   if (esFlujo && anchoCajas !== '120') flowchart.wrappingWidth = Number(anchoCajas);
+  if (tipo === 'state' && anchoCajas !== '120') config.state = { wrappingWidth: Number(anchoCajas) };
   if (Object.keys(flowchart).length) config.flowchart = flowchart;
   if (el.numberingSelect.value === 'yes') config.sequence = { showSequenceNumbers: true };
   return config;
@@ -1843,7 +1848,7 @@ function readAppearance() {
   readArrowTypes();
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
-  anchoCajas = String(flujo.wrappingWidth || 120);
+  anchoCajas = String((diagramKind() === 'state' ? (config.state || {}).wrappingWidth : flujo.wrappingWidth) || 120);
   fuenteActual = config.fontFamily || '';
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readShowData();
@@ -3460,7 +3465,9 @@ function setupEditorTools() {
   // El botón de cajas abre un menú con lo suyo: la forma y el ancho.
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();
-    alternarMenuEditor(el.shapeMenu, $('btn-shape'));
+    // Fuera del flujo solo hay ancho: se abre directamente.
+    if (diagramKind() !== 'flowchart') alternarMenuEditor(el.widthMenu, $('btn-shape'), buildWidthMenu);
+    else alternarMenuEditor(el.shapeMenu, $('btn-shape'));
   });
   el.shapeMenu.addEventListener('click', (event) => {
     const boton = event.target.closest('button[data-cajas]');
@@ -4587,7 +4594,7 @@ function construirContextual(objeto) {
   entradaSubmenu(menu, objeto, 'colores');
   entradaSubmenu(menu, objeto, 'lineas');
   if (!$('wrap-shape').hidden) {
-    accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
+    if (diagramKind() === 'flowchart') accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
     entradaSubmenu(menu, objeto, 'ancho');
   }
   entradaSubmenu(menu, objeto, 'trazo');
