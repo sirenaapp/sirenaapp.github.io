@@ -55,7 +55,8 @@ propia dirección.
   código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve
   igual en cualquier editor de Mermaid.
 - Descargar el resultado en PNG, SVG, página HTML o código `.mmd`, o copiarlo
-  como imagen. El PNG se puede pedir a 1×, 2× o 4× del tamaño de pantalla y con
+  como imagen. El archivo toma el nombre del diagrama (su título accesible, su
+  `title` o el puesto a mano) o, si no tiene, el tipo de diagrama. El PNG se puede pedir a 1×, 2× o 4× del tamaño de pantalla y con
   fondo blanco, transparente o el del editor.
 - Imprimir el diagrama o guardarlo en PDF, en una hoja A4 que toma la
   orientación de la forma del diagrama.

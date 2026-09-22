@@ -4152,9 +4152,18 @@ function download(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Nombre del archivo que se descarga: el mismo que tiene el diagrama en la
+// biblioteca (título accesible, título o contenido, o el puesto a mano) y, si
+// no dice nada, el tipo de diagrama. La primera línea del código no sirve:
+// suele ser la cabecera de ajustes o solo el tipo.
 function diagramName() {
-  const first = el.editor.value.split('\n').find((line) => line.trim());
-  const base = (first || 'diagrama').trim().replace(/[^\p{L}\p{N}]+/gu, '-').slice(0, 40).replace(/^-|-$/g, '');
+  const doc = leerDocs().find((d) => d.id === docActivo);
+  let nombre = doc ? doc.nombre : nombreSugerido(el.editor.value);
+  if (!nombre || nombre === t('untitled')) {
+    const tipo = editorType();
+    nombre = tipo ? typeLabelFor(tipo) : '';
+  }
+  const base = (nombre || '').trim().replace(/[^\p{L}\p{N}]+/gu, '-').slice(0, 60).replace(/^-|-$/g, '');
   return base.toLowerCase() || 'diagrama';
 }
 

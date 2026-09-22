@@ -39,6 +39,15 @@ así que quien no toque nada obtiene exactamente lo que obtenía.
   copiar como imagen, que es un paso en lugar de dos, y el SVG entra en los dos
   programas.
 
+## Nombre del archivo (22-09-2026)
+
+Lo descargado (PNG, SVG, HTML o `.mmd`) toma el nombre que el diagrama tiene
+en la biblioteca: el título accesible, el `title` o la primera línea con
+contenido, o el que se le puso a mano. Si no dice nada («Sin título»), el tipo
+de diagrama en el idioma de la interfaz. Antes salía de la primera línea del
+código, y con una cabecera de ajustes delante el archivo se llamaba
+`init-layout-elk.png`.
+
 ## Consecuencias
 
 Un PNG a 4× de un diagrama grande puede ocupar varios megabytes. Se avisa en el
