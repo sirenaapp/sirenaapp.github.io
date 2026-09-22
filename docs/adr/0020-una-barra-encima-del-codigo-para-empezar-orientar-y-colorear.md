@@ -33,7 +33,9 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   en el código como antes (`flowchart LR` o una línea `direction`).
 - **Colores.** Un solo menú con dos secciones. «Todo el diagrama» es el color
   principal de antes (paleta de cinco colores o colores propios de relleno,
-  borde, líneas y texto). «Color del elemento donde está el cursor», solo en
+  borde, líneas, texto y, desde el 22-09-2026, fondo de los rótulos de
+  flecha, `edgeLabelBackground`, que solo se escribe si se ha tocado; el fondo
+  de un solo rótulo no lo permite Mermaid). «Color del elemento donde está el cursor», solo en
   flujo, estados, clases y bloques, toma el elemento de la línea del cursor
   (si hay varios, el que está bajo el cursor) o los de las líneas
   seleccionadas, y deja elegir qué se colorea: toda la caja, solo el texto o

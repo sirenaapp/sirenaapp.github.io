@@ -34,7 +34,8 @@ propia dirección.
   Mermaid (escritos en la cabecera del código, como todo lo demás) y, en la
   barra del editor, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
   color principal (una paleta de cinco colores, o uno propio con selector
-  independiente para el relleno, el borde, las líneas y el texto) y, en los
+  independiente para el relleno, el borde, las líneas, el texto y el fondo de
+  los rótulos de flecha) y, en los
   diagramas de
   flujo, la forma de las líneas y la distribución. Cada ajuste se escribe en el
   código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve

@@ -74,6 +74,7 @@ window.SIRENA_LANG.gl = {
   colorFill: 'Recheo',
   colorBorder: 'Bordo',
   colorLine: 'Liñas',
+  colorLabelBg: 'Fondo dos rótulos de frecha',
   colorText: 'Texto',
   colorHint: 'Ao cambiar o recheo, o bordo, as liñas e o texto axústanse sós mentres non se toquen.',
   conceptHint: '%% Mapa conceptual: cada ligazón leva un verbo, por exemplo A[Auga] -- preséntase en --> B[Tres estados]',

@@ -152,6 +152,7 @@ const el = {
   colorBorder: $('color-border'),
   colorLine: $('color-line'),
   colorText: $('color-text'),
+  colorLabelBg: $('color-label-bg'),
   typeLabel: $('type-label'),
   typeMenu: $('type-menu'),
   dirGroup: $('dir-group'),
@@ -1175,7 +1176,10 @@ function colorVariables(valor) {
       primaryColor: el.colorFill.value,
       primaryBorderColor: el.colorBorder.value,
       lineColor: el.colorLine.value,
-      primaryTextColor: el.colorText.value
+      primaryTextColor: el.colorText.value,
+      // El fondo de los rótulos de flecha solo se escribe si se ha elegido:
+      // si no, sigue el gris del tema, como en cualquier editor de Mermaid.
+      ...(coloresTocados.has('labelbg') ? { edgeLabelBackground: el.colorLabelBg.value } : {})
     };
   }
   const encontrado = COLORS.find(([nombre]) => nombre === valor);
@@ -1324,6 +1328,10 @@ function readAppearance() {
     if (variables.primaryBorderColor) el.colorBorder.value = variables.primaryBorderColor;
     if (variables.lineColor) el.colorLine.value = variables.lineColor;
     if (variables.primaryTextColor) el.colorText.value = variables.primaryTextColor;
+    if (variables.edgeLabelBackground) {
+      el.colorLabelBg.value = variables.edgeLabelBackground;
+      coloresTocados.add('labelbg');
+    }
   } else {
     el.colorSelect.value = '';
   }
@@ -1345,6 +1353,7 @@ function deriveColors() {
   if (!coloresTocados.has('border')) el.colorBorder.value = darken(el.colorFill.value, 0.45);
   if (!coloresTocados.has('line')) el.colorLine.value = darken(el.colorFill.value, 0.45);
   if (!coloresTocados.has('text')) el.colorText.value = darken(el.colorFill.value, 0.75);
+  if (!coloresTocados.has('labelbg')) el.colorLabelBg.value = el.colorFill.value;
 }
 
 /* --- Chuleta de sintaxis --- *//* --- Chuleta de sintaxis --- */
@@ -2969,7 +2978,7 @@ function setupToolbar() {
     writeAppearance();
   });
 
-  [['border', el.colorBorder], ['line', el.colorLine], ['text', el.colorText]].forEach(([clave, input]) => {
+  [['border', el.colorBorder], ['line', el.colorLine], ['text', el.colorText], ['labelbg', el.colorLabelBg]].forEach(([clave, input]) => {
     input.addEventListener('input', () => {
       coloresTocados.add(clave);
       writeAppearance();

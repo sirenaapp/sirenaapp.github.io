@@ -74,6 +74,7 @@ window.SIRENA_LANG.ca = {
   colorFill: 'Farciment',
   colorBorder: 'Vora',
   colorLine: 'Línies',
+  colorLabelBg: 'Fons dels rètols de fletxa',
   colorText: 'Text',
   colorHint: "En canviar el farciment, la vora, les línies i el text s'ajusten sols mentre no es toquin.",
   conceptHint: '%% Mapa conceptual: cada enllaç porta un verb, per exemple A[Aigua] -- es presenta en --> B[Tres estats]',

@@ -74,6 +74,7 @@ window.SIRENA_LANG.es = {
   colorFill: 'Relleno',
   colorBorder: 'Borde',
   colorLine: 'Líneas',
+  colorLabelBg: 'Fondo de los rótulos de flecha',
   colorText: 'Texto',
   colorHint: 'Al cambiar el relleno, el borde, las líneas y el texto se ajustan solos mientras no se toquen.',
   conceptHint: '%% Mapa conceptual: cada enlace lleva un verbo, por ejemplo A[Agua] -- se presenta en --> B[Tres estados]',

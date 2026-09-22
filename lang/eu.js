@@ -74,6 +74,7 @@ window.SIRENA_LANG.eu = {
   colorFill: 'Betegarria',
   colorBorder: 'Ertza',
   colorLine: 'Marrak',
+  colorLabelBg: 'Gezi-etiketen atzealdea',
   colorText: 'Testua',
   colorHint: 'Betegarria aldatzean, ertza, marrak eta testua bakarrik doitzen dira ukitzen ez diren bitartean.',
   conceptHint: '%% Kontzeptu-mapa: lotura bakoitzak aditz bat darama, adibidez A[Ura] -- egoera hauetan agertzen da --> B[Hiru egoera]',
