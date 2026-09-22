@@ -99,6 +99,11 @@ const YESNO = [['no', 'optNo'], ['yes', 'optYes']];
 const AXIS_FORMATS = [['', 'axisDefault'], ['%d/%m', 'axisDM'], ['%d/%m/%Y', 'axisDMY'], ['%d/%m/%y', 'axisDMy']];
 const TICK_INTERVALS = [['', 'tickAuto'], ['1day', 'tickDay'], ['1week', 'tickWeek'], ['2week', 'tickTwoWeeks'], ['1month', 'tickMonth']];
 const WEEKDAYS = [['sunday', 'weekSunday'], ['monday', 'weekMonday']];
+// Diagrama de sectores: anillo (donutHole), leyenda y color de cada sector
+// (pie1…pie12 de las variables del tema). Todo va en la cabecera.
+const DONUTS = [['0', 'donutNone'], ['0.3', 'donutThin'], ['0.5', 'donutMedium'], ['0.7', 'donutThick']];
+const LEGENDS = [['right', 'legendRight'], ['left', 'legendLeft'], ['top', 'legendTop'], ['bottom', 'legendBottom']];
+const coloresSectores = {};
 // Máximo de diagramas en la biblioteca. Al llegar se borran los más antiguos.
 const LIMITES = [10, 25, 50, 100];
 const LIMITE_POR_DEFECTO = 50;
@@ -208,6 +213,10 @@ const el = {
   paddingSelect: $('padding-select'),
   numberingSelect: $('numbering-select'),
   showDataSelect: $('showdata-select'),
+  pieMenu: $('pie-menu'),
+  donutSelect: $('donut-select'),
+  legendSelect: $('legend-select'),
+  pieColores: $('pie-colores'),
   calendarMenu: $('calendar-menu'),
   axisFormatSelect: $('axis-format-select'),
   axisFormatCustom: $('axis-format-custom'),
@@ -736,6 +745,8 @@ function buildAppearanceSelects() {
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
   fillSelect(el.numberingSelect, YESNO, null, 'no');
   fillSelect(el.showDataSelect, YESNO, null, 'no');
+  fillSelect(el.donutSelect, DONUTS, null, '0');
+  fillSelect(el.legendSelect, LEGENDS, null, 'right');
   fillSelect(el.axisFormatSelect, AXIS_FORMATS, null, '');
   fillSelect(el.tickIntervalSelect, TICK_INTERVALS, null, '');
   fillSelect(el.weekdaySelect, WEEKDAYS, null, 'sunday');
@@ -789,7 +800,7 @@ function updateAppearanceVisibility() {
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
     numbering: tipo === 'sequence',
-    showdata: tipo === 'pie',
+    pie: tipo === 'pie',
     calendar: tipo === 'gantt'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
@@ -1494,6 +1505,14 @@ function appearanceConfig() {
   // El fondo de los rótulos de flecha vale con cualquier tema, así que se
   // escribe aparte y solo si se ha elegido; si no, sigue el gris del tema.
   if (coloresTocados.has('labelbg')) variables.edgeLabelBackground = el.colorLabelBg.value;
+  if (diagramKind() === 'pie') {
+    Object.entries(coloresSectores).forEach(([i, valor]) => { if (valor) variables['pie' + i] = valor; });
+    if (Object.keys(coloresSectores).some((i) => coloresSectores[i]) && !config.theme) config.theme = 'base';
+    const pie = {};
+    if (el.donutSelect.value && el.donutSelect.value !== '0') pie.donutHole = Number(el.donutSelect.value);
+    if (el.legendSelect.value && el.legendSelect.value !== 'right') pie.legendPosition = el.legendSelect.value;
+    if (Object.keys(pie).length) config.pie = pie;
+  }
   if (Object.keys(variables).length) config.themeVariables = variables;
   const flowchart = {};
   const curva = el.curveSelect.value;
@@ -1660,6 +1679,56 @@ function setupEnlaces() {
   });
 }
 
+/* --- Diagrama de sectores --- */
+
+// Los sectores que hay en el código, por orden: «"Nombre" : 5».
+function sectoresDelCodigo() {
+  const nombres = [];
+  el.editor.value.split('\n').forEach((linea) => {
+    const m = /^[ \t]*"([^"]*)"[ \t]*:[ \t]*[\d.]+/.exec(linea);
+    if (m && nombres.length < 12) nombres.push(m[1]);
+  });
+  return nombres;
+}
+
+// Un selector de color por sector, con su nombre; el color que Mermaid le
+// da de serie se toma del dibujo.
+function buildPieMenu() {
+  const caja = el.pieColores;
+  caja.innerHTML = '';
+  const dibujados = [...el.canvas.querySelectorAll('svg path')].map((p) => getComputedStyle(p).fill);
+  sectoresDelCodigo().forEach((nombre, k) => {
+    const i = k + 1;
+    const fila = document.createElement('label');
+    fila.className = 'color-fila';
+    const rotulo = document.createElement('span');
+    rotulo.textContent = nombre || String(i);
+    rotulo.title = nombre;
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = coloresSectores[i] || rgbAHex(dibujados[k]) || '#cccccc';
+    input.addEventListener('input', () => {
+      // Al fijar el primer color propio Mermaid pasa al tema «base», que
+      // cambia la paleta: se fijan también los demás con el color que tenían,
+      // para que solo cambie el que se ha tocado.
+      if (!Object.keys(coloresSectores).some((j) => coloresSectores[j])) {
+        caja.querySelectorAll('input').forEach((otro, j) => { coloresSectores[j + 1] = otro.value; });
+      }
+      coloresSectores[i] = input.value;
+      $('pie-reset').hidden = false;
+      writeAppearance();
+    });
+    fila.append(rotulo, input);
+    caja.appendChild(fila);
+  });
+  $('pie-reset').hidden = !Object.keys(coloresSectores).some((i) => coloresSectores[i]);
+}
+
+function rgbAHex(rgb) {
+  const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(rgb || '');
+  return m ? '#' + [m[1], m[2], m[3]].map((v) => Number(v).toString(16).padStart(2, '0')).join('') : '';
+}
+
 /* --- Calendario del diagrama de Gantt --- */
 
 // Valor de una directiva del cuerpo (axisFormat, tickInterval, weekday…), o ''.
@@ -1746,9 +1815,15 @@ function readAppearance() {
   readShowData();
   // Si el menú del calendario está abierto mientras cambia el código, se relee.
   if (el.calendarMenu && !el.calendarMenu.hidden) readGantt();
+  if (el.pieMenu && !el.pieMenu.hidden) buildPieMenu();
   updateEditorTools();
   setSizeValue(variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16');
 
+  Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
+  for (let i = 1; i <= 12; i += 1) if (variables['pie' + i]) coloresSectores[i] = variables['pie' + i];
+  const pie = config.pie || {};
+  el.donutSelect.value = DONUTS.some(([v]) => Number(v) === Number(pie.donutHole)) ? String(pie.donutHole) : '0';
+  el.legendSelect.value = LEGENDS.some(([v]) => v === pie.legendPosition) ? pie.legendPosition : 'right';
   const primario = variables.primaryColor || '';
   const conocido = COLORS.find(([, , vars]) => vars && vars.primaryColor === primario);
   if (conocido) {
@@ -3120,7 +3195,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -4230,6 +4305,7 @@ const SUBMENUS = {
   tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   calendario: { titulo: 'calendar', icono: 'i-calendar', boton: 'btn-calendar', menu: () => el.calendarMenu, preparar: readGantt },
+  sectores: { titulo: 'pieMenu', icono: 'i-pie', boton: 'btn-pie', menu: () => el.pieMenu, preparar: buildPieMenu },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
   lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
@@ -4479,6 +4555,7 @@ function construirContextual(objeto) {
   entradaSubmenu(menu, objeto, 'tamano');
   entradaSubmenu(menu, objeto, 'motor');
   entradaSubmenu(menu, objeto, 'calendario');
+  entradaSubmenu(menu, objeto, 'sectores');
   if (!$('wrap-merge').hidden) {
     interruptorContextual(menu, t('merge'), 'i-merge', unirFlechasPuesto(), () => {
       alternarUnirFlechas();
@@ -5328,6 +5405,16 @@ function setupToolbar() {
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();
     render();
+  });
+  $('btn-pie').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.pieMenu, $('btn-pie'), buildPieMenu);
+  });
+  [el.donutSelect, el.legendSelect].forEach((select) => select.addEventListener('change', () => writeAppearance()));
+  $('pie-reset').addEventListener('click', () => {
+    Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
+    writeAppearance();
+    buildPieMenu();
   });
   $('btn-calendar').addEventListener('click', (event) => {
     event.stopPropagation();

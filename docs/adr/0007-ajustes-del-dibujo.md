@@ -52,6 +52,23 @@ Se deja partir ya en el elemento de medida, con una regla de CSS, y con eso
 la caja con fórmula sale al mismo ancho que las demás (482 frente a 813 a
 450 píxeles).
 
+## Diagrama de sectores (22-09-2026)
+
+El botón que solo mostraba los valores pasa a ser un menú «Sectores» con
+cuatro cosas: mostrar los valores (que sigue escribiéndose en el cuerpo, `pie
+showData`), el anillo (`pie.donutHole`: sin anillo, fino 0,3, medio 0,5,
+grueso 0,7), la posición de la leyenda (`pie.legendPosition`: derecha, que es
+la de serie, izquierda, arriba o abajo) y el color de cada sector, con un
+selector por sector leído del código (`"Nombre" : 5`, hasta doce), escrito
+como `pie1…pie12` en las variables del tema. Es el punto 4 del inventario de
+lo que Mermaid permite.
+
+Los colores de sector solo actúan con el tema `base`, y ese tema cambia la
+paleta de serie: al fijar el primer color propio se fijan también los demás
+con el color que tenían en el dibujo, para que solo cambie el que se ha
+tocado, y un botón devuelve los de serie. El menú se presta al botón derecho
+sobre el fondo, como los demás.
+
 ## Consecuencias
 
 Al elegir un color principal, el dibujo pasa al tema base de Mermaid, porque es
