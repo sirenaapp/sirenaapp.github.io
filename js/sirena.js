@@ -1719,7 +1719,9 @@ function readAccessibility() {
 function writeAccessibility(titulo, descr) {
   const lineas = el.editor.value.split('\n')
     .filter((linea) => !/^[ \t]*(?:%%[ \t]*)?acc(Title|Descr)[ \t]*:/.test(linea));
-  const primera = lineas.findIndex((linea) => linea.trim());
+  // Van justo debajo de la línea que define el tipo, no de la cabecera
+  // %%{init}%% ni de un comentario, que no cuentan para Mermaid.
+  const primera = lineas.findIndex((linea) => linea.trim() && !/^\s*%%/.test(linea));
   if (primera === -1) return;
   const sangria = (lineas[primera + 1] || '').match(/^[ \t]*/)[0] || '    ';
   const prefijo = accEsComentario() ? '%% ' : '';
