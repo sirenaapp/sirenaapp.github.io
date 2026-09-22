@@ -112,7 +112,6 @@
       <button type="button" id="btn-lang" class="tb" data-i18n-title="language"><svg><use href="#i-lang"></use></svg></button>
       <div class="menu" id="lang-menu" hidden></div>
     </div>
-    <button type="button" id="btn-help" class="tb" data-i18n-title="help"><svg><use href="#i-help"></use></svg></button>
   </div>
 </header>
 
@@ -175,7 +174,14 @@
         <button type="button" id="btn-stroke" class="tb" data-i18n-title="strokeMenu"><svg><use href="#i-brush"></use></svg></button>
         <div class="menu menu-izq menu-ajustes" id="stroke-menu" hidden>
           <label class="ajuste"><svg aria-hidden="true"><use href="#i-brush"></use></svg><span data-i18n="look"></span><select id="look-select"></select></label>
-          <label class="ajuste"><svg aria-hidden="true"><use href="#i-text-size"></use></svg><span data-i18n="fontSize"></span><select id="size-select"></select></label>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button type="button" id="btn-size" class="tb" data-i18n-title="fontSize"><svg><use href="#i-text-size"></use></svg></button>
+        <div class="menu menu-izq menu-opciones menu-tamano" id="size-menu" hidden>
+          <p class="menu-titulo" data-i18n="fontSize"></p>
+          <div id="size-options"></div>
+          <label class="tamano-propio"><span data-i18n="sizeCustom"></span><input type="number" id="size-custom" min="8" max="72" step="1" inputmode="numeric"><span>px</span></label>
         </div>
       </div>
       <span class="tb-sep" id="sep-ajustes" hidden></span>
@@ -219,11 +225,13 @@
       </div>
       <span class="tb-sep"></span>
       <button type="button" id="btn-a11y" class="tb" data-i18n-title="a11y"><svg><use href="#i-a11y"></use></svg></button>
+      <button type="button" id="btn-help" class="tb" data-i18n-title="help"><svg><use href="#i-help"></use></svg></button>
       <span class="tb-sep tb-fin"></span>
       <button type="button" id="btn-undo" class="tb" data-i18n-title="undo" disabled><svg><use href="#i-undo"></use></svg></button>
       <button type="button" id="btn-redo" class="tb" data-i18n-title="redo" disabled><svg><use href="#i-redo"></use></svg></button>
       <div hidden>
         <select id="engine-select"></select>
+        <select id="size-select"></select>
         <select id="spacing-select"></select>
         <select id="padding-select"></select>
         <select id="merge-select"></select>

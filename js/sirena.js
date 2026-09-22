@@ -132,6 +132,9 @@ const el = {
   arrowWidthSelect: $('arrow-width-select'),
   borderWidthSelect: $('border-width-select'),
   linesMenu: $('lines-menu'),
+  sizeMenu: $('size-menu'),
+  sizeOptions: $('size-options'),
+  sizeCustom: $('size-custom'),
   lineTargetBox: $('line-target-box'),
   lineTarget: $('line-target'),
   linePartes: $('line-partes'),
@@ -614,6 +617,34 @@ function fillSelect(select, opciones, guardado, predeterminado) {
   // Una opción cuyo texto es un número se deja tal cual; las demás se traducen.
   opciones.forEach(([valor, clave]) => select.appendChild(new Option(/^\d+$/.test(clave) ? clave : t(clave), valor)));
   select.value = opciones.some(([v]) => v === actual) ? actual : porDefecto;
+}
+
+// El tamaño del texto puede ser cualquier número de píxeles: si no está entre
+// los de la lista, se añade como opción para que el selector lo conserve.
+function setSizeValue(px) {
+  const valor = String(px);
+  if (![...el.sizeSelect.options].some((o) => o.value === valor)) {
+    el.sizeSelect.appendChild(new Option(valor, valor));
+  }
+  el.sizeSelect.value = valor;
+}
+
+function buildSizeMenu() {
+  el.sizeOptions.innerHTML = '';
+  const actual = el.sizeSelect.value || '16';
+  SIZES.forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = t(clave) + ' (' + valor + ' px)';
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      el.sizeMenu.hidden = true;
+      setSizeValue(valor);
+      el.sizeSelect.dispatchEvent(new Event('change'));
+    });
+    el.sizeOptions.appendChild(boton);
+  });
+  el.sizeCustom.value = actual;
 }
 
 function buildAppearanceSelects() {
@@ -1279,7 +1310,7 @@ function readAppearance() {
   el.numberingSelect.value = config.sequence && config.sequence.showSequenceNumbers ? 'yes' : 'no';
   readShowData();
   updateEditorTools();
-  el.sizeSelect.value = variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16';
+  setSizeValue(variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16');
 
   const primario = variables.primaryColor || '';
   const conocido = COLORS.find(([, , vars]) => vars && vars.primaryColor === primario);
@@ -1833,7 +1864,7 @@ function buildNodeColorSection() {
   });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -1935,6 +1966,21 @@ function setupEditorTools() {
   $('btn-engine').addEventListener('click', (event) => {
     event.stopPropagation();
     alternarMenuEditor(el.engineMenu, $('btn-engine'), buildEngineMenu);
+  });
+  $('btn-size').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.sizeMenu, $('btn-size'), buildSizeMenu);
+  });
+  const aplicarTamano = () => {
+    const n = Math.round(Number(el.sizeCustom.value));
+    if (!n || n < 8 || n > 72) return;
+    setSizeValue(n);
+    el.sizeSelect.dispatchEvent(new Event('change'));
+    buildSizeMenu();
+  };
+  el.sizeCustom.addEventListener('change', aplicarTamano);
+  el.sizeCustom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); aplicarTamano(); el.sizeMenu.hidden = true; }
   });
   $('btn-lines').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2441,7 +2487,7 @@ function setupSplitter() {
   el.splitter.addEventListener('pointercancel', stop);
 
   el.splitter.addEventListener('keydown', (event) => {
-    const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--editor-width')) || 38;
+    const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--editor-width')) || 44;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       const next = Math.min(75, Math.max(15, current + (event.key === 'ArrowLeft' ? -2 : 2)));

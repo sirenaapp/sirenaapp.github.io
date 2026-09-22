@@ -52,7 +52,10 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   aparición desde 0 y contando las que suman «&» y las encadenadas, que es lo
   que más cuesta hacer a mano. El fondo del rótulo de una sola flecha no se
   puede cambiar en Mermaid; el de todos es la variable `edgeLabelBackground`.
-- **Trazo y texto.** El trazo y el tamaño del texto, en un botón.
+- **Trazo** y **Tamaño del texto**, cada uno en su botón. El del tamaño ofrece
+  los cuatro de la lista y un campo para escribir cualquier número de píxeles
+  (de 8 a 72), a petición del autor; el valor libre se conserva en el selector
+  y se lee de vuelta de la cabecera.
 - **Motor de distribución.** Un botón que lista todos los motores que trae
   Mermaid 12: dagre y los algoritmos de ELK (por capas, árbol, radial, por
   tensión, por fuerzas, sin solapamientos, en cajas, empaquetado y por

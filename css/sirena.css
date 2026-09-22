@@ -281,12 +281,41 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .editor-tools .tb:disabled:hover { background: transparent; border-color: transparent; }
 
 .tb-texto { gap: 6px; padding: 0 9px 0 7px; font-size: 13px; white-space: nowrap; }
-.tb-texto span { max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+.tb-texto span { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+/* En pantallas medianas el nombre del tipo se queda en el rótulo emergente,
+   para que la barra siga cabiendo en una línea. */
+@media (max-width: 1200px) and (min-width: 901px) {
+  .tb-texto span { display: none; }
+  .tb-texto { padding: 0 5px; }
+}
 
 .menu-direccion { min-width: 200px; white-space: nowrap; }
 .menu-opciones { min-width: 160px; white-space: nowrap; }
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
+.menu-tamano { min-width: 200px; }
+.tamano-propio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 10px 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.tamano-propio input {
+  width: 58px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: right;
+}
 .menu-motores button[aria-current="true"] strong { color: var(--accent); }
 .modal-aviso { color: var(--accent); }
 .menu-direccion button { align-items: center; }
@@ -396,7 +425,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   overflow: hidden;
 }
 
-.pane-editor { flex: 0 0 var(--editor-width, 38%); }
+.pane-editor { flex: 0 0 var(--editor-width, 44%); }
 .pane-preview { flex: 1; }
 
 .editor-wrap {
