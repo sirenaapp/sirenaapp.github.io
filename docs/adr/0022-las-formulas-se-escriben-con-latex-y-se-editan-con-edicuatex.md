@@ -40,6 +40,12 @@ El botón aparece solo en los tipos que las dibujan, comprobados uno a uno:
 flujo (y mapa conceptual), estados, clases, secuencia, bloques, kanban y
 entidad-relación. En los demás el `$$…$$` saldría tal cual.
 
+Con los rótulos en HTML, Mermaid 12 deja el hueco del texto en 120 píxeles
+fijos aunque la caja sea mayor, y los textos largos salen cortados (medido el
+22-09-2026, también fuera de Sirena, así que es cosa suya). El tamaño de la
+caja sí lo calcula bien, de modo que después de dibujar se estira cada rótulo
+hasta el ancho de su caja, menos un margen, y se vuelve a centrar.
+
 ## Alternativas descartadas
 
 - **Guardar una copia de Edicuatex dentro del repositorio.** Descartada: pesa

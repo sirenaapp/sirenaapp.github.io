@@ -954,6 +954,35 @@ function anchoDeMedida() {
   document.documentElement.style.setProperty('--ancho-medida', (ancho > 200 ? ancho : 800) + 'px');
 }
 
+// Con los rótulos en HTML (los diagramas con fórmulas), Mermaid 12 deja el
+// hueco del texto en 120 píxeles fijos aunque la caja sea mayor, y el texto
+// se corta. El tamaño de la caja sí lo calcula bien, así que el rótulo se
+// estira hasta ahí y se vuelve a centrar.
+function ajustarRotulosHtml() {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return;
+  let ajustado = false;
+  svg.querySelectorAll('g.node foreignObject, g[class*="node"] foreignObject').forEach((hueco) => {
+    const nodo = hueco.closest('g.node') || hueco.parentElement;
+    const forma = nodo && nodo.querySelector('rect, polygon, ellipse, circle, path');
+    const dentro = hueco.firstElementChild;
+    if (!forma || !dentro || !forma.getBBox) return;
+    const caja = forma.getBBox();
+    const ancho = parseFloat(hueco.getAttribute('width')) || 0;
+    // Se deja un margen para que el texto no toque el borde.
+    const necesario = Math.floor(caja.width - 12);
+    if (!necesario || necesario <= ancho + 1) return;
+    const x = parseFloat(hueco.getAttribute('x')) || 0;
+    hueco.setAttribute('width', necesario);
+    hueco.setAttribute('x', x - (necesario - ancho) / 2);
+    dentro.style.width = necesario + 'px';
+    dentro.style.maxWidth = necesario + 'px';
+    ajustado = true;
+  });
+  if (!ajustado) return;
+  currentSvg = svg.outerHTML;
+}
+
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
@@ -979,6 +1008,11 @@ async function renderOnce() {
     if (token !== renderToken) return;
     currentSvg = opaqueEdgeLabels(svg, id);
     el.canvas.innerHTML = currentSvg;
+    // El ancho del texto no es el definitivo hasta que el navegador compone
+    // la página, así que el arreglo del rótulo espera al siguiente dibujado.
+    if (currentSvg.includes('<foreignObject')) {
+      requestAnimationFrame(() => requestAnimationFrame(ajustarRotulosHtml));
+    }
     ocultarAnclas();
     hideEmpty();
     hideError();
