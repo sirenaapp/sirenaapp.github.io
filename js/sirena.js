@@ -81,6 +81,14 @@ const CON_MOTOR = ['flowchart', 'state', 'class', 'er'];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 // Grosores en píxeles; el vacío es el de serie de Mermaid (2 en flechas, 1 en bordes).
 const ARROW_WIDTHS = [['1', 'widthThin'], ['', 'widthNormal'], ['3', 'widthThick'], ['5', 'widthXThick']];
+// Tipo de línea y puntas de las flechas de flujo. No son ajustes de Mermaid:
+// se escriben en cada flecha (-->, -.->, ==>, ~~~, ---, <-->, --o, --x).
+const LINE_TYPES = [['normal', 'lineNormal'], ['punteada', 'lineDotted'], ['discontinua', 'lineDashed'], ['rayapunto', 'lineDashDot'], ['gruesa', 'lineThick'], ['invisible', 'lineInvisible']];
+// Dos trazos que Mermaid no tiene en su sintaxis: se escriben como estilo
+// (linkStyle N stroke-dasharray:…) sobre una flecha continua.
+const TRAZOS = { discontinua: '8 4', rayapunto: '10 3 2 3' };
+// Mermaid solo dibuja la punta inicial cuando es igual a la final (<-->, o--o, x--x).
+const ARROW_HEADS = [['ninguna', 'headNone'], ['flecha', 'headArrow'], ['circulo', 'headCircle'], ['cruz', 'headCross'], ['doble', 'headBoth'], ['circulo2', 'headCircleBoth'], ['cruz2', 'headCrossBoth']];
 const BORDER_WIDTHS = [['', 'widthNormal'], ['2', 'widthThick'], ['4', 'widthXThick']];
 const DIRECTIONS = [['TD', 'dirTD'], ['BT', 'dirBT'], ['LR', 'dirLR'], ['RL', 'dirRL']];
 const PADDINGS = [['8', 'padS'], ['20', 'padM'], ['40', 'padL']];
@@ -134,6 +142,11 @@ const el = {
   strokeMenu: $('stroke-menu'),
   engineSelect: $('engine-select'),
   arrowWidthSelect: $('arrow-width-select'),
+  lineTypeAll: $('line-type-all'),
+  arrowHeadAll: $('arrow-head-all'),
+  lineArrowType: $('line-arrow-type'),
+  lineTypes: $('line-types'),
+  arrowHeads: $('arrow-heads'),
   borderWidthSelect: $('border-width-select'),
   arrowWidthCustom: $('arrow-width-custom'),
   borderWidthCustom: $('border-width-custom'),
@@ -1556,6 +1569,7 @@ function readAppearance() {
   el.curveSelect.value = CURVES.some(([v]) => v === flujo.curve) ? flujo.curve : 'basis';
   el.mergeSelect.value = config.elk && config.elk.mergeEdges ? 'yes' : 'no';
   readLineWidths();
+  readArrowTypes();
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   anchoCajas = String(flujo.wrappingWidth || 120);
@@ -1926,14 +1940,14 @@ function targetNodes() {
 // Flechas de un diagrama de flujo, numeradas como las cuenta Mermaid para
 // linkStyle: por orden de aparición, empezando en 0. Una línea con «&» o con
 // varias flechas encadenadas suma varias.
-const ENLACE_RE = /<?-{2,}[>xo]?|<?-\.+-?[>xo]?|<?={2,}[>xo]?|~{3,}/g;
+const ENLACE_RE = /(?:(?<=\s)[ox]|<)?-{2,}[>xo]?|(?:(?<=\s)[ox]|<)?-\.+-?[>xo]?|(?:(?<=\s)[ox]|<)?={2,}[>xo]?|~{3,}/g;
 
 function enlacesDeLinea(linea) {
   const limpia = linea.replace(/%%.*$/, '').trim();
   if (!limpia || /^(flowchart|graph|subgraph|end|direction|style|classDef|class|linkStyle|click|accTitle|accDescr)\b/.test(limpia)) return 0;
   const sinTextos = limpia
     .replace(/"[^"]*"/g, '""')
-    .replace(/--\s[^-]*?\s-->/g, '-->').replace(/-\.\s[^.]*?\s\.->/g, '-.->').replace(/==\s[^=]*?\s==>/g, '==>')
+    .replace(/--\s[^-]*?\s(--[>xo]?)/g, '$1').replace(/-\.\s[^.]*?\s(\.-[>xo]?)/g, '-$1').replace(/==\s[^=]*?\s(==[>xo]?)/g, '$1')
     .replace(/\|[^|]*\|/g, '')
     .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|(?<=[A-Za-z0-9_])>[^\]]*\]/g, '');
   const segmentos = sinTextos.split(ENLACE_RE);
@@ -1964,11 +1978,13 @@ function enmascararLinea(linea) {
 
 // Las formas de escribir una flecha, con su rótulo si lo lleva. Las que llevan
 // el texto en medio van primero, para que se reconozcan enteras.
+// Una punta inicial (<, o, x) solo cuenta tras un espacio: «Foo-->» es la caja Foo.
+const PUNTA_INICIAL = '(?:(?<=\\s)[ox]|<)?';
 const FLECHA_RE = new RegExp([
-  '-{2,}\\s[^|]*?\\s-{2,}[>xo]?',
-  '={2,}\\s[^|]*?\\s={2,}[>xo]?',
-  '-\\.\\s[^|]*?\\s\\.-{1,}[>xo]?',
-  '(?:<?-{2,}[>xo]?|<?={2,}[>xo]?|<?-\\.+-{1,}[>xo]?|~{3,})(?:\\|[^|]*\\|)?'
+  PUNTA_INICIAL + '-{2,}\\s[^|]*?\\s-{2,}[>xo]?',
+  PUNTA_INICIAL + '={2,}\\s[^|]*?\\s={2,}[>xo]?',
+  PUNTA_INICIAL + '-\\.\\s[^|]*?\\s\\.-{1,}[>xo]?',
+  '(?:' + PUNTA_INICIAL + '-{2,}[>xo]?|' + PUNTA_INICIAL + '={2,}[>xo]?|' + PUNTA_INICIAL + '-\\.+-{1,}[>xo]?|~{3,})(?:\\|[^|]*\\|)?'
 ].join('|'), 'g');
 
 // Devuelve las flechas de una línea (con su posición y su rótulo) y los trozos
@@ -1993,7 +2009,7 @@ function trocearLinea(linea) {
 function rotuloDeFlecha(flecha) {
   const barras = /\|([^|]*)\|/.exec(flecha);
   if (barras) return barras[1];
-  const medio = /^(?:-{2,}|={2,}|-\.)\s([\s\S]*?)\s(?:-{2,}|={2,}|\.-)/.exec(flecha);
+  const medio = /^[<ox]?(?:-{2,}|={2,}|-\.)\s([\s\S]*?)\s(?:-{2,}|={2,}|\.-)/.exec(flecha);
   return medio ? medio[1] : '';
 }
 
@@ -2005,12 +2021,13 @@ function flechaConRotulo(flecha, texto) {
     : texto.trim();
   const barras = /^(.*?)\|[^|]*\|(.*)$/.exec(flecha);
   if (barras) return limpio ? barras[1] + '|' + limpio + '|' + barras[2] : barras[1] + barras[2];
-  const medio = /^(-{2,}|={2,}|-\.)\s[\s\S]*?\s(-{2,}[>xo]?|={2,}[>xo]?|\.-{1,}[>xo]?)$/.exec(flecha);
+  const medio = /^([<ox]?)(-{2,}|={2,}|-\.)\s[\s\S]*?\s(-{2,}[>xo]?|={2,}[>xo]?|\.-{1,}[>xo]?)$/.exec(flecha);
   if (medio) {
-    if (limpio) return medio[1] + ' ' + limpio + ' ' + medio[2];
+    const [, pref, izq, der] = medio;
+    if (limpio) return pref + izq + ' ' + limpio + ' ' + der;
     // Sin rótulo, la flecha vuelve a su forma corta.
-    const corta = { '-.': '-.->' };
-    return corta[medio[1]] || (medio[1] + (medio[2].slice(-1).match(/[>xo]/) ? medio[2].slice(-1) : ''));
+    const fin = /[>xo]$/.test(der) ? der.slice(-1) : '';
+    return pref + (izq === '-.' ? '-.-' : izq + (fin ? '' : izq[0])) + fin;
   }
   return limpio ? flecha + '|' + limpio + '|' : flecha;
 }
@@ -2149,7 +2166,13 @@ function borrarNodo(id) {
 
 // Deja el código en el editor y lo vuelve a dibujar.
 function aplicarCodigo(lineas) {
+  // El cursor se queda en la misma línea: quien cambia algo de «la flecha
+  // del cursor» espera seguir sobre ella al volver a abrir el menú.
+  const antes = el.editor.value.slice(0, el.editor.selectionStart).split('\n').length - 1;
   el.editor.value = lineas.join('\n') + '\n';
+  const fila = Math.min(antes, lineas.length - 1);
+  const inicio = lineas.slice(0, fila).reduce((n, l) => n + l.length + 1, 0);
+  el.editor.setSelectionRange(inicio, inicio);
   codigoPrevio = el.editor.value;
   updateStatus();
   renderGutter();
@@ -2596,6 +2619,232 @@ function buildLineTargetSection() {
     el.linesMenu.hidden = true;
     escribirGrosor(lineaParte, ids, flechas, valor);
   });
+  // Tipo de línea y puntas, solo para la flecha del cursor.
+  const conFlecha = lineaParte === 'flecha' && flechas.length > 0;
+  el.lineArrowType.hidden = !conFlecha;
+  el.lineTypes.innerHTML = '';
+  el.arrowHeads.innerHTML = '';
+  if (conFlecha) {
+    const tipo = tipoDeFlecha(flechas[0]);
+    botonesDeFlecha(el.lineTypes, 'linea', tipo.linea, (valor) => { el.linesMenu.hidden = true; aplicarTipoFlecha(flechas, { linea: valor }, false); });
+    botonesDeFlecha(el.arrowHeads, 'puntas', tipo.puntas, (valor) => { el.linesMenu.hidden = true; aplicarTipoFlecha(flechas, { puntas: valor }, false); });
+  }
+}
+
+// Dibujo de una flecha con un tipo de línea o de puntas, para los botones.
+function dibujoDeFlecha(campo, valor) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 40 16');
+  svg.setAttribute('aria-hidden', 'true');
+  const add = (tag, attrs) => { const e = document.createElementNS(ns, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); svg.appendChild(e); return e; };
+  const linea = campo === 'linea' ? valor : 'normal';
+  const puntas = campo === 'puntas' ? valor : 'flecha';
+  const doble = ['doble', 'circulo2', 'cruz2'].includes(puntas);
+  const x1 = doble ? 9 : 3;
+  const x2 = puntas === 'ninguna' ? 37 : 31;
+  const trazo = { x1, y1: 8, x2, y2: 8 };
+  if (linea === 'punteada') trazo['stroke-dasharray'] = '2 3';
+  if (linea === 'discontinua') trazo['stroke-dasharray'] = '6 3';
+  if (linea === 'rayapunto') trazo['stroke-dasharray'] = '7 2 2 2';
+  if (linea === 'gruesa') trazo['stroke-width'] = 4;
+  add('line', trazo);
+  if (puntas === 'flecha' || puntas === 'doble') add('path', { d: 'M31 3l6 5-6 5z', class: 'relleno' });
+  if (puntas === 'doble') add('path', { d: 'M9 3l-6 5 6 5z', class: 'relleno' });
+  if (puntas === 'circulo' || puntas === 'circulo2') add('circle', { cx: 34, cy: 8, r: 3, class: 'relleno' });
+  if (puntas === 'circulo2') add('circle', { cx: 6, cy: 8, r: 3, class: 'relleno' });
+  if (puntas === 'cruz' || puntas === 'cruz2') { add('line', { x1: 31, y1: 5, x2: 37, y2: 11 }); add('line', { x1: 37, y1: 5, x2: 31, y2: 11 }); }
+  if (puntas === 'cruz2') { add('line', { x1: 3, y1: 5, x2: 9, y2: 11 }); add('line', { x1: 9, y1: 5, x2: 3, y2: 11 }); }
+  return svg;
+}
+
+// El valor actual, dibujado, en la fila que pliega la lista.
+function pintarActual(idLista, campo, valor) {
+  const sitio = $(idLista + '-actual');
+  if (!sitio) return;
+  sitio.innerHTML = '';
+  if (campo === 'linea' && valor === 'invisible') sitio.textContent = t('lineInvisible');
+  else sitio.appendChild(dibujoDeFlecha(campo, valor));
+}
+
+// Pliega todas las listas del menú de líneas.
+function plegarFlechas() {
+  el.linesMenu.querySelectorAll('.pliegue').forEach((boton) => {
+    boton.setAttribute('aria-expanded', 'false');
+    const lista = $(boton.dataset.pliegue);
+    if (lista) lista.hidden = true;
+  });
+}
+
+// Lista de botones, uno por tipo de línea o de puntas, cada uno con su dibujo
+// y su nombre.
+function botonesDeFlecha(caja, campo, actual, alElegir) {
+  caja.innerHTML = '';
+  pintarActual(caja.id, campo, actual);
+  (campo === 'linea' ? LINE_TYPES : ARROW_HEADS).forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.title = t(clave);
+    boton.setAttribute('aria-label', t(clave));
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+    // Cada fila lleva el dibujo y el nombre; la invisible, solo el nombre.
+    const dibujo = campo === 'linea' && valor === 'invisible'
+      ? document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      : dibujoDeFlecha(campo, valor);
+    const nombre = document.createElement('span');
+    nombre.textContent = t(clave);
+    boton.append(dibujo, nombre);
+    boton.addEventListener('click', () => alElegir(valor));
+    caja.appendChild(boton);
+  });
+}
+
+/* --- Tipo de línea y puntas de las flechas --- */
+
+// Lo que dice una flecha escrita: línea, puntas, guiones de más (longitud),
+// rótulo y si el rótulo va en medio (-- Sí -->) o entre barras (-->|Sí|).
+function analizarFlecha(f) {
+  const texto = rotuloDeFlecha(f);
+  const enBarras = /\|[^|]*\|/.test(f);
+  const cuerpo = f.replace(/\|[^|]*\|/, '');
+  const medio = /^[<ox]?(?:-{2,}|={2,}|-\.)\s[\s\S]*?\s((?:-{2,}|={2,}|\.-{1,})[>xo]?)$/.exec(cuerpo);
+  const derecha = medio ? medio[1] : cuerpo.replace(/^[<ox]/, '');
+  const inicio = /^[<ox]/.test(cuerpo) ? cuerpo[0] : '';
+  const fin = /[>xo]$/.test(derecha) ? derecha.slice(-1) : '';
+  let linea = 'normal';
+  if (cuerpo.includes('~')) linea = 'invisible';
+  else if (cuerpo.includes('=')) linea = 'gruesa';
+  else if (cuerpo.includes('.')) linea = 'punteada';
+  let puntas = 'ninguna';
+  if (fin === '>') puntas = inicio === '<' ? 'doble' : 'flecha';
+  else if (fin === 'o') puntas = inicio === 'o' ? 'circulo2' : 'circulo';
+  else if (fin === 'x') puntas = inicio === 'x' ? 'cruz2' : 'cruz';
+  let extra = 0;
+  if (linea === 'punteada') extra = (derecha.match(/\./g) || []).length - 1;
+  else if (linea === 'invisible') extra = (cuerpo.match(/~/g) || []).length - 3;
+  else extra = (derecha.match(/[-=]/g) || []).length - (fin ? 2 : 3);
+  return { linea, puntas, extra: Math.max(0, extra), texto, enMedio: Boolean(medio) && !enBarras };
+}
+
+// La flecha escrita a partir de sus partes.
+function escribirFlecha(a) {
+  const extra = a.extra || 0;
+  if (a.linea === 'invisible') return '~~~' + '~'.repeat(extra);
+  const ini = { doble: '<', circulo2: 'o', cruz2: 'x' }[a.puntas] || '';
+  const fin = { flecha: '>', doble: '>', circulo: 'o', circulo2: 'o', cruz: 'x', cruz2: 'x' }[a.puntas] || '';
+  const texto = (a.texto || '').trim();
+  // El rótulo en medio se conserva en la línea continua (también con punta
+  // inicial, comprobado); en las demás con punta inicial, o en la punteada
+  // con puntos de más, va entre barras.
+  const enMedio = texto && a.enMedio && (!ini || a.linea === 'normal') && !(a.linea === 'punteada' && extra);
+  let izq;
+  let der;
+  if (a.linea === 'gruesa') { izq = '=='; der = '='.repeat((fin ? 2 : 3) + extra) + fin; }
+  else if (a.linea === 'punteada') { izq = '-.'; der = (enMedio ? '.' : '-.' + '.'.repeat(extra)) + '-' + fin; }
+  else { izq = '--'; der = '-'.repeat((fin ? 2 : 3) + extra) + fin; }
+  if (enMedio) return `${izq} ${texto} ${der}`;
+  const base = ini + der;
+  return texto ? `${base}|${texto}|` : base;
+}
+
+// El tipo general de flecha es el que se dio a todas la última vez. Queda
+// apuntado en el código como comentario, igual que la forma general.
+const FLECHA_GENERAL_RE = /^[ \t]*%%[ \t]*flechaGeneral[ \t]*:[ \t]*(\w+)[ \t]+(\w+)[ \t]*$/m;
+
+function flechaGeneral() {
+  const m = FLECHA_GENERAL_RE.exec(el.editor.value);
+  const linea = m && LINE_TYPES.some(([v]) => v === m[1]) ? m[1] : 'normal';
+  const puntas = m && ARROW_HEADS.some(([v]) => v === m[2]) ? m[2] : 'flecha';
+  return { linea, puntas };
+}
+
+function escribirFlechaGeneral(lineas, tipo) {
+  const i = lineas.findIndex((l) => FLECHA_GENERAL_RE.test(l));
+  if (i >= 0) lineas.splice(i, 1);
+  if (tipo.linea === 'normal' && tipo.puntas === 'flecha') return;
+  let pos = lineas.findIndex((l) => l.trim() && !/^\s*%%/.test(l)) + 1;
+  while (pos < lineas.length && /^\s*(?:%%\s*)?(acc(Title|Descr)\s*:|formaGeneral\s*:)/.test(lineas[pos])) pos += 1;
+  lineas.splice(pos, 0, `${sangriaDelCodigo(lineas)}%% flechaGeneral: ${tipo.linea} ${tipo.puntas}`);
+}
+
+// Línea y puntas de una flecha por su índice.
+function tipoDeFlecha(indice) {
+  const filas = lineasConCuenta(el.editor.value);
+  const fila = filas.find(({ desde, n }) => n && indice >= desde && indice < desde + n);
+  if (!fila) return { linea: 'normal', puntas: 'flecha' };
+  const { flechas } = trocearLinea(fila.linea);
+  const f = flechas[indice - fila.desde];
+  const a = f ? analizarFlecha(f.texto) : { linea: 'normal', puntas: 'flecha' };
+  const trazo = getPropLine('linkStyle ' + indice, 'stroke-dasharray') || getPropLine('linkStyle default', 'stroke-dasharray');
+  const porTrazo = lineaDeTrazo(trazo);
+  return porTrazo ? { ...a, linea: porTrazo } : a;
+}
+
+// Qué tipo de línea es un stroke-dasharray, o null si no cambia la sintaxis.
+function lineaDeTrazo(valor) {
+  const v = (valor || '').trim().replace(/\s+/g, ' ');
+  if (!v || v === '0') return null;
+  if (v === '3') return 'punteada';
+  return Object.keys(TRAZOS).find((k) => TRAZOS[k] === v) || 'discontinua';
+}
+
+// Cambia la línea o las puntas de unas flechas. Con «todas» cambia las que
+// siguen con el valor general y apunta el nuevo, respetando las que se
+// cambiaron una a una.
+function aplicarTipoFlecha(indices, cambios, todas) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const general = flechaGeneral();
+  const elegidas = new Set(indices);
+  const tocadas = [];
+  let cuenta = 0;
+  for (let i = 0; i < lineas.length; i += 1) {
+    const n = enlacesDeLinea(lineas[i]);
+    if (!n) continue;
+    const { flechas, trozos } = trocearLinea(lineas[i]);
+    let tocada = false;
+    const nuevas = flechas.map((f, k) => {
+      const indice = cuenta + k;
+      const a = analizarFlecha(f.texto);
+      // Lo que la flecha es ahora, contando el trazo puesto por estilo.
+      const propio = lineaDeTrazo(getPropLine('linkStyle ' + indice, 'stroke-dasharray'));
+      const efectiva = { ...a, linea: propio || (TRAZOS[general.linea] && a.linea === 'normal' && !getPropLine('linkStyle ' + indice, 'stroke-dasharray') ? general.linea : a.linea) };
+      const toca = todas
+        ? Object.keys(cambios).every((clave) => efectiva[clave] === general[clave])
+        : elegidas.has(indice);
+      if (!toca) return f.texto;
+      tocada = true;
+      tocadas.push(indice);
+      // Un trazo por estilo va sobre una flecha continua.
+      const nueva = { ...a, ...cambios };
+      if (TRAZOS[nueva.linea]) nueva.linea = 'normal';
+      return escribirFlecha(nueva);
+    });
+    if (tocada) lineas[i] = (lineas[i].match(/^[ \t]*/) || [''])[0] + rehacerLinea(trozos, nuevas, '').trim();
+    cuenta += n;
+  }
+  if ('linea' in cambios) {
+    const trazo = TRAZOS[cambios.linea] || null;
+    if (todas) {
+      setPropLine(lineas, 'linkStyle default', 'stroke-dasharray', trazo, sangria);
+      tocadas.forEach((indice) => setPropLine(lineas, 'linkStyle ' + indice, 'stroke-dasharray', null, sangria));
+    } else {
+      // Si el general lleva trazo, la flecha que vuelve a la sintaxis lo
+      // tiene que anular a mano (0 continua, 3 punteada).
+      const generalConTrazo = Boolean(TRAZOS[general.linea]);
+      const anula = cambios.linea === 'punteada' ? '3' : '0';
+      tocadas.forEach((indice) => setPropLine(lineas, 'linkStyle ' + indice, 'stroke-dasharray', trazo || (generalConTrazo ? anula : null), sangria));
+    }
+  }
+  if (todas) escribirFlechaGeneral(lineas, { ...general, ...cambios });
+  aplicarCodigo(lineas);
+}
+
+function readArrowTypes() {
+  plegarFlechas();
+  const general = flechaGeneral();
+  botonesDeFlecha(el.lineTypeAll, 'linea', general.linea, (valor) => { el.linesMenu.hidden = true; cerrarContextual(); aplicarTipoFlecha([], { linea: valor }, true); });
+  botonesDeFlecha(el.arrowHeadAll, 'puntas', general.puntas, (valor) => { el.linesMenu.hidden = true; cerrarContextual(); aplicarTipoFlecha([], { puntas: valor }, true); });
 }
 
 // Escribe el grosor de la flecha o del borde elegidos.
@@ -2951,6 +3200,19 @@ function setupEditorTools() {
   [el.arrowWidthSelect, el.borderWidthSelect].forEach((select) => {
     select.addEventListener('change', () => writeLineWidths());
   });
+  // Los pliegues del menú de líneas: uno abierto como mucho.
+  el.linesMenu.addEventListener('click', (event) => {
+    const boton = event.target.closest('.pliegue');
+    if (!boton) return;
+    event.stopPropagation();
+    const abierto = boton.getAttribute('aria-expanded') === 'true';
+    plegarFlechas();
+    if (!abierto) {
+      boton.setAttribute('aria-expanded', 'true');
+      $(boton.dataset.pliegue).hidden = false;
+    }
+  });
+
 
   [[el.arrowWidthCustom, el.arrowWidthSelect], [el.borderWidthCustom, el.borderWidthSelect]].forEach(([input, select]) => {
     const aplicar = () => {
@@ -3347,9 +3609,10 @@ function posicionParaFlecha(lineas) {
 function crearFlecha(origen, destino, textoNuevo) {
   const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
   const sangria = sangriaDelCodigo(lineas);
+  const flecha = escribirFlecha({ ...flechaGeneral(), extra: 0, texto: '' });
   const trozo = textoNuevo !== undefined
-    ? `${origen} --> ${nodeDefWith(destino, formaGeneral(), textoNuevo || destino)}`
-    : `${origen} --> ${destino}`;
+    ? `${origen} ${flecha} ${nodeDefWith(destino, formaGeneral(), textoNuevo || destino)}`
+    : `${origen} ${flecha} ${destino}`;
   lineas.splice(posicionParaFlecha(lineas), 0, sangria + trozo);
   aplicarCodigo(lineas);
 }
@@ -3794,8 +4057,25 @@ const SUBMENUS = {
   tamano: { titulo: 'fontSize', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
-  direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu }
+  direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
+  lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
+  puntas: { titulo: 'arrowHead', icono: 'i-arrow-right', construir: (caja) => construirTipoFlecha(caja, 'puntas') }
 };
+
+// Objeto sobre el que se abrió el menú, para los submenús que lo necesitan.
+let objetoContextual = null;
+
+function construirTipoFlecha(caja, campo) {
+  const indice = objetoContextual ? objetoContextual.indice : 0;
+  const actual = tipoDeFlecha(indice)[campo];
+  const fila = document.createElement('div');
+  fila.className = 'lista-flechas';
+  caja.appendChild(fila);
+  botonesDeFlecha(fila, campo, actual, (valor) => {
+    cerrarContextual();
+    aplicarTipoFlecha([indice], { [campo]: valor }, false);
+  });
+}
 
 function cerrarSubmenu() {
   devolverMenu();
@@ -3875,6 +4155,7 @@ function entradaSubmenu(contenedor, objeto, clave, texto) {
 
 function construirContextual(objeto) {
   const menu = el.contextMenu;
+  objetoContextual = objeto;
   cerrarSubmenu();
   menu.innerHTML = '';
 
@@ -3999,6 +4280,8 @@ function construirContextual(objeto) {
     });
     if (diagramKind() === 'flowchart') {
       menu.appendChild(document.createElement('hr'));
+      entradaSubmenu(menu, objeto, 'lineaTipo');
+      entradaSubmenu(menu, objeto, 'puntas');
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
         const destino = rotuloDeLaFlecha(objeto.indice);
         editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());

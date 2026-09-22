@@ -23,8 +23,11 @@ propia dirección.
   escrito en píxeles; el motor de distribución (dagre
   y los nueve algoritmos de ELK que trae Mermaid, cada uno con una línea que
   dice cómo reparte los elementos); y un botón por cada ajuste que ese motor y
-  ese tipo de diagrama atienden (líneas, con la forma solo con dagre y el
+  ese tipo de diagrama atienden (líneas, con la forma solo con dagre, el
   grosor de todas las flechas y bordes o de la flecha y el borde donde está el
+  cursor, y en flujo el tipo de línea de las flechas —continua, punteada,
+  discontinua, raya y punto, gruesa, invisible— y sus puntas —ninguna, flecha,
+  círculo o cruz, al final o en los dos extremos—, para todas o para la del
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
   numeración de mensajes; valores en sectores), en flujo un botón de cajas con
   dos entradas, las 52 formas que dibuja Mermaid (para el elemento donde está
@@ -33,7 +36,8 @@ propia dirección.
   un botón que inserta un salto de línea (`<br>`) y otros dos que ponen el
   texto en negrita o en cursiva, en los tipos cuyos rótulos lo admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
-  flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
+  flecha o el fondo abre las opciones que le corresponden (en una flecha,
+  también su tipo de línea y sus puntas, cada opción dibujada) y lleva el cursor del
   editor a su línea, y el doble clic sobre una caja o sobre el texto de una
   flecha permite escribirlo encima del propio dibujo, con una barrita de
   botones para la negrita, la cursiva, el salto de línea y la fórmula. En los diagramas de flujo

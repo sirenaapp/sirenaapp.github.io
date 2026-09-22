@@ -305,7 +305,58 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 }
 .menu-contextual { overflow-y: auto; }
 .menu-contextual .menu-titulo { margin: 2px 2px 8px; }
-.menu-contextual .segmentos { margin-bottom: 8px; }
+.menu-contextual .segmentos { margin-bottom: 8px; flex-wrap: wrap; }
+#line-arrow-type .segmentos { flex-wrap: wrap; }
+.ajuste-flechas { margin: 6px 0 2px; }
+.menu-ajustes { max-height: calc(100vh - 120px); overflow-y: auto; }
+
+/* Lista de tipos de línea o de puntas: cada fila con su dibujo y su nombre. */
+.lista-flechas { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 0 0 6px 18px; }
+.menu-contextual .lista-flechas, #context-submenu .lista-flechas { margin-left: 0; }
+
+/* Fila que pliega y despliega una lista, con el valor actual dibujado a la derecha. */
+.menu button.pliegue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.menu button.pliegue > span:first-of-type { flex: 1; }
+.ajuste-flechas, #line-arrow-type { grid-column: 1 / -1; }
+.menu button.pliegue:hover { background: var(--accent-soft); color: var(--accent); }
+.pliegue .chev { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(-90deg); transition: transform .15s; }
+.pliegue[aria-expanded="true"] .chev { transform: rotate(0); }
+.pliegue-actual { display: inline-flex; margin-left: auto; color: var(--text-soft); font-size: 12px; }
+.pliegue-actual svg { width: 40px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pliegue-actual svg .relleno { fill: currentColor; stroke: none; }
+.menu .lista-flechas button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.menu .lista-flechas button:hover { background: var(--accent-soft); color: var(--accent); }
+.menu .lista-flechas button[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.lista-flechas svg { flex: none; width: 40px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lista-flechas svg .relleno { fill: currentColor; stroke: none; }
 .menu-contextual .tamano-propio { margin: 0 2px 8px; padding-top: 0; border-top: 0; }
 .menu-contextual .swatches { margin-bottom: 8px; }
 .menu-contextual hr { margin: 8px 0; border: 0; border-top: 1px solid var(--border); }
