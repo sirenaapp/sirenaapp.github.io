@@ -13,8 +13,9 @@ propia dirección.
 
 - Escribir el diagrama como texto y verlo dibujado al momento. Encima del
   código hay una barra con todo lo que cambia el dibujo, repartido por temas:
-  un botón que escribe la línea que define el tipo de diagrama (con los 22
-  tipos agrupados como los ejemplos, el mapa conceptual entre ellos); un
+  un botón que escribe la línea que define el tipo de diagrama (con los 24
+  tipos agrupados como los ejemplos, el mapa conceptual, los carriles y el
+  árbol entre ellos); un
   desplegable con las cuatro orientaciones, en los diagramas que la admiten;
   el menú de colores, con el color principal de todo el diagrama y el color
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
@@ -59,7 +60,7 @@ propia dirección.
   pasar el menú del navegador. Un aviso flotante sobre el lienzo lo
   cuenta al entrar, solo cuando el diagrama es de flujo o un mapa conceptual,
   y se retira al usarlo o al cerrarlo.
-- Elegir entre 25 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
+- Elegir entre 27 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
 - Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
   Mermaid (escritos en la cabecera del código, como todo lo demás) y, en la

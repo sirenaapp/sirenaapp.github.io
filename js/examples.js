@@ -373,6 +373,97 @@ window.SIRENA_EXAMPLES = [
         }
       },
       {
+        id: 'swimlane',
+        label: { es: 'Carriles (quién hace qué)', ca: 'Carrils (qui fa què)', gl: 'Carrís (quen fai que)', eu: 'Erreiak (nork zer egiten duen)', en: 'Swimlanes (who does what)' },
+        code: {
+          es: `swimlane-beta LR
+    accTitle: Entrega y corrección de un trabajo, por carriles
+    accDescr: Proceso repartido en dos carriles, alumnado y profesorado, con lo que hace cada uno.
+    subgraph Alumnado
+        E[Entrega el trabajo]
+        C[Corrige lo señalado]
+    end
+    subgraph Profesorado
+        R[Revisa la entrega]
+        D{¿Está completo?}
+        N[Publica la nota]
+    end
+    E --> R
+    R --> D
+    D -- No --> C
+    C --> R
+    D -- Sí --> N`,
+          ca: `swimlane-beta LR
+    accTitle: Lliurament i correcció d'un treball, per carrils
+    accDescr: Procés repartit en dos carrils, alumnat i professorat, amb el que fa cadascú.
+    subgraph Alumnat
+        E[Lliura el treball]
+        C[Corregeix el que s'ha assenyalat]
+    end
+    subgraph Professorat
+        R[Revisa el lliurament]
+        D{És complet?}
+        N[Publica la nota]
+    end
+    E --> R
+    R --> D
+    D -- No --> C
+    C --> R
+    D -- Sí --> N`,
+          gl: `swimlane-beta LR
+    accTitle: Entrega e corrección dun traballo, por carrís
+    accDescr: Proceso repartido en dous carrís, alumnado e profesorado, co que fai cada un.
+    subgraph Alumnado
+        E[Entrega o traballo]
+        C[Corrixe o sinalado]
+    end
+    subgraph Profesorado
+        R[Revisa a entrega]
+        D{Está completo?}
+        N[Publica a nota]
+    end
+    E --> R
+    R --> D
+    D -- Non --> C
+    C --> R
+    D -- Si --> N`,
+          eu: `swimlane-beta LR
+    accTitle: Lan baten entrega eta zuzenketa, erreietan
+    accDescr: Bi erreitan banatutako prozesua, ikasleak eta irakasleak, bakoitzak zer egiten duen.
+    subgraph Ikasleak
+        E[Lana entregatu]
+        C[Adierazitakoa zuzendu]
+    end
+    subgraph Irakasleak
+        R[Entrega berrikusi]
+        D{Osorik dago?}
+        N[Nota argitaratu]
+    end
+    E --> R
+    R --> D
+    D -- Ez --> C
+    C --> R
+    D -- Bai --> N`,
+          en: `swimlane-beta LR
+    accTitle: Handing in and correcting a piece of work, by lanes
+    accDescr: A process split into two lanes, students and teachers, with what each one does.
+    subgraph Students
+        E[Hands in the work]
+        C[Corrects what was flagged]
+    end
+    subgraph Teachers
+        R[Reviews the submission]
+        D{Is it complete?}
+        N[Publishes the mark]
+    end
+    E --> R
+    R --> D
+    D -- No --> C
+    C --> R
+    D -- Yes --> N`
+        }
+      },
+      {
         id: 'state',
         label: { es: 'Diagrama de estados', ca: "Diagrama d'estats", gl: 'Diagrama de estados', eu: 'Egoera-diagrama', en: 'State diagram' },
         code: {
@@ -1054,6 +1145,82 @@ flowchart TD
     Nucleus
       DNA
       Nucleolus`
+        }
+      },
+      {
+        id: 'treeview',
+        label: { es: 'Árbol (estructura de un trabajo)', ca: 'Arbre (estructura d\'un treball)', gl: 'Árbore (estrutura dun traballo)', eu: 'Zuhaitza (lan baten egitura)', en: 'Tree (structure of a piece of work)' },
+        code: {
+          es: `treeView-beta
+    accTitle: Estructura de un trabajo de investigación
+    accDescr: Árbol con las partes de un trabajo de investigación y una nota en las que más dudas dan.
+    "Trabajo de investigación/"
+        "Portada"
+        "Índice"
+        "Introducción/"
+            "Pregunta de partida" ## qué se quiere averiguar
+            "Hipótesis"
+        "Desarrollo/"
+            "Método" ## cómo se ha hecho
+            "Resultados" :::highlight
+        "Conclusiones"
+        "Bibliografía"`,
+          ca: `treeView-beta
+    accTitle: Estructura d'un treball de recerca
+    accDescr: Arbre amb les parts d'un treball de recerca i una nota a les que més dubtes generen.
+    "Treball de recerca/"
+        "Portada"
+        "Índex"
+        "Introducció/"
+            "Pregunta de partida" ## què es vol esbrinar
+            "Hipòtesi"
+        "Desenvolupament/"
+            "Mètode" ## com s'ha fet
+            "Resultats" :::highlight
+        "Conclusions"
+        "Bibliografia"`,
+          gl: `treeView-beta
+    accTitle: Estrutura dun traballo de investigación
+    accDescr: Árbore coas partes dun traballo de investigación e unha nota nas que máis dúbidas dan.
+    "Traballo de investigación/"
+        "Portada"
+        "Índice"
+        "Introdución/"
+            "Pregunta de partida" ## que se quere descubrir
+            "Hipótese"
+        "Desenvolvemento/"
+            "Método" ## como se fixo
+            "Resultados" :::highlight
+        "Conclusións"
+        "Bibliografía"`,
+          eu: `treeView-beta
+    accTitle: Ikerketa-lan baten egitura
+    accDescr: Zuhaitza, ikerketa-lan baten atalekin eta zalantza gehien sortzen dutenetan ohar batekin.
+    "Ikerketa-lana/"
+        "Azala"
+        "Aurkibidea"
+        "Sarrera/"
+            "Abiapuntuko galdera" ## zer jakin nahi den
+            "Hipotesia"
+        "Garapena/"
+            "Metodoa" ## nola egin den
+            "Emaitzak" :::highlight
+        "Ondorioak"
+        "Bibliografia"`,
+          en: `treeView-beta
+    accTitle: Structure of a research project
+    accDescr: A tree with the parts of a research project and a note on the ones that raise most doubts.
+    "Research project/"
+        "Cover"
+        "Contents"
+        "Introduction/"
+            "Starting question" ## what we want to find out
+            "Hypothesis"
+        "Body/"
+            "Method" ## how it was done
+            "Results" :::highlight
+        "Conclusions"
+        "Bibliography"`
         }
       },
       {

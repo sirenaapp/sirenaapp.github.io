@@ -90,6 +90,26 @@ window.SIRENA_SYNTAX = [
     ]
   },
   {
+    id: 'swimlane',
+    detect: /^\s*swimlane(-beta)?\b/m,
+    rows: [
+      { c: 'swimlane-beta LR', t: { es: 'Empezar un diagrama de carriles (LR horizontal, TD vertical)', ca: 'Començar un diagrama de carrils (LR horitzontal, TD vertical)', gl: 'Comezar un diagrama de carrís (LR horizontal, TD vertical)', eu: 'Errei-diagrama bat hasi (LR horizontala, TD bertikala)', en: 'Start a swimlane diagram (LR horizontal, TD vertical)' } },
+      { c: 'subgraph Alumnado\n  A[Entrega]\nend', t: { es: 'Un carril, con las cajas de quien hace esas tareas', ca: 'Un carril, amb les caixes de qui fa aquestes tasques', gl: 'Un carril, coas caixas de quen fai esas tarefas', eu: 'Errei bat, zeregin horiek egiten dituenaren kutxekin', en: 'A lane, with the boxes of whoever does those tasks' } },
+      { c: 'A --> B', t: { es: 'Flecha, también entre carriles', ca: 'Fletxa, també entre carrils', gl: 'Frecha, tamén entre carrís', eu: 'Gezia, erreien artean ere', en: 'Arrow, also across lanes' } },
+      { c: 'D{¿Está completo?}', t: { es: 'Rombo de decisión, en el carril de quien decide', ca: 'Rombe de decisió, al carril de qui decideix', gl: 'Rombo de decisión, no carril de quen decide', eu: 'Erabaki-erronboa, erabakitzen duenaren erreian', en: 'Decision diamond, in the lane of whoever decides' } }
+    ]
+  },
+  {
+    id: 'treeview',
+    detect: /^\s*treeView(-beta)?\b/m,
+    rows: [
+      { c: 'treeView-beta', t: { es: 'Empezar un árbol (la jerarquía la marca la sangría)', ca: 'Començar un arbre (la jerarquia la marca el sagnat)', gl: 'Comezar unha árbore (a xerarquía márcaa a sangría)', eu: 'Zuhaitz bat hasi (hierarkia koskak markatzen du)', en: 'Start a tree (the hierarchy comes from the indentation)' } },
+      { c: '    "Carpeta/"', t: { es: 'Elemento con hijos: acaba en barra y sale en negrita', ca: 'Element amb fills: acaba en barra i surt en negreta', gl: 'Elemento con fillos: remata en barra e sae en negra', eu: 'Seme-alabak dituen elementua: barraz amaitzen da eta lodiz ateratzen da', en: 'Item with children: ends with a slash and is shown in bold' } },
+      { c: '        "Elemento" ## una nota', t: { es: 'Elemento con una nota al lado, en cursiva', ca: 'Element amb una nota al costat, en cursiva', gl: 'Elemento cunha nota ao lado, en cursiva', eu: 'Elementua alboan ohar batekin, etzanean', en: 'Item with a note beside it, in italics' } },
+      { c: '        "Elemento" :::highlight', t: { es: 'Elemento resaltado', ca: 'Element ressaltat', gl: 'Elemento resaltado', eu: 'Nabarmendutako elementua', en: 'Highlighted item' } }
+    ]
+  },
+  {
     id: 'timeline',
     detect: /^\s*timeline\b/m,
     rows: [

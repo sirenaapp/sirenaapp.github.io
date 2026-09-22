@@ -2235,7 +2235,8 @@ const TYPE_HEADERS = {
   gantt: 'gantt', timeline: 'timeline', journey: 'journey',
   concept: 'flowchart TD', mindmap: 'mindmap', venn: 'venn-beta', class: 'classDiagram', er: 'erDiagram', treemap: 'treemap-beta',
   pie: 'pie', xychart: 'xychart-beta', radar: 'radar-beta', quadrant: 'quadrantChart', sankey: 'sankey-beta',
-  sequence: 'sequenceDiagram', block: 'block-beta', kanban: 'kanban', architecture: 'architecture-beta'
+  sequence: 'sequenceDiagram', block: 'block-beta', kanban: 'kanban', architecture: 'architecture-beta',
+  swimlane: 'swimlane-beta LR', treeview: 'treeView-beta'
 };
 
 // El mapa conceptual es un diagrama de flujo con los enlaces rotulados con un

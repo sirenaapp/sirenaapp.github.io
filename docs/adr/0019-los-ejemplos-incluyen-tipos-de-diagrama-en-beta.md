@@ -38,6 +38,19 @@ se corrige el ejemplo en `js/examples.js` en la misma actualización.
   alargan el menú sin servir al profesorado, y cada ejemplo hay que
   mantenerlo en cinco idiomas.
 
+## Dos tipos más: carriles y árbol (22-09-2026)
+
+Del inventario de lo que Mermaid 12.0.0 dibuja y Sirena no ofrecía, el autor
+aprobó dos tipos nuevos, con el mismo criterio de esta decisión (uso en el
+aula, no ingeniería): **carriles** (`swimlane-beta`, un proceso repartido
+por quién hace cada cosa: alumnado y profesorado en el ejemplo) y **árbol**
+(`treeView-beta`, una jerarquía por sangría: la estructura de un trabajo de
+investigación en el ejemplo, con notas y un elemento resaltado). Los dos
+admiten título y descripción accesibles (comprobado), así que no van como
+comentario. Quedan fuera, por ser de ingeniería o consultoría, `requirement`,
+`C4`, `packet`, `agentflow`, `eventmodeling`, `wardley`, `cynefin`,
+`railroad` y `usecase`.
+
 ## Consecuencias
 
 El menú pasa de 21 a 24 ejemplos y cubre los organizadores gráficos habituales
