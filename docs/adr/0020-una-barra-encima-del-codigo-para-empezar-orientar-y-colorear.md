@@ -92,8 +92,13 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   repositorio, se queda con la silueta (muestreo del trazado y reducción de
   puntos, porque rough.js genera cientos de curvas) y la guarda en
   `js/formas-iconos.js` (unos 30 KB para las 52). Hay que volver a generarlas
-  al actualizar Mermaid o al cambiar la lista. Cambia la forma del elemento
-  de la línea del cursor allí donde esté definido, conservando su texto: con
+  al actualizar Mermaid o al cambiar la lista. Van en rejilla de cuatro
+  columnas, con la sintaxis en el rótulo emergente, porque en lista una
+  debajo de otra la ventana no cabía en pantalla. Con «Esta caja» cambia la
+  forma del elemento de la línea del cursor; con «Todas las cajas», la de
+  todos los elementos del diagrama, uno a uno, porque Mermaid no tiene un
+  ajuste global de forma. Reescribe cada definición allí donde esté,
+  conservando su texto: con
   la sintaxis clásica (`A{Texto}`, `A([Texto])`…) cuando la forma la tiene, y
   con la nueva (`A@{ shape: doc, label: "Texto" }`) para el resto. Un
   elemento que solo aparece suelto recibe una línea propia.

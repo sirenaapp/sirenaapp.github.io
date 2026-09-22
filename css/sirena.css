@@ -290,9 +290,22 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-opciones .menu-titulo { margin: 4px 10px 6px; }
 .menu-motores { min-width: 300px; }
 .menu-tamano { min-width: 200px; }
-.menu-formas { min-width: 340px; }
-.menu-formas button { justify-content: flex-start; }
-.menu-formas .forma-nombre { flex: 1; }
+.menu-formas { min-width: 400px; max-width: min(92vw, 460px); }
+.menu-formas .segmentos-menu { margin: 6px 8px 8px; }
+/* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
+.formas-rejilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 0 4px 4px; }
+.menu .formas-rejilla button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: auto;
+  padding: 6px 4px;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+}
+.menu .formas-rejilla .forma-nombre { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .forma-icono { display: inline-flex; width: 44px; height: 26px; flex: none; align-items: center; justify-content: center; color: var(--accent); }
 .forma-icono svg { width: 44px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6px; stroke-linejoin: round; stroke-linecap: round; }
 .forma-icono svg * { vector-effect: non-scaling-stroke; }

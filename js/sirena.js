@@ -1510,18 +1510,12 @@ function updateEditorTools() {
 
 // Identificadores de los elementos que hay en las líneas donde está el cursor
 // (o la selección), según el tipo de diagrama.
-function targetNodes() {
-  const kind = diagramKind();
-  const texto = el.editor.value;
-  const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
-  let hasta = texto.indexOf('\n', el.editor.selectionEnd);
-  if (hasta === -1) hasta = texto.length;
-  const lineas = texto.slice(desde, hasta).split('\n');
-  const columna = el.editor.selectionStart - desde;
-  const ids = [];
-  const RESERVADAS = new Set(['subgraph', 'end', 'direction', 'style', 'classDef', 'class', 'click', 'linkStyle',
-    'note', 'state', 'columns', 'space', 'block', 'cssClass', 'namespace', 'callback', 'link']);
-  lineas.forEach((linea) => {
+const RESERVADAS = new Set(['subgraph', 'end', 'direction', 'style', 'classDef', 'class', 'click', 'linkStyle',
+  'note', 'state', 'columns', 'space', 'block', 'cssClass', 'namespace', 'callback', 'link']);
+
+// Añade a «ids» los identificadores de elementos que hay en una línea.
+function idsDeLinea(linea, kind, ids) {
+  {
     const limpia = linea.replace(/%%.*$/, '').trim();
     if (!limpia || /^(flowchart|graph|stateDiagram|classDiagram|block|accTitle|accDescr)/.test(limpia)) return;
     const primera = limpia.split(/\s+/)[0];
@@ -1538,7 +1532,7 @@ function targetNodes() {
       const sinTextos = limpia
         .replace(/"[^"]*"/g, '""')
         .replace(/--\s[^-]*?\s-->/g, '-->').replace(/\|[^|]*\|/g, '')
-        .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|>[^\]]*\]/g, '');
+        .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|(?<=[A-Za-z0-9_])>[^\]]*\]/g, '');
       candidatos = sinTextos.split(/\s*(?:<?-{2,}>?|-\.+->?|={2,}>?|~{3,}|o--o|x--x|&)\s*/);
     } else if (kind === 'state') {
       candidatos = limpia.replace(/:.*$/, '').split(/\s*-->\s*/);
@@ -1549,7 +1543,27 @@ function targetNodes() {
       const m = /^([A-Za-z0-9_][\w-]*)/.exec(c.trim());
       if (m && m[1] !== '*' && !RESERVADAS.has(m[1]) && !ids.includes(m[1])) ids.push(m[1]);
     });
-  });
+  }
+}
+
+// Todos los elementos del diagrama, por orden de aparición.
+function allNodes() {
+  const kind = diagramKind();
+  const ids = [];
+  el.editor.value.split('\n').forEach((linea) => idsDeLinea(linea, kind, ids));
+  return ids;
+}
+
+function targetNodes() {
+  const kind = diagramKind();
+  const texto = el.editor.value;
+  const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
+  let hasta = texto.indexOf('\n', el.editor.selectionEnd);
+  if (hasta === -1) hasta = texto.length;
+  const lineas = texto.slice(desde, hasta).split('\n');
+  const columna = el.editor.selectionStart - desde;
+  const ids = [];
+  lineas.forEach((linea) => idsDeLinea(linea, kind, ids));
   // Sin selección y con varios elementos en la línea, se toma el que está
   // bajo el cursor (o el último que empieza antes de él).
   if (lineas.length === 1 && ids.length > 1 && el.editor.selectionStart === el.editor.selectionEnd) {
@@ -1581,7 +1595,7 @@ function enlacesDeLinea(linea) {
     .replace(/"[^"]*"/g, '""')
     .replace(/--\s[^-]*?\s-->/g, '-->').replace(/-\.\s[^.]*?\s\.->/g, '-.->').replace(/==\s[^=]*?\s==>/g, '==>')
     .replace(/\|[^|]*\|/g, '')
-    .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|>[^\]]*\]/g, '');
+    .replace(/\[\[?[^\]]*\]\]?|\(\(?[^)]*\)\)?|\{\{?[^}]*\}\}?|(?<=[A-Za-z0-9_])>[^\]]*\]/g, '');
   const segmentos = sinTextos.split(ENLACE_RE);
   let total = 0;
   for (let i = 0; i < segmentos.length - 1; i += 1) {
@@ -1805,27 +1819,45 @@ function currentShape(id) {
   return 'rect';
 }
 
+// Alcance del cambio de forma: la caja del cursor o todas las del diagrama.
+let formaAlcance = 'esta';
+
 function buildShapeMenu() {
-  const ids = targetNodes();
+  const enCursor = targetNodes();
+  const ids = formaAlcance === 'todas' ? allNodes() : enCursor;
   el.shapeMenu.innerHTML = '';
+  const alcance = document.createElement('div');
+  alcance.className = 'segmentos segmentos-menu';
+  [['esta', 'shapeThis'], ['todas', 'shapeAll']].forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = t(clave);
+    boton.setAttribute('aria-current', valor === formaAlcance ? 'true' : 'false');
+    boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(); });
+    alcance.appendChild(boton);
+  });
+  el.shapeMenu.appendChild(alcance);
   const titulo = document.createElement('p');
   titulo.className = 'menu-titulo';
   if (!ids.length) {
-    titulo.textContent = t('shapeNone');
+    titulo.textContent = t(formaAlcance === 'todas' ? 'shapeNoneAll' : 'shapeNone');
     el.shapeMenu.appendChild(titulo);
     return;
   }
-  titulo.textContent = t('shapeTarget') + ' ';
+  titulo.textContent = t(formaAlcance === 'todas' ? 'shapeTargetAll' : 'shapeTarget') + ' ';
   const codigo = document.createElement('code');
-  codigo.textContent = ids.join(', ');
+  codigo.textContent = formaAlcance === 'todas' ? String(ids.length) : ids.join(', ');
   titulo.appendChild(codigo);
   el.shapeMenu.appendChild(titulo);
-  const actual = currentShape(ids[0]);
+  const actual = formaAlcance === 'todas' ? null : currentShape(ids[0]);
   (window.SIRENA_SHAPES || []).forEach((grupo) => {
     const cabecera = document.createElement('p');
     cabecera.className = 'menu-grupo';
     cabecera.textContent = grupo.group[lang] || grupo.group.es;
     el.shapeMenu.appendChild(cabecera);
+    const rejilla = document.createElement('div');
+    rejilla.className = 'formas-rejilla';
+    el.shapeMenu.appendChild(rejilla);
     grupo.items.forEach((item) => {
       const boton = document.createElement('button');
       boton.type = 'button';
@@ -1837,14 +1869,15 @@ function buildShapeMenu() {
       const nombre = document.createElement('span');
       nombre.className = 'forma-nombre';
       nombre.textContent = item.label[lang] || item.label.es;
-      const ejemplo = document.createElement('code');
-      ejemplo.textContent = item.classic ? item.classic.slice(0, item.classic.length / 2) + 'A' + item.classic.slice(item.classic.length / 2) : item.id;
-      boton.append(icono, nombre, ejemplo);
+      // La sintaxis va en el rótulo emergente, para que la rejilla quede limpia.
+      const sintaxis = item.classic ? item.classic.slice(0, item.classic.length / 2) + 'A' + item.classic.slice(item.classic.length / 2) : 'A@{ shape: ' + item.id + ' }';
+      boton.title = (item.label[lang] || item.label.es) + ' · ' + sintaxis;
+      boton.append(icono, nombre);
       boton.addEventListener('click', () => {
         el.shapeMenu.hidden = true;
         applyShape(ids, item.id);
       });
-      el.shapeMenu.appendChild(boton);
+      rejilla.appendChild(boton);
     });
   });
 }
