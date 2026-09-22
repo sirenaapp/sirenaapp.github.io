@@ -1528,6 +1528,12 @@ function isConceptMap(code) {
   return nombres.some((n) => titulo[1].toLowerCase().includes(n.toLowerCase()));
 }
 
+// Tipos cuyos rótulos admiten <br> como salto de línea. Comprobado uno a uno
+// con Mermaid 12: en los que faltan (Gantt, sectores, radar, Venn, mapa de
+// árbol, ramas de Git) el <br> se dibujaría tal cual, como texto.
+const CON_SALTO = ['flowchart', 'concept', 'state', 'class', 'sequence', 'journey',
+  'mindmap', 'kanban', 'block', 'timeline', 'ishikawa', 'architecture'];
+
 // Tipos en los que se puede colorear un elemento suelto.
 const COLORABLE = ['flowchart', 'state', 'class', 'block'];
 
@@ -1604,6 +1610,7 @@ function updateEditorTools() {
   $('dir-sep').hidden = !conDireccion;
   if (conDireccion) readDirection();
   el.nodeColorBox.hidden = !COLORABLE.includes(kind);
+  $('btn-salto').hidden = !CON_SALTO.includes(tipo);
   updateAppearanceVisibility();
 }
 
@@ -2335,8 +2342,23 @@ function ajustarMenuAlPanel(menu) {
   if (r.right > panel.right - 8) menu.style.left = Math.round(panel.right - 8 - r.right) + 'px';
 }
 
+// Un salto de línea dentro de un rótulo: en Mermaid se escribe <br>.
+function insertarSalto() {
+  const inicio = el.editor.selectionStart;
+  const fin = el.editor.selectionEnd;
+  const texto = el.editor.value;
+  el.editor.value = texto.slice(0, inicio) + '<br>' + texto.slice(fin);
+  el.editor.focus();
+  el.editor.setSelectionRange(inicio + 4, inicio + 4);
+  codigoPrevio = el.editor.value;
+  updateStatus();
+  renderGutter();
+  render();
+}
+
 function setupEditorTools() {
   buildTypeMenu();
+  $('btn-salto').addEventListener('click', insertarSalto);
 
   $('btn-type').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -2673,15 +2695,18 @@ function construirFondoRotulos(caja) {
   };
   const muestras = document.createElement('div');
   muestras.className = 'swatches';
-  COLORS.filter(([, , vars]) => vars).forEach(([, clave, vars]) => {
+  // El blanco va el primero: es el fondo que más se usa en estos rótulos.
+  [['#ffffff', 'colorWhite', 'var(--border)']].concat(
+    COLORS.filter(([, , vars]) => vars).map(([, clave, vars]) => [vars.primaryColor, clave, vars.primaryBorderColor])
+  ).forEach(([color, clave, borde]) => {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.title = t(clave);
     boton.setAttribute('aria-label', t(clave));
-    boton.style.background = vars.primaryColor;
-    boton.style.setProperty('--swatch-border', vars.primaryBorderColor);
-    boton.setAttribute('aria-current', actual === vars.primaryColor ? 'true' : 'false');
-    boton.addEventListener('click', () => aplicar(vars.primaryColor));
+    boton.style.background = color;
+    boton.style.setProperty('--swatch-border', borde);
+    boton.setAttribute('aria-current', actual === color ? 'true' : 'false');
+    boton.addEventListener('click', () => aplicar(color));
     muestras.appendChild(boton);
   });
   caja.appendChild(muestras);

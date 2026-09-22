@@ -26,8 +26,10 @@ propia dirección.
   ese tipo de diagrama atienden (líneas, con la forma solo con dagre y el
   grosor de todas las flechas y bordes o de la flecha y el borde donde está el
   cursor; separación con dagre; unir flechas con ELK por capas; márgenes;
-  numeración de mensajes; valores en sectores), y en flujo un botón con las 52
-  formas de caja que dibuja Mermaid, para el elemento donde está el cursor. El botón de título y descripción accesibles está también aquí.
+  numeración de mensajes; valores en sectores), en flujo un botón con las 52
+  formas de caja que dibuja Mermaid, para el elemento donde está el cursor, y
+  un botón que inserta un salto de línea (`<br>`) en los tipos cuyos rótulos lo
+  admiten. El botón de título y descripción accesibles está también aquí.
 - Dar formato desde el propio dibujo: el botón derecho sobre una caja, una
   flecha o el fondo abre las opciones que le corresponden y lleva el cursor del
   editor a su línea. En pantalla táctil, la pulsación larga; con Mayús se deja

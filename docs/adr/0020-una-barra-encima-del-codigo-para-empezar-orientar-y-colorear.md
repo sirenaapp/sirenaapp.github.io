@@ -115,6 +115,11 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   la sintaxis clásica (`A{Texto}`, `A([Texto])`…) cuando la forma la tiene, y
   con la nueva (`A@{ shape: doc, label: "Texto" }`) para el resto. Un
   elemento que solo aparece suelto recibe una línea propia.
+- **Salto de línea.** Un botón escribe `<br>` donde esté el cursor, que es
+  como Mermaid parte un rótulo en varias líneas. Solo aparece en los tipos
+  cuyos rótulos lo admiten, comprobados uno a uno con Mermaid 12; en los
+  demás (Gantt, sectores, radar, Venn, mapa de árbol y ramas de Git) se
+  dibujaría tal cual, como texto, así que el botón se oculta.
 - **Título y descripción accesibles.** El botón pasa de la barra superior a
   esta, junto al resto de lo que se escribe en el código. En los tipos que
   rechazan `accTitle` y `accDescr` o los ignoran (mapa mental, kanban, línea
