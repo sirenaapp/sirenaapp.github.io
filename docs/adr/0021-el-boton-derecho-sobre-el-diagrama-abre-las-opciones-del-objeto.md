@@ -16,9 +16,9 @@ del objeto señalado, y coloca además el cursor del editor en su línea, de mod
 que los botones de la barra pasan a actuar sobre él.
 
 - **Sobre una caja**: color (toda la caja, solo el texto o solo el borde),
-  quitar el color, grosor del borde y acceso al menú de formas.
-- **Sobre una flecha**: color de la línea y de su texto, quitar el color y
-  grosor.
+  quitar el color, grosor del borde, forma, escribir el texto y borrarla.
+- **Sobre una flecha**: color de la línea y de su texto, quitar el color,
+  grosor, escribir su texto y borrarla.
 - **Sobre el texto de una flecha**: su color (`linkStyle N color:…`, sin tocar
   la línea), quitarlo, el fondo de los rótulos (que en Mermaid solo se puede
   cambiar para todos a la vez, `edgeLabelBackground`) y el paso a las
@@ -69,10 +69,9 @@ No aparece en el modo visor.
 
 ## Alternativas descartadas
 
-- **Editar sobre el dibujo (arrastrar, escribir dentro de la caja).**
-  Descartado: el código es la fuente y el dibujo lo genera Mermaid; permitir
-  edición directa obligaría a mantener una correspondencia que Mermaid no
-  garantiza.
+- **Mover las cajas con el ratón.** Descartado: Mermaid coloca los elementos
+  con su motor y no admite coordenadas, así que una caja arrastrada volvería a
+  su sitio al redibujar.
 - **Un panel lateral de propiedades.** Descartado: ocupa sitio permanente y
   Sirena ya tiene la barra del editor.
 - **Explicar el botón derecho solo en la ayuda.** Descartado: quien no abre la
@@ -80,6 +79,28 @@ No aparece en el modo visor.
 - **Duplicar en el menú contextual todas las opciones de la barra.**
   Descartado: lo que cuesta una sola pulsación se resuelve ahí; para lo
   demás (formas, tema) el menú lleva al de la barra, sin mantener dos listas.
+
+## Escribir y borrar sobre el dibujo (22-09-2026)
+
+En los diagramas de flujo (y con ellos el mapa conceptual), el doble clic
+sobre una caja o sobre el texto de una flecha abre un campo encima del propio
+elemento, a su medida y con el tamaño de letra del zoom. Intro confirma,
+Mayús+Intro añade un salto, que se guarda como `<br>`, Escape cancela y pulsar
+fuera confirma. El texto se reescribe conservando la forma de la caja y el
+estilo de la flecha (`A -- Sí -->` sigue siendo así, y `-->|Sí|` también).
+
+Borrar tiene su cuidado: los estilos de las flechas van por número
+(`linkStyle 2`), así que al quitar una se renumeran los posteriores y se
+retiran los que se queden sin flecha. Al borrar una caja se parte la línea por
+donde estaba, sin unir lo que ella unía, se quitan su `style` y su lugar en
+las asignaciones de clase, y las cajas que se quedan sueltas se conservan
+salvo que ya aparezcan en otra línea. Una línea que describe varias flechas de
+una vez (`A & B --> C`) se retira entera, porque no se puede quitar solo una
+de sus flechas sin reescribirla.
+
+El motor de todo esto es el troceo de una línea de flujo: se enmascaran los
+textos (para que un guion dentro de una caja no se confunda con una flecha) y
+se localizan las flechas con su rótulo y su posición.
 
 ## Consecuencias
 

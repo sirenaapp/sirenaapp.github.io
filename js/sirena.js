@@ -139,6 +139,7 @@ const el = {
   shapeGrid: $('shape-grid'),
   contextMenu: $('context-menu'),
   contextSubmenu: $('context-submenu'),
+  editorSitio: $('editor-sitio'),
   pistaFormato: $('pista-formato'),
   sizeOptions: $('size-options'),
   sizeCustom: $('size-custom'),
@@ -1712,6 +1713,213 @@ function enlacesDeLinea(linea) {
   return total;
 }
 
+/* --- Troceo de una línea de diagrama de flujo --- */
+
+// Oculta los textos (los de las cajas, los entrecomillados y los rótulos entre
+// barras) dejando la línea de la misma longitud, para poder buscar las flechas
+// sin que un guion dentro de un texto se confunda con una.
+function enmascararLinea(linea) {
+  const tapar = (m) => m[0] + '·'.repeat(Math.max(0, m.length - 2)) + m[m.length - 1];
+  return linea
+    .replace(/%%.*$/, (m) => ' '.repeat(m.length))
+    .replace(/"[^"]*"/g, tapar)
+    .replace(/\[[^\]]*\]/g, tapar)
+    .replace(/\([^)]*\)/g, tapar)
+    .replace(/\{[^}]*\}/g, tapar)
+    .replace(/\|[^|]*\|/g, tapar);
+}
+
+// Las formas de escribir una flecha, con su rótulo si lo lleva. Las que llevan
+// el texto en medio van primero, para que se reconozcan enteras.
+const FLECHA_RE = new RegExp([
+  '-{2,}\\s[^|]*?\\s-{2,}[>xo]?',
+  '={2,}\\s[^|]*?\\s={2,}[>xo]?',
+  '-\\.\\s[^|]*?\\s\\.-{1,}[>xo]?',
+  '(?:<?-{2,}[>xo]?|<?={2,}[>xo]?|<?-\\.+-{1,}[>xo]?|~{3,})(?:\\|[^|]*\\|)?'
+].join('|'), 'g');
+
+// Devuelve las flechas de una línea (con su posición y su rótulo) y los trozos
+// que quedan entre ellas.
+function trocearLinea(linea) {
+  const mascara = enmascararLinea(linea);
+  const flechas = [];
+  let m;
+  FLECHA_RE.lastIndex = 0;
+  while ((m = FLECHA_RE.exec(mascara))) {
+    const entero = linea.slice(m.index, m.index + m[0].length);
+    flechas.push({ ini: m.index, fin: m.index + m[0].length, texto: entero });
+  }
+  const trozos = [];
+  let desde = 0;
+  flechas.forEach((f) => { trozos.push(linea.slice(desde, f.ini)); desde = f.fin; });
+  trozos.push(linea.slice(desde));
+  return { flechas, trozos };
+}
+
+// El rótulo de una flecha, tal como está escrito.
+function rotuloDeFlecha(flecha) {
+  const barras = /\|([^|]*)\|/.exec(flecha);
+  if (barras) return barras[1];
+  const medio = /^(?:-{2,}|={2,}|-\.)\s([\s\S]*?)\s(?:-{2,}|={2,}|\.-)/.exec(flecha);
+  return medio ? medio[1] : '';
+}
+
+// La misma flecha con otro rótulo, conservando su forma de escribirse.
+function flechaConRotulo(flecha, texto) {
+  const limpio = texto.trim();
+  const barras = /^(.*?)\|[^|]*\|(.*)$/.exec(flecha);
+  if (barras) return limpio ? barras[1] + '|' + limpio + '|' + barras[2] : barras[1] + barras[2];
+  const medio = /^(-{2,}|={2,}|-\.)\s[\s\S]*?\s(-{2,}[>xo]?|={2,}[>xo]?|\.-{1,}[>xo]?)$/.exec(flecha);
+  if (medio) {
+    if (limpio) return medio[1] + ' ' + limpio + ' ' + medio[2];
+    // Sin rótulo, la flecha vuelve a su forma corta.
+    const corta = { '-.': '-.->' };
+    return corta[medio[1]] || (medio[1] + (medio[2].slice(-1).match(/[>xo]/) ? medio[2].slice(-1) : ''));
+  }
+  return limpio ? flecha + '|' + limpio + '|' : flecha;
+}
+
+// Identificador principal de un trozo («  B{¿Sí?}» → «B»).
+function idDeTrozo(trozo) {
+  const m = /^[\s&]*([A-Za-z0-9_][\w-]*)/.exec(trozo);
+  return m ? m[1] : '';
+}
+
+// Rehace una línea a partir de sus trozos y sus flechas, y la descarta si se
+// queda en un identificador suelto que no define nada.
+function rehacerLinea(trozos, flechas, sangria) {
+  if (!trozos.length) return null;
+  if (!flechas.length) {
+    // La caja se queda aunque pierda su flecha: solo se borra lo que se pidió.
+    const solo = trozos[0].trim();
+    return solo ? sangria + solo : null;
+  }
+  let texto = trozos[0];
+  flechas.forEach((f, i) => { texto += f + (trozos[i + 1] !== undefined ? trozos[i + 1] : ''); });
+  return sangria + texto.trim();
+}
+
+// Una caja que se queda suelta pero que ya aparece en otra línea no hace
+// falta repetirla.
+function limpiarSueltos(lineas) {
+  const salida = [];
+  lineas.forEach((linea, i) => {
+    const solo = /^\s*([A-Za-z0-9_][\w-]*)\s*$/.exec(linea);
+    if (!solo) { salida.push(linea); return; }
+    const re = new RegExp('(^|[^\\w-])' + escapaRe(solo[1]) + '(?![\\w-])');
+    const repetida = lineas.some((otra, j) => (
+      j !== i && !/^\s*%%/.test(otra) && !/^\s*[A-Za-z0-9_][\w-]*\s*$/.test(otra) && re.test(otra)
+    )) || salida.some((otra) => re.test(otra));
+    if (!repetida) salida.push(linea);
+  });
+  return salida;
+}
+
+// Al quitar flechas, los estilos que van por número (linkStyle 2) se
+// renumeran, y los que se quedan sin flecha se retiran.
+function renumerarLinkStyle(lineas, borrados) {
+  if (!borrados.length) return lineas;
+  return lineas.map((linea) => {
+    const m = /^(\s*)linkStyle\s+([\d\s,]+?)\s+(\S.*)$/.exec(linea);
+    if (!m) return linea;
+    const nums = m[2].split(',').map((x) => Number(x.trim())).filter((n) => !Number.isNaN(n));
+    const quedan = nums
+      .filter((n) => !borrados.includes(n))
+      .map((n) => n - borrados.filter((b) => b < n).length);
+    return quedan.length ? `${m[1]}linkStyle ${quedan.join(',')} ${m[3]}` : null;
+  }).filter((linea) => linea !== null);
+}
+
+// Recorre las líneas del código contando flechas, y deja que «tratar» decida
+// qué hacer con la que contiene la flecha buscada o con cada línea.
+function lineasConCuenta(texto) {
+  let cuenta = 0;
+  return texto.replace(/\s+$/, '').split('\n').map((linea) => {
+    const n = enlacesDeLinea(linea);
+    const desde = cuenta;
+    cuenta += n;
+    return { linea, desde, n };
+  });
+}
+
+// Quita del código la flecha con ese número.
+function borrarFlecha(indice) {
+  const filas = lineasConCuenta(el.editor.value);
+  const salida = [];
+  const borrados = [];
+  filas.forEach(({ linea, desde, n }) => {
+    if (!n || indice < desde || indice >= desde + n) { salida.push(linea); return; }
+    const sangria = (linea.match(/^[ \t]*/) || [''])[0];
+    const { flechas, trozos } = trocearLinea(linea);
+    // Una línea con «&» describe varias flechas en un solo trazo: se quita entera.
+    if (flechas.length !== n) {
+      for (let k = 0; k < n; k += 1) borrados.push(desde + k);
+      return;
+    }
+    const k = indice - desde;
+    borrados.push(indice);
+    const izquierda = rehacerLinea(trozos.slice(0, k + 1), flechas.slice(0, k).map((f) => f.texto), sangria);
+    const derecha = rehacerLinea(trozos.slice(k + 1), flechas.slice(k + 1).map((f) => f.texto), sangria);
+    if (izquierda) salida.push(izquierda);
+    if (derecha) salida.push(derecha);
+  });
+  aplicarCodigo(limpiarSueltos(renumerarLinkStyle(salida, borrados)));
+}
+
+// Quita del código una caja y las flechas que llegaban a ella.
+function borrarNodo(id) {
+  const filas = lineasConCuenta(el.editor.value);
+  const salida = [];
+  const borrados = [];
+  filas.forEach(({ linea, desde, n }) => {
+    const sangria = (linea.match(/^[ \t]*/) || [''])[0];
+    if (/^\s*%%/.test(linea)) { salida.push(linea); return; }
+    // Los estilos y las clases de esa caja se van con ella.
+    if (new RegExp(`^\\s*style\\s+${escapaRe(id)}\\s`).test(linea)) return;
+    const asigna = /^(\s*)(class|cssClass)\s+("?)([^"\s]+)\3\s+([\w-]+)\s*$/.exec(linea);
+    if (asigna) {
+      const resto = asigna[4].split(',').filter((x) => x !== id);
+      if (!resto.length) return;
+      salida.push(`${asigna[1]}${asigna[2]} ${asigna[3]}${resto.join(',')}${asigna[3]} ${asigna[5]}`);
+      return;
+    }
+    const { flechas, trozos } = trocearLinea(linea);
+    const afecta = trozos.some((t) => idDeTrozo(t) === id);
+    if (!afecta) { salida.push(linea); return; }
+    if (flechas.length !== n) {
+      for (let k = 0; k < n; k += 1) borrados.push(desde + k);
+      return;
+    }
+    // Se parte la línea por donde estaba la caja, sin unir lo que unía.
+    let partes = [{ trozos: [], flechas: [] }];
+    trozos.forEach((trozo, i) => {
+      const actual = partes[partes.length - 1];
+      if (idDeTrozo(trozo) === id) {
+        if (i > 0) borrados.push(desde + i - 1);
+        if (i < flechas.length) borrados.push(desde + i);
+        partes.push({ trozos: [], flechas: [] });
+        return;
+      }
+      actual.trozos.push(trozo);
+      if (i < flechas.length && idDeTrozo(trozos[i + 1]) !== id) actual.flechas.push(flechas[i].texto);
+    });
+    partes.forEach((parte) => {
+      const hecha = rehacerLinea(parte.trozos, parte.flechas, sangria);
+      if (hecha) salida.push(hecha);
+    });
+  });
+  aplicarCodigo(limpiarSueltos(renumerarLinkStyle(salida, [...new Set(borrados)].sort((a, b) => a - b))));
+}
+
+// Deja el código en el editor y lo vuelve a dibujar.
+function aplicarCodigo(lineas) {
+  el.editor.value = lineas.join('\n') + '\n';
+  codigoPrevio = el.editor.value;
+  updateStatus();
+  renderGutter();
+  render();
+}
+
 // Índices de las flechas que hay en las líneas del cursor o de la selección.
 function targetLinks() {
   if (diagramKind() !== 'flowchart') return [];
@@ -2480,6 +2688,145 @@ function setupEditorTools() {
   });
 }
 
+/* --- Escribir el texto sobre el propio diagrama --- */
+
+// Los saltos se guardan como <br>, que es como los escribe Mermaid.
+function textoAEditor(texto) {
+  return texto.replace(/<br\s*\/?>/gi, '\n');
+}
+
+function textoACodigo(texto) {
+  return texto.trim().replace(/\s*\n\s*/g, '<br>');
+}
+
+// Texto que tiene ahora el objeto señalado.
+function textoDelObjeto(objeto) {
+  if (objeto.tipo === 'nodo') {
+    for (const linea of el.editor.value.split('\n')) {
+      if (/^\s*%%/.test(linea)) continue;
+      const def = parseNodeDef(linea, objeto.id);
+      if (def) return def.texto;
+    }
+    return objeto.id;
+  }
+  const filas = lineasConCuenta(el.editor.value);
+  const fila = filas.find(({ desde, n }) => n && objeto.indice >= desde && objeto.indice < desde + n);
+  if (!fila) return '';
+  const { flechas } = trocearLinea(fila.linea);
+  const flecha = flechas[objeto.indice - fila.desde];
+  return flecha ? rotuloDeFlecha(flecha.texto) : '';
+}
+
+// Escribe el texto nuevo en el código, conservando forma y estilo.
+function escribirTextoDelObjeto(objeto, texto) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  if (objeto.tipo === 'nodo') {
+    const forma = currentShape(objeto.id);
+    for (let i = 0; i < lineas.length; i += 1) {
+      if (/^\s*%%/.test(lineas[i])) continue;
+      const def = parseNodeDef(lineas[i], objeto.id);
+      if (!def) continue;
+      lineas[i] = lineas[i].slice(0, def.inicio) + nodeDefWith(objeto.id, forma, texto || objeto.id) + lineas[i].slice(def.fin);
+      aplicarCodigo(lineas);
+      return;
+    }
+    lineas.push(sangriaDelCodigo(lineas) + nodeDefWith(objeto.id, forma, texto || objeto.id));
+    aplicarCodigo(lineas);
+    return;
+  }
+  let cuenta = 0;
+  for (let i = 0; i < lineas.length; i += 1) {
+    const n = enlacesDeLinea(lineas[i]);
+    if (n && objeto.indice >= cuenta && objeto.indice < cuenta + n) {
+      const { flechas, trozos } = trocearLinea(lineas[i]);
+      const k = objeto.indice - cuenta;
+      if (flechas[k]) {
+        const nuevas = flechas.map((f, j) => (j === k ? flechaConRotulo(f.texto, texto) : f.texto));
+        lineas[i] = (lineas[i].match(/^[ \t]*/) || [''])[0] + rehacerLinea(trozos, nuevas, '').trim();
+        aplicarCodigo(lineas);
+      }
+      return;
+    }
+    cuenta += n;
+  }
+}
+
+// Abre el campo encima del objeto, a su medida y con el zoom del lienzo.
+let editandoObjeto = null;
+
+function editarEnElSitio(objeto, caja) {
+  if (viewer || !caja) return;
+  cerrarContextual();
+  const campo = el.editorSitio;
+  editandoObjeto = objeto;
+  campo.value = textoAEditor(textoDelObjeto(objeto));
+  const alto = Math.max(26, Math.min(caja.height + 4, 160));
+  campo.style.left = Math.round(caja.left - 4) + 'px';
+  campo.style.top = Math.round(caja.top - 2) + 'px';
+  campo.style.width = Math.max(70, Math.round(caja.width + 8)) + 'px';
+  campo.style.height = Math.round(alto) + 'px';
+  campo.style.fontSize = Math.max(11, Math.round(14 * view.scale)) + 'px';
+  campo.hidden = false;
+  campo.focus();
+  campo.select();
+}
+
+function cerrarEditorSitio(guardar) {
+  const campo = el.editorSitio;
+  if (campo.hidden || !editandoObjeto) return;
+  const objeto = editandoObjeto;
+  const texto = campo.value;
+  editandoObjeto = null;
+  campo.hidden = true;
+  if (guardar) escribirTextoDelObjeto(objeto, textoACodigo(texto));
+}
+
+function setupEditorSitio() {
+  const campo = el.editorSitio;
+  campo.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); cerrarEditorSitio(true); }
+    else if (event.key === 'Escape') { event.preventDefault(); cerrarEditorSitio(false); }
+  });
+  campo.addEventListener('blur', () => cerrarEditorSitio(true));
+  el.viewport.addEventListener('dblclick', (event) => {
+    const objeto = objetoDelDiagrama(event);
+    if (objeto.tipo === 'fondo') return;
+    event.preventDefault();
+    const bajo = document.elementFromPoint(event.clientX, event.clientY);
+    const destino = objeto.tipo === 'nodo'
+      ? (bajo && bajo.closest('g.node'))
+      : ((bajo && bajo.closest('.edgeLabel')) || rotuloDeLaFlecha(objeto.indice));
+    if (!destino) return;
+    irAlObjeto(objeto);
+    editarEnElSitio(objeto.tipo === 'nodo' ? objeto : { ...objeto, tipo: 'rotulo' }, destino.getBoundingClientRect());
+  });
+}
+
+// El rótulo dibujado de una flecha, para escribir encima de él.
+function rotuloDeLaFlecha(indice) {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return null;
+  const flechas = [...svg.querySelectorAll('.edgePaths path, path.flowchart-link')];
+  const path = flechas[indice];
+  if (!path) return null;
+  let mejor = null;
+  let cerca = Infinity;
+  [...svg.querySelectorAll('.edgeLabel')].forEach((rotulo) => {
+    if (!(rotulo.textContent || '').trim()) return;
+    const caja = rotulo.getBoundingClientRect();
+    const d = distanciaAFlecha(path, caja.left + caja.width / 2, caja.top + caja.height / 2);
+    if (d < cerca) { cerca = d; mejor = rotulo; }
+  });
+  if (mejor && cerca < 40) return mejor;
+  // Sin rótulo todavía: se escribe en el centro de la flecha.
+  const largo = path.getTotalLength();
+  const q = path.getPointAtLength(largo / 2);
+  const pt = svg.createSVGPoint();
+  pt.x = q.x; pt.y = q.y;
+  const centro = pt.matrixTransform(path.getScreenCTM());
+  return { getBoundingClientRect: () => ({ left: centro.x - 45, top: centro.y - 13, width: 90, height: 26 }) };
+}
+
 /* --- Menú del botón derecho sobre el diagrama --- */
 
 // Distancia en pantalla de un punto al trazado de una flecha.
@@ -2518,15 +2865,21 @@ function objetoDelDiagrama(event) {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return { tipo: 'fondo' };
   const flechasSvg = [...svg.querySelectorAll('.edgePaths path, path.flowchart-link')];
+  // Mientras se arrastra el lienzo, el puntero queda capturado y los eventos
+  // llegan con otro destino: vale más mirar qué hay bajo el cursor.
+  let objetivo = event.target;
+  if (!objetivo || !objetivo.closest || !objetivo.closest('#canvas')) {
+    objetivo = document.elementFromPoint(event.clientX, event.clientY) || objetivo;
+  }
 
-  const nodo = event.target.closest && event.target.closest('g.node');
+  const nodo = objetivo.closest && objetivo.closest('g.node');
   if (nodo) {
     const m = /-flowchart-(.+)-\d+$/.exec(nodo.id || '');
     const id = m && m[1];
     if (id && allNodes().includes(id)) return { tipo: 'nodo', id };
   }
 
-  const flecha = event.target.closest && event.target.closest('.edgePaths path, path.flowchart-link');
+  const flecha = objetivo.closest && objetivo.closest('.edgePaths path, path.flowchart-link');
   if (flecha) {
     const indice = flechasSvg.indexOf(flecha);
     if (indice >= 0) return { tipo: 'flecha', indice };
@@ -2534,7 +2887,7 @@ function objetoDelDiagrama(event) {
 
   // El rótulo no dice a qué flecha pertenece, y acertar un trazo fino con el
   // ratón es difícil: en ambos casos vale la flecha que pase más cerca.
-  const rotulo = event.target.closest && event.target.closest('.edgeLabel');
+  const rotulo = objetivo.closest && objetivo.closest('.edgeLabel');
   const caja = rotulo && rotulo.getBoundingClientRect();
   const x = caja ? caja.left + caja.width / 2 : event.clientX;
   const y = caja ? caja.top + caja.height / 2 : event.clientY;
@@ -2881,6 +3234,13 @@ function construirContextual(objeto) {
       escribirGrosor('borde', ids, [], valor);
     });
     accionContextual(menu, t('ctxShape'), 'i-square', () => abrirFormas('esta'));
+    if (diagramKind() === 'flowchart') {
+      accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
+        const nodo = el.canvas.querySelector('[id$="-flowchart-' + objeto.id + '-' + '"], [id*="-flowchart-' + objeto.id + '-"]');
+        editarEnElSitio(objeto, nodo && nodo.getBoundingClientRect());
+      });
+      accionContextual(menu, t('ctxDeleteBox'), 'i-trash', () => borrarNodo(objeto.id));
+    }
     return;
   }
 
@@ -2897,7 +3257,15 @@ function construirContextual(objeto) {
     entradaSubmenu(menu, objeto, 'fondoRotulos');
     accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
       construirContextual({ tipo: 'flecha', indice: objeto.indice });
+      ajustarContextualEnPantalla();
     }, true);
+    if (diagramKind() === 'flowchart') {
+      menu.appendChild(document.createElement('hr'));
+      accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
+        const destino = rotuloDeLaFlecha(objeto.indice);
+        editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
+      });
+    }
     return;
   }
 
@@ -2923,6 +3291,14 @@ function construirContextual(objeto) {
       cerrarContextual();
       escribirGrosor('flecha', [], flechas, valor);
     });
+    if (diagramKind() === 'flowchart') {
+      menu.appendChild(document.createElement('hr'));
+      accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
+        const destino = rotuloDeLaFlecha(objeto.indice);
+        editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
+      });
+      accionContextual(menu, t('ctxDeleteArrow'), 'i-trash', () => borrarFlecha(objeto.indice));
+    }
     return;
   }
 
@@ -2945,6 +3321,22 @@ function construirContextual(objeto) {
   accionContextual(menu, t('a11y'), 'i-a11y', abrirAccesibilidad);
 }
 
+// El menú crece al cambiar de pantalla (las propiedades de una flecha tienen
+// más opciones): se recoloca para que siga cabiendo.
+function ajustarContextualEnPantalla() {
+  const menu = el.contextMenu;
+  if (menu.hidden) return;
+  const caja = menu.getBoundingClientRect();
+  const alto = Math.min(caja.height, window.innerHeight - 16);
+  menu.style.maxHeight = Math.round(window.innerHeight - 16) + 'px';
+  if (caja.bottom > window.innerHeight - 8) {
+    menu.style.top = Math.max(8, window.innerHeight - alto - 8) + 'px';
+  }
+  if (caja.right > window.innerWidth - 8) {
+    menu.style.left = Math.max(8, window.innerWidth - caja.width - 8) + 'px';
+  }
+}
+
 function abrirContextual(event) {
   // Con Mayús se deja pasar el menú del navegador (guardar o copiar la imagen).
   if (event.shiftKey || viewer) return;
@@ -2964,6 +3356,7 @@ function abrirContextual(event) {
   const y = Math.min(event.clientY, window.innerHeight - caja.height - 8);
   menu.style.left = Math.max(8, x) + 'px';
   menu.style.top = Math.max(8, y) + 'px';
+  ajustarContextualEnPantalla();
 }
 
 /* --- Aviso del botón derecho --- */
@@ -3725,6 +4118,7 @@ function setupToolbar() {
 
   setupEditorTools();
   setupContextual();
+  setupEditorSitio();
 
   el.showDataSelect.addEventListener('change', () => {
     writeShowData();
@@ -3786,6 +4180,7 @@ function setupToolbar() {
       el.downloadMenu.hidden = true;
       cerrarMenusEditor();
       cerrarContextual();
+      cerrarEditorSitio(false);
       cerrarFormas();
       el.libraryModal.hidden = true;
     }

@@ -303,6 +303,7 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   max-width: 280px;
   padding: 8px;
 }
+.menu-contextual { overflow-y: auto; }
 .menu-contextual .menu-titulo { margin: 2px 2px 8px; }
 .menu-contextual .segmentos { margin-bottom: 8px; }
 .menu-contextual .tamano-propio { margin: 0 2px 8px; padding-top: 0; border-top: 0; }
@@ -490,6 +491,24 @@ body > div[id^="dsirena-diagram-"] {
      Gantt) se dibujan según el ancho disponible, y así salen a su medida. */
   width: var(--ancho-medida, 100vw);
   pointer-events: none;
+}
+
+/* Campo para escribir el texto encima del propio elemento del diagrama. */
+.editor-sitio {
+  position: fixed;
+  z-index: 55;
+  margin: 0;
+  padding: 2px 4px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  line-height: 1.2;
+  text-align: center;
+  resize: none;
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 /* Aviso flotante sobre el lienzo: cuenta lo del botón derecho hasta que se
