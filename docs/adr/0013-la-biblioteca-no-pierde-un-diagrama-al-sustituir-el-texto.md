@@ -56,8 +56,9 @@ sea el más antiguo. Bajar el máximo pide confirmación cuando va a borrar algo
 
 Ya no se puede vaciar un diagrama para reescribirlo dentro de la misma ficha: al
 quedarse vacío, el anterior se conserva y lo siguiente nace aparte. Para
-empezar de cero está el botón de diagrama nuevo, y para deshacerse de una ficha,
-la papelera de la biblioteca.
+empezar de cero está el botón de diagrama nuevo, y para deshacerse de fichas,
+la biblioteca deja marcarlas una a una o todas y borrar las marcadas con una
+sola confirmación (desde el 22-09-2026; antes cada ficha tenía su papelera).
 
 Un diagrama de ejemplo o el de la primera visita también se conservan cuando se
 escribe otro encima, así que la lista crece algo más deprisa que antes. El

@@ -496,6 +496,23 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 
 .lista-docs li:hover { background: var(--surface-2); }
 .lista-docs li[aria-current="true"] { background: var(--accent-soft); }
+.lista-docs input[type="checkbox"], .marca-todos input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+
+/* Marcar diagramas de uno en uno o todos, y borrar los marcados de una vez. */
+.lista-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 0 8px;
+}
+.marca-todos { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.btn-peligro { display: inline-flex; align-items: center; gap: 6px; }
+.btn-peligro svg { width: 16px; height: 16px; }
+.btn-peligro:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+.btn-peligro:disabled { opacity: .5; cursor: default; }
+.lista-cabecera + .lista-docs { margin-top: 6px; }
 
 /* El máximo de diagramas guardados, al pie de la lista. */
 #ajuste-limite {

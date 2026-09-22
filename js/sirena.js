@@ -360,12 +360,18 @@ function duplicarDoc(id) {
   buildLibrary();
 }
 
-function borrarDoc(id) {
+// Borra los diagramas marcados en la lista, pidiendo confirmación una sola vez.
+function borrarMarcados() {
+  const ids = [...el.listaDocs.querySelectorAll('input[type="checkbox"]:checked')].map((c) => c.value);
+  if (!ids.length) return;
   const docs = leerDocs();
-  const doc = docs.find((d) => d.id === id);
-  if (!doc || !confirm(t('removeConfirm').replace('{nombre}', doc.nombre))) return;
-  escribirDocs(docs.filter((d) => d.id !== id));
-  if (docActivo === id) {
+  const nombres = docs.filter((d) => ids.includes(d.id)).map((d) => d.nombre);
+  const aviso = ids.length === 1
+    ? t('removeConfirm').replace('{nombre}', nombres[0])
+    : t('removeManyConfirm').replace('{n}', ids.length);
+  if (!confirm(aviso)) return;
+  escribirDocs(docs.filter((d) => !ids.includes(d.id)));
+  if (ids.includes(docActivo)) {
     const resto = leerDocs();
     if (resto.length) abrirDoc(resto[0].id);
     else {
@@ -379,6 +385,18 @@ function borrarDoc(id) {
   buildLibrary();
 }
 
+// Estado del «seleccionar todos» y del botón de borrar según lo marcado.
+function updateMarcados() {
+  const marcas = [...el.listaDocs.querySelectorAll('input[type="checkbox"]')];
+  const marcados = marcas.filter((m) => m.checked).length;
+  const todos = $('marcar-todos');
+  todos.checked = marcas.length > 0 && marcados === marcas.length;
+  todos.indeterminate = marcados > 0 && marcados < marcas.length;
+  const boton = $('borrar-marcados');
+  boton.disabled = marcados === 0;
+  $('borrar-marcados-texto').textContent = marcados ? t('removeMarked') + ' (' + marcados + ')' : t('removeMarked');
+}
+
 function fechaCorta(marca) {
   try {
     return new Date(marca).toLocaleString(lang, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -390,15 +408,25 @@ function fechaCorta(marca) {
 function buildLibrary() {
   const docs = leerDocs().sort((a, b) => b.modificado - a.modificado);
   el.listaDocs.innerHTML = '';
+  $('lista-cabecera').hidden = !docs.length;
   if (!docs.length) {
     const vacio = document.createElement('li');
     vacio.textContent = t('libraryEmpty');
     el.listaDocs.appendChild(vacio);
+    updateMarcados();
     return;
   }
   docs.forEach((doc) => {
     const fila = document.createElement('li');
     if (doc.id === docActivo) fila.setAttribute('aria-current', 'true');
+
+    const marca = document.createElement('input');
+    marca.type = 'checkbox';
+    marca.value = doc.id;
+    marca.title = t('selectOne');
+    marca.setAttribute('aria-label', t('selectOne') + ': ' + doc.nombre);
+    marca.addEventListener('change', updateMarcados);
+    fila.appendChild(marca);
 
     const abrir = document.createElement('button');
     abrir.type = 'button';
@@ -416,8 +444,7 @@ function buildLibrary() {
     fila.appendChild(abrir);
 
     [['i-pencil', 'rename', () => renombrarDoc(doc.id)],
-     ['i-duplicate', 'duplicate', () => duplicarDoc(doc.id)],
-     ['i-trash', 'remove', () => borrarDoc(doc.id)]].forEach(([icono, clave, accion]) => {
+     ['i-duplicate', 'duplicate', () => duplicarDoc(doc.id)]].forEach(([icono, clave, accion]) => {
       const boton = document.createElement('button');
       boton.type = 'button';
       boton.className = 'doc-accion';
@@ -2458,6 +2485,11 @@ function setupToolbar() {
   });
 
   $('library-close').addEventListener('click', () => { el.libraryModal.hidden = true; });
+  $('marcar-todos').addEventListener('change', (event) => {
+    el.listaDocs.querySelectorAll('input[type="checkbox"]').forEach((m) => { m.checked = event.target.checked; });
+    updateMarcados();
+  });
+  $('borrar-marcados').addEventListener('click', borrarMarcados);
   el.libraryModal.addEventListener('click', (event) => {
     if (event.target === el.libraryModal) el.libraryModal.hidden = true;
   });
