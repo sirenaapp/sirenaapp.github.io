@@ -161,6 +161,29 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
   font-size: 12px;
 }
 
+/* En el menú de aspecto cada ajuste lleva su icono delante del rótulo,
+   para reconocerlo de un vistazo; el selector ocupa todo el ancho. */
+.menu-ajustes > .ajuste {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  column-gap: 8px;
+  align-items: center;
+}
+
+.menu-ajustes > .ajuste > svg {
+  width: 16px;
+  height: 16px;
+  margin-bottom: 4px;
+  color: var(--text-soft);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.menu-ajustes > .ajuste > select { grid-column: 1 / -1; }
+
 .ajuste select {
   width: 100%;
   height: 32px;
