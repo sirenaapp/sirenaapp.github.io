@@ -638,7 +638,7 @@ function updateAppearanceVisibility() {
     showdata: tipo === 'pie'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
-  $('sep-ajustes').hidden = !Object.values(visibles).some(Boolean);
+  $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
   readShowData();
 }
 

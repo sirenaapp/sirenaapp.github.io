@@ -53,7 +53,8 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   partes), cada uno con una línea que dice cómo reparte los elementos. Se
   excluye `elk.random`, que coloca al azar y solo sirve para pruebas. Aparece
   en flujo, estados, clases y entidad-relación, y el motor elegido se escribe
-  en la cabecera (ADR 12).
+  en la cabecera (ADR 12). Va en segundo lugar, justo después del tipo, porque
+  condiciona qué ajustes tienen sentido después.
 - **Un botón por ajuste.** El resto del antiguo menú de aspecto de la barra
   superior, a petición del autor, con un botón por ajuste que solo aparece
   cuando el tipo de diagrama y el motor lo atienden, comprobado uno a uno:
