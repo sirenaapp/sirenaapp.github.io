@@ -668,6 +668,92 @@ window.SIRENA_EXAMPLES = [
     group: { es: 'Estructuras', ca: 'Estructures', gl: 'Estruturas', eu: 'Egiturak', en: 'Structures' },
     items: [
       {
+        id: 'concept',
+        label: { es: 'Mapa conceptual', ca: 'Mapa conceptual', gl: 'Mapa conceptual', eu: 'Kontzeptu-mapa', en: 'Concept map' },
+        code: {
+          es: `flowchart TD
+    accTitle: Mapa conceptual del agua
+    accDescr: Mapa conceptual con los conceptos unidos por enlaces que llevan un verbo: el agua, su composición, sus tres estados, su ciclo y su papel en los seres vivos.
+    A([El agua]) -- está formada por --> B[Hidrógeno y oxígeno]
+    A -- se presenta en --> C[Estado sólido]
+    A -- se presenta en --> D[Estado líquido]
+    A -- se presenta en --> E[Estado gaseoso]
+    A -- recorre --> F[El ciclo del agua]
+    A -- es imprescindible para --> G[Los seres vivos]
+    F -- tiene como fases --> H[Evaporación]
+    F -- tiene como fases --> I[Condensación]
+    F -- tiene como fases --> J[Precipitación]
+    F -- se mantiene gracias a --> K[La energía del Sol]
+    I -- forma --> L[Nubes]
+    J -- alimenta --> M[Ríos, lagos y mares]
+    G -- la obtienen de --> M`,
+          ca: `flowchart TD
+    accTitle: Mapa conceptual de l'aigua
+    accDescr: Mapa conceptual amb els conceptes units per enllaços que porten un verb: l'aigua, la seva composició, els seus tres estats, el seu cicle i el seu paper en els éssers vius.
+    A([L'aigua]) -- està formada per --> B[Hidrogen i oxigen]
+    A -- es presenta en --> C[Estat sòlid]
+    A -- es presenta en --> D[Estat líquid]
+    A -- es presenta en --> E[Estat gasós]
+    A -- recorre --> F[El cicle de l'aigua]
+    A -- és imprescindible per a --> G[Els éssers vius]
+    F -- té com a fases --> H[Evaporació]
+    F -- té com a fases --> I[Condensació]
+    F -- té com a fases --> J[Precipitació]
+    F -- es manté gràcies a --> K[L'energia del Sol]
+    I -- forma --> L[Núvols]
+    J -- alimenta --> M[Rius, llacs i mars]
+    G -- l'obtenen de --> M`,
+          gl: `flowchart TD
+    accTitle: Mapa conceptual da auga
+    accDescr: Mapa conceptual cos conceptos unidos por ligazóns que levan un verbo: a auga, a súa composición, os seus tres estados, o seu ciclo e o seu papel nos seres vivos.
+    A([A auga]) -- está formada por --> B[Hidróxeno e osíxeno]
+    A -- preséntase en --> C[Estado sólido]
+    A -- preséntase en --> D[Estado líquido]
+    A -- preséntase en --> E[Estado gasoso]
+    A -- percorre --> F[O ciclo da auga]
+    A -- é imprescindible para --> G[Os seres vivos]
+    F -- ten como fases --> H[Evaporación]
+    F -- ten como fases --> I[Condensación]
+    F -- ten como fases --> J[Precipitación]
+    F -- mantense grazas á --> K[Enerxía do Sol]
+    I -- forma --> L[Nubes]
+    J -- alimenta --> M[Ríos, lagos e mares]
+    G -- obtéñena de --> M`,
+          eu: `flowchart TD
+    accTitle: Uraren kontzeptu-mapa
+    accDescr: Kontzeptu-mapa, kontzeptuak aditza daramaten loturen bidez elkartuta: ura, bere osaera, bere hiru egoerak, bere zikloa eta izaki bizidunengan duen eginkizuna.
+    A([Ura]) -- honakoek osatzen dute --> B[Hidrogenoa eta oxigenoa]
+    A -- egoera honetan agertzen da --> C[Egoera solidoa]
+    A -- egoera honetan agertzen da --> D[Egoera likidoa]
+    A -- egoera honetan agertzen da --> E[Egoera gaseosoa]
+    A -- zeharkatzen du --> F[Uraren zikloa]
+    A -- ezinbestekoa da --> G[Izaki bizidunentzat]
+    F -- fase hauek ditu --> H[Lurruntzea]
+    F -- fase hauek ditu --> I[Kondentsazioa]
+    F -- fase hauek ditu --> J[Prezipitazioa]
+    F -- honi esker mantentzen da --> K[Eguzkiaren energia]
+    I -- sortzen ditu --> L[Hodeiak]
+    J -- elikatzen ditu --> M[Ibaiak, aintzirak eta itsasoak]
+    G -- hemendik lortzen dute --> M`,
+          en: `flowchart TD
+    accTitle: Concept map of water
+    accDescr: A concept map whose concepts are joined by links that carry a verb: water, what it is made of, its three states, its cycle and its role for living things.
+    A([Water]) -- is made of --> B[Hydrogen and oxygen]
+    A -- is found as --> C[Solid]
+    A -- is found as --> D[Liquid]
+    A -- is found as --> E[Gas]
+    A -- goes through --> F[The water cycle]
+    A -- is essential for --> G[Living things]
+    F -- has the stages --> H[Evaporation]
+    F -- has the stages --> I[Condensation]
+    F -- has the stages --> J[Precipitation]
+    F -- is driven by --> K[The Sun's energy]
+    I -- forms --> L[Clouds]
+    J -- feeds --> M[Rivers, lakes and seas]
+    G -- get it from --> M`
+        }
+      },
+      {
         id: 'mindmap',
         label: { es: 'Mapa mental', ca: 'Mapa mental', gl: 'Mapa mental', eu: 'Adimen-mapa', en: 'Mind map' },
         code: {
