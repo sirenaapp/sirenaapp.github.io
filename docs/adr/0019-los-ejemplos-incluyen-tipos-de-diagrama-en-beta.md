@@ -22,7 +22,9 @@ con nombres entre comillas el dibujo sale mal ordenado en esta versión.
 Se añaden ejemplos de radar, Venn e Ishikawa, en los cinco idiomas y cada uno
 en su grupo (datos, estructuras y procesos). Solo el radar lleva `accTitle` y
 `accDescr`: el analizador del Venn los rechaza y el del Ishikawa los dibuja
-como si fueran texto del diagrama.
+como si fueran texto del diagrama. En esos dos, el título y la descripción van
+en comentarios `%%` al principio del código, que Mermaid retira antes de
+analizar y por eso valen en cualquier tipo de diagrama.
 
 Al actualizar Mermaid (`scripts/actualizar-mermaid.sh`) hay que cargar estos
 tres ejemplos y comprobar que siguen dibujándose; si la sintaxis ha cambiado,
