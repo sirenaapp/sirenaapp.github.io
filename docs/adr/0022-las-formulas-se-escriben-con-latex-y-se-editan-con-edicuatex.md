@@ -62,6 +62,13 @@ también fuera de Sirena, así que vienen de Mermaid 12:
   la fórmula queda como una palabra más. Lo que sobresale se mide sobre los
   elementos de dentro, no solo sobre el rótulo, porque lo que desborda de una
   fila no cuenta en la medida del padre.
+- Decide si el texto se parte o no (`white-space`) con una medida previa que
+  hace en un elemento fuera de pantalla, y en el Chrome del autor esa medida
+  le decía que cabía en una línea cuando no cabía: el rótulo salía en `nowrap`
+  y cortado. Se parte siempre. Y el arreglo se hace en el momento, forzando la
+  composición, no en el siguiente fotograma: en una pestaña que el navegador
+  considera oculta no dibuja fotogramas y el arreglo no llegaba a hacerse
+  (así se destapó, 22-09-2026, con la pestaña de la extensión del navegador).
 - En un rótulo con fórmula se come los `<br>`. Antes de dibujar se cambian por
   una marca invisible, que viaja como texto normal, y después se vuelven a
   poner como saltos de verdad.

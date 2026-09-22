@@ -1048,6 +1048,9 @@ function ajustarRotulosHtml() {
     restaurarSaltos(dentro);
     soltarFilas(dentro);
     dentro.style.display = 'block';
+    // Mermaid deja el rótulo sin partir (nowrap) cuando su medida previa le
+    // dice que cabe, y esa medida falla en una pestaña oculta: se parte siempre.
+    dentro.style.whiteSpace = 'normal';
     dentro.style.width = disponible + 'px';
     dentro.style.maxWidth = disponible + 'px';
     dentro.style.overflowWrap = 'break-word';
@@ -1109,10 +1112,11 @@ async function renderOnce() {
     if (token !== renderToken) return;
     currentSvg = opaqueEdgeLabels(svg, id);
     el.canvas.innerHTML = currentSvg;
-    // El ancho del texto no es el definitivo hasta que el navegador compone
-    // la página, así que el arreglo del rótulo espera al siguiente dibujado.
+    // El arreglo del rótulo se hace ya, forzando la composición: si se
+    // dejara para el siguiente fotograma no llegaría a hacerse en una pestaña
+    // que el navegador considere oculta, donde no dibuja fotogramas.
     if (currentSvg.includes('<foreignObject')) {
-      requestAnimationFrame(() => requestAnimationFrame(ajustarRotulosHtml));
+      ajustarRotulosHtml();
     }
     ocultarAnclas();
     hideEmpty();
