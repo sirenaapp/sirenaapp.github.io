@@ -1226,7 +1226,7 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 .lista-temas hr { width: 100%; margin: 4px 0; border: 0; border-top: 1px solid var(--border); }
 .menu .lista-temas button { display: flex; align-items: center; gap: 10px; padding: 5px 8px; }
 .menu .lista-temas button[aria-current="true"] { background: var(--accent-soft); }
-.muestra-tema { flex: none; width: 58px; height: 20px; }
+.muestra-tema { flex: none; width: 38px; height: 20px; }
 .menu-temas .colores-propios { margin-top: 8px; }
 
 /* Menú de colores: el elemento del cursor y, debajo, el fondo de los rótulos.

@@ -39,7 +39,7 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   deshabilitado al elegir el segundo, porque Mermaid solo admite colores
   propios sobre el tema `base`; para quien usa el programa son la misma
   elección, y el autor pidió sacarla a la vista. Cada opción se ve dibujada
-  (dos cajas y una flecha con su relleno, su borde y su línea, los de las
+  (una caja con una flecha, con su relleno, su borde y su línea, los de las
   variables de tema de Mermaid 12), y la del predeterminado sigue al modo
   claro u oscuro, como el propio tema. «Base» no figura porque sin colores
   propios apenas se distingue del predeterminado; solo aparece, marcado, si

@@ -3552,8 +3552,8 @@ function buildNodeColorSection() {
 /* --- Tema --- */
 
 // Los temas de Mermaid y la paleta de Sirena son una sola elección: los
-// colores del diagrama entero. Cada opción se ve dibujada con su relleno, su
-// borde y sus líneas (los de Mermaid 12, leídos de sus variables de tema).
+// colores del diagrama entero. Cada opción se ve dibujada, una caja con una
+// flecha, con su relleno, su borde y sus líneas (los de Mermaid 12, leídos de sus variables de tema).
 const MUESTRAS_TEMA = {
   default: ['#ececff', '#9370db', '#333333'],
   neutral: ['#eeeeee', '#999999', '#666666'],
@@ -3563,11 +3563,10 @@ const MUESTRAS_TEMA = {
 };
 
 function dibujoDeTema([relleno, borde, linea]) {
-  return '<svg class="muestra-tema" viewBox="0 0 58 20" aria-hidden="true">'
-    + `<rect x="1" y="3" width="18" height="14" rx="2" fill="${relleno}" stroke="${borde}" stroke-width="1.5"/>`
-    + `<path d="M20 10h13" stroke="${linea}" stroke-width="1.5" fill="none"/>`
-    + `<path d="M33 6.5l5 3.5-5 3.5z" fill="${linea}"/>`
-    + `<rect x="39" y="3" width="18" height="14" rx="2" fill="${relleno}" stroke="${borde}" stroke-width="1.5"/>`
+  return '<svg class="muestra-tema" viewBox="0 0 38 20" aria-hidden="true">'
+    + `<rect x="1" y="3" width="20" height="14" rx="2" fill="${relleno}" stroke="${borde}" stroke-width="1.5"/>`
+    + `<path d="M22 10h9" stroke="${linea}" stroke-width="1.5" fill="none"/>`
+    + `<path d="M31 6.5l5 3.5-5 3.5z" fill="${linea}"/>`
     + '</svg>';
 }
 
