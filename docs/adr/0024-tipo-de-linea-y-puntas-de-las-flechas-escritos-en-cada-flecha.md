@@ -24,8 +24,11 @@ punto, gruesa, invisible) y **puntas** (ninguna; flecha, círculo o cruz al
 final; flecha, círculo o cruz en los dos extremos). Se ofrecen en tres sitios,
 con el mismo patrón que la forma de las cajas:
 
-- **Botón derecho sobre una flecha**: dos submenús en cascada, «Tipo de
-  línea» y «Puntas», con cada opción dibujada y con su nombre, en vertical.
+- **Botón derecho sobre una flecha**: dos apartados plegables, «Tipo de
+  línea» y «Puntas», con la opción actual dibujada en la cabecera y, al
+  abrirlos, cada opción dibujada y con su nombre, en vertical. Hasta el
+  23-09-2026 eran submenús en cascada; se cambiaron para que fueran iguales
+  que en el menú de líneas y en el tipo de borde de los bloques (ADR 21).
 - **Botón de líneas de la barra**, sección «Donde está el cursor»: lo mismo
   para la flecha de la línea del cursor.
 - **Botón de líneas, sección «Todas las líneas»**: cambia las flechas que

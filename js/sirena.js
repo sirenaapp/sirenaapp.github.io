@@ -1893,17 +1893,8 @@ function construirFormatoBloque(caja, id, alCambiar) {
     }
   };
   muestrasDeColor(caja, parteBloque !== 'todo', colorear);
-  const propio = document.createElement('label');
-  propio.className = 'swatch-propio';
-  const input = document.createElement('input');
-  input.type = 'color';
   const clave = { todo: 'fill', texto: 'color', borde: 'stroke' }[parteBloque];
-  input.value = hexDeCSS(actual[clave]) || '#d0ebff';
-  input.addEventListener('change', () => colorear(input.value, null));
-  const texto = document.createElement('span');
-  texto.textContent = t('nodeColorCustom');
-  propio.append(input, texto);
-  caja.appendChild(propio);
+  otroColor(caja, actual[clave] || (parteBloque === 'todo' ? '#d0ebff' : '#1971c2'), (color) => colorear(color, null));
   accionContextual(caja, t('nodeColorClear'), 'i-trash', () => {
     if (parteBloque === 'texto') escribirFormatoBloque(id, { color: null });
     else if (parteBloque === 'borde') escribirFormatoBloque(id, { stroke: null });
@@ -1917,25 +1908,8 @@ function construirFormatoBloque(caja, id, alCambiar) {
   const grosor = (actual['stroke-width'] || '').replace('px', '');
   segmentosDe(caja, BORDER_WIDTHS.map(([v, k]) => [v, t(k)]), grosor, (valor) => escribir({ 'stroke-width': valor ? valor + 'px' : null }));
   campoGrosor(caja, grosor, (valor) => escribir({ 'stroke-width': valor + 'px' }));
-  const grupoTrazo = document.createElement('p');
-  grupoTrazo.className = 'menu-grupo';
-  grupoTrazo.textContent = t('borderLine');
-  caja.appendChild(grupoTrazo);
-  const lista = document.createElement('div');
-  lista.className = 'lista-flechas';
   const trazo = (actual['stroke-dasharray'] || '').replace(/\s+/g, ' ');
-  TRAZOS_BORDE.forEach(([valor, k]) => {
-    const boton = document.createElement('button');
-    boton.type = 'button';
-    boton.innerHTML = `<svg viewBox="0 0 40 16" aria-hidden="true"><path d="M2 8h36"${valor ? ` stroke-dasharray="${valor}"` : ''} stroke-linecap="butt"/></svg>`;
-    const span = document.createElement('span');
-    span.textContent = t(k);
-    boton.appendChild(span);
-    boton.setAttribute('aria-current', trazo === valor ? 'true' : 'false');
-    boton.addEventListener('click', () => escribir({ 'stroke-dasharray': valor || null }));
-    lista.appendChild(boton);
-  });
-  caja.appendChild(lista);
+  pliegueDibujado(caja, t('borderLine'), TRAZOS_BORDE, trazo, dibujoDeBorde, (valor) => escribirFormatoBloque(id, { 'stroke-dasharray': valor || null }));
 }
 
 /* --- Bloques (subgraph … end) --- */
@@ -2117,8 +2091,14 @@ function construirMenuBloque(caja) {
 function construirDireccionBloque(caja) {
   const id = objetoContextual && objetoContextual.id;
   const b = bloquesDelCodigo().find((x) => x.id === id);
-  const opciones = [['', 'blockDirDefault'], ['TB', 'dirTB'], ['LR', 'dirLR'], ['BT', 'dirBT'], ['RL', 'dirRL']];
-  segmentosDe(caja, opciones.map(([v, k]) => [v, t(k)]), b ? b.direccion : '', (valor) => { cerrarContextual(); escribirDireccionBloque(id, valor); });
+  // La misma lista que la dirección del diagrama, con «la del diagrama» delante.
+  const actual = b ? b.direccion : '';
+  const opciones = [['', 'blockDirDefault', $('dir-icon').getAttribute('href')], ['TB', 'dirTD', '#i-arrow-down'],
+    ['LR', 'dirLR', '#i-arrow-right'], ['BT', 'dirBT', '#i-arrow-up'], ['RL', 'dirRL', '#i-arrow-left']];
+  opciones.forEach(([valor, clave, icono]) => {
+    const boton = accionContextual(caja, t(clave), icono.slice(1), () => escribirDireccionBloque(id, valor));
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+  });
 }
 
 /* --- Enlace de una caja (click A "https://…" "texto") --- */
@@ -3987,11 +3967,44 @@ function buildEngineMenu() {
 
 // Abre un menú de la barra del editor cerrando los demás; «antes» prepara su
 // contenido cuando se va a abrir.
+// Los ajustes de los menús se eligen con botones a la vista, no con un
+// desplegable dentro del menú: el selector queda oculto y guarda el valor.
+function segmentosDeSelects(raiz) {
+  raiz.querySelectorAll('label.ajuste > select').forEach((select) => {
+    let caja = select.nextElementSibling;
+    if (!caja || !caja.classList.contains('segmentos-ajuste')) {
+      select.hidden = true;
+      caja = document.createElement('div');
+      caja.className = 'segmentos segmentos-ajuste';
+      select.after(caja);
+      select.addEventListener('change', () => pintarSegmentosDeSelect(select, caja));
+    }
+    pintarSegmentosDeSelect(select, caja);
+  });
+}
+
+function pintarSegmentosDeSelect(select, caja) {
+  caja.innerHTML = '';
+  [...select.options].forEach((opcion) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.textContent = opcion.textContent;
+    boton.setAttribute('aria-current', opcion.value === select.value ? 'true' : 'false');
+    boton.addEventListener('click', (event) => {
+      event.preventDefault();
+      select.value = opcion.value;
+      select.dispatchEvent(new Event('change'));
+    });
+    caja.appendChild(boton);
+  });
+}
+
 function alternarMenuEditor(menu, boton, antes) {
   const abrir = menu.hidden;
   cerrarMenusEditor();
   if (!abrir) return;
   if (antes) antes();
+  segmentosDeSelects(menu);
   placeMenu(menu, boton);
   menu.hidden = false;
   ajustarMenuAlPanel(menu);
@@ -4938,6 +4951,71 @@ function muestrasDeColor(contenedor, usarBorde, alElegir) {
   contenedor.appendChild(caja);
 }
 
+// Apartado plegable con una lista de opciones dibujadas y la actual al lado,
+// como el tipo de línea y las puntas del menú de líneas.
+function pliegueDibujado(contenedor, titulo, opciones, actual, dibujo, alElegir) {
+  const cabeza = document.createElement('button');
+  cabeza.type = 'button';
+  cabeza.className = 'pliegue';
+  cabeza.setAttribute('aria-expanded', 'false');
+  cabeza.innerHTML = '<svg class="chev" aria-hidden="true"><use href="#i-chevron"></use></svg>';
+  const nombre = document.createElement('span');
+  nombre.textContent = titulo;
+  const ahora = document.createElement('span');
+  ahora.className = 'pliegue-actual';
+  ahora.appendChild(dibujo(actual));
+  cabeza.append(nombre, ahora);
+  const lista = document.createElement('div');
+  lista.className = 'lista-flechas';
+  lista.hidden = true;
+  opciones.forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.setAttribute('aria-current', valor === actual ? 'true' : 'false');
+    const texto = document.createElement('span');
+    texto.textContent = t(clave);
+    boton.append(dibujo(valor), texto);
+    boton.addEventListener('click', () => { cerrarContextual(); alElegir(valor); });
+    lista.appendChild(boton);
+  });
+  cabeza.addEventListener('click', () => {
+    const abrir = lista.hidden;
+    lista.hidden = !abrir;
+    cabeza.setAttribute('aria-expanded', String(abrir));
+    ajustarContextualEnPantalla();
+  });
+  contenedor.append(cabeza, lista);
+}
+
+// Dibujo de una flecha para las listas; la invisible no tiene dibujo.
+function dibujoDeFlechaOVacio(campo) {
+  return (valor) => (campo === 'linea' && valor === 'invisible'
+    ? document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    : dibujoDeFlecha(campo, valor));
+}
+
+function dibujoDeBorde(valor) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 40 16');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = `<path d="M2 8h36"${valor ? ` stroke-dasharray="${valor}"` : ''} stroke-linecap="butt"/>`;
+  return svg;
+}
+
+// «Otro color…»: el selector del navegador, tras la paleta.
+function otroColor(contenedor, inicial, alElegir) {
+  const propio = document.createElement('label');
+  propio.className = 'swatch-propio';
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = hexDeCSS(inicial) || '#1971c2';
+  input.addEventListener('change', () => { cerrarContextual(); alElegir(input.value); });
+  const texto = document.createElement('span');
+  texto.textContent = t('nodeColorCustom');
+  propio.append(input, texto);
+  contenedor.appendChild(propio);
+}
+
 function segmentosDe(contenedor, opciones, actual, alElegir) {
   const caja = document.createElement('div');
   caja.className = 'segmentos';
@@ -4985,7 +5063,12 @@ function accionContextual(contenedor, texto, icono, alPulsar, mantener, conPaso)
     boton.appendChild(paso);
   }
   boton.addEventListener('click', () => { if (!mantener) cerrarContextual(); alPulsar(); });
-  boton.addEventListener('mouseenter', () => { if (!boton.hasAttribute('aria-expanded')) cerrarSubmenu(); });
+  // Pasar por otra entrada del menú principal cierra el submenú abierto; las
+  // entradas de dentro del submenú, no.
+  boton.addEventListener('mouseenter', () => {
+    if (!boton.hasAttribute('aria-expanded') && !el.contextSubmenu.contains(boton)) cambiarSubmenu(cerrarSubmenu);
+  });
+  boton.addEventListener('mouseleave', cancelarCambioSubmenu);
   contenedor.appendChild(boton);
   return boton;
 }
@@ -5014,6 +5097,7 @@ function prestarMenu(nodo, destino, titulo) {
   const repetido = primero && primero.matches('.menu-titulo, .menu-seccion') && !primero.hidden
     && primero.textContent.trim().toLowerCase() === (titulo || '').trim().toLowerCase() ? primero : null;
   if (repetido) repetido.hidden = true;
+  segmentosDeSelects(nodo);
   menuPrestado = { nodo, padre: nodo.parentNode, siguiente: nodo.nextSibling, repetido };
   nodo.classList.add('prestado');
   nodo.style.left = '';
@@ -5097,26 +5181,31 @@ const SUBMENUS = {
   bloque: { titulo: 'blockMenu', icono: 'i-group', construir: construirMenuBloque },
   todosBloques: { titulo: 'blockAll', icono: 'i-group', construir: (caja) => formatoBloqueEn(caja, null) },
   bloqueDir: { titulo: 'direction', icono: 'i-arrow-down', construir: construirDireccionBloque },
-  lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
-  puntas: { titulo: 'arrowHead', icono: 'i-arrow-right', construir: (caja) => construirTipoFlecha(caja, 'puntas') }
+
 };
 
 // Objeto sobre el que se abrió el menú, para los submenús que lo necesitan.
 let objetoContextual = null;
 
-function construirTipoFlecha(caja, campo) {
-  const indice = objetoContextual ? objetoContextual.indice : 0;
-  const actual = tipoDeFlecha(indice)[campo];
-  const fila = document.createElement('div');
-  fila.className = 'lista-flechas';
-  caja.appendChild(fila);
-  botonesDeFlecha(fila, campo, actual, (valor) => {
-    cerrarContextual();
-    aplicarTipoFlecha([indice], { [campo]: valor }, false);
-  });
+// Camino hacia el submenú: quien va en diagonal hasta él pasa por encima de
+// otras entradas del menú. Con un submenú abierto, esas entradas solo lo
+// cambian si el ratón se queda en ellas un momento; al entrar en el submenú,
+// el cambio se anula.
+let cambioSubmenu = null;
+
+function cambiarSubmenu(accion) {
+  cancelarCambioSubmenu();
+  if (el.contextSubmenu.hidden) { accion(); return; }
+  cambioSubmenu = setTimeout(() => { cambioSubmenu = null; accion(); }, 300);
+}
+
+function cancelarCambioSubmenu() {
+  clearTimeout(cambioSubmenu);
+  cambioSubmenu = null;
 }
 
 function cerrarSubmenu() {
+  cancelarCambioSubmenu();
   devolverMenu();
   el.contextSubmenu.hidden = true;
   el.contextMenu.querySelectorAll('[aria-expanded="true"]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
@@ -5187,8 +5276,10 @@ function entradaSubmenu(contenedor, objeto, clave, texto) {
     entrada.setAttribute('aria-expanded', 'false');
     // Como en cualquier menú de escritorio, basta con pasar el ratón.
     entrada.addEventListener('mouseenter', () => {
-      if (entrada.getAttribute('aria-expanded') !== 'true') abrirSubmenuCascada(clave, entrada);
+      if (entrada.getAttribute('aria-expanded') === 'true') { cancelarCambioSubmenu(); return; }
+      cambiarSubmenu(() => abrirSubmenuCascada(clave, entrada));
     });
+    entrada.addEventListener('mouseleave', cancelarCambioSubmenu);
   }
 }
 
@@ -5239,6 +5330,8 @@ function construirContextual(objeto) {
     muestrasDeColor(menu, colorParte !== 'todo', (color, borde) => {
       applyNodeColor(ids, color, borde, null);
     });
+    const propCaja = { todo: 'fill', texto: 'color', borde: 'stroke' }[colorParte];
+    otroColor(menu, getPropLine('style ' + objeto.id, propCaja) || (colorParte === 'todo' ? '#d0ebff' : '#1971c2'), (color) => applyNodeColor(ids, color, null, null));
     accionContextual(menu, t('nodeColorClear'), 'i-trash', () => clearNodeColor(ids));
     menu.appendChild(document.createElement('hr'));
     const grupoGrosor = document.createElement('p');
@@ -5282,7 +5375,8 @@ function construirContextual(objeto) {
     titulo.appendChild(codigo);
     const flechas = [objeto.indice];
     muestrasDeColor(menu, true, (color) => applyLinkColor(flechas, color, true));
-    accionContextual(menu, t('ctxTextClear'), 'i-trash', () => applyLinkColor(flechas, null, true));
+    otroColor(menu, getPropLine('linkStyle ' + objeto.indice, 'color'), (color) => applyLinkColor(flechas, color, true));
+    accionContextual(menu, t('nodeColorClear'), 'i-trash', () => applyLinkColor(flechas, null, true));
     menu.appendChild(document.createElement('hr'));
     // El fondo del rótulo solo se puede cambiar para todos a la vez.
     entradaSubmenu(menu, objeto, 'fondoRotulos');
@@ -5336,6 +5430,7 @@ function construirContextual(objeto) {
     titulo.appendChild(codigo);
     const flechas = [objeto.indice];
     muestrasDeColor(menu, true, (color) => applyLinkColor(flechas, color));
+    otroColor(menu, getPropLine('linkStyle ' + objeto.indice, 'stroke'), (color) => applyLinkColor(flechas, color));
     accionContextual(menu, t('nodeColorClear'), 'i-trash', () => applyLinkColor(flechas, null));
     menu.appendChild(document.createElement('hr'));
     const grupo = document.createElement('p');
@@ -5353,8 +5448,9 @@ function construirContextual(objeto) {
     });
     if (diagramKind() === 'flowchart') {
       menu.appendChild(document.createElement('hr'));
-      entradaSubmenu(menu, objeto, 'lineaTipo');
-      entradaSubmenu(menu, objeto, 'puntas');
+      const tipo = tipoDeFlecha(objeto.indice);
+      pliegueDibujado(menu, t('lineType'), LINE_TYPES, tipo.linea, dibujoDeFlechaOVacio('linea'), (valor) => aplicarTipoFlecha([objeto.indice], { linea: valor }, false));
+      pliegueDibujado(menu, t('arrowHead'), ARROW_HEADS, tipo.puntas, dibujoDeFlechaOVacio('puntas'), (valor) => aplicarTipoFlecha([objeto.indice], { puntas: valor }, false));
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
         const destino = rotuloDeLaFlecha(objeto.indice);
         editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
@@ -5478,6 +5574,7 @@ function setupContextual() {
     event.stopPropagation();
     ocultarPista(true);
   });
+  el.contextSubmenu.addEventListener('mouseenter', cancelarCambioSubmenu);
   [el.contextMenu, el.contextSubmenu].forEach((caja) => {
     caja.addEventListener('click', (event) => event.stopPropagation());
     caja.addEventListener('contextmenu', (event) => event.stopPropagation());

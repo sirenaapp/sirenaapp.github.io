@@ -1236,3 +1236,13 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 #fondo-rotulos > .accion-menu { color: var(--text-soft); font-size: 12.5px; }
 #fondo-rotulos > .accion-menu svg { display: none; }
 .muestra-trazo { flex: none; width: 38px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
+
+/* Submenús homogéneos: los ajustes con botones a la vista en lugar de un
+   desplegable, un solo estilo para los títulos de apartado y la opción
+   actual marcada igual en todas las listas. */
+.menu-ajustes > .ajuste > .segmentos-ajuste { grid-column: 1 / -1; margin: 0; flex-wrap: wrap; }
+.menu-ajustes > .ajuste > .segmentos-ajuste button { flex: 1 0 auto; }
+.menu-contextual .menu-grupo { margin: 4px 2px 6px; color: var(--text-soft); font-size: 12px; }
+.menu-contextual .accion-menu[aria-current="true"] { color: var(--accent); font-weight: 600; }
+.menu-contextual .accion-menu[aria-current="true"] svg { color: var(--accent); }
+.menu-contextual .lista-flechas { margin-bottom: 6px; }

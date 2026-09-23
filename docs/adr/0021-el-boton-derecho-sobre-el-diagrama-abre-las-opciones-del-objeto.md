@@ -48,6 +48,28 @@ al menú contextual, se muestra sin su marco y vuelve a su sitio al cerrar. Las
 formas de caja, que son cincuenta y dos, se abren en una ventana, que es
 también la que abre el botón de la barra.
 
+El 23-09-2026, a petición del autor, los menús y submenús se igualaron en
+aspecto y funcionamiento:
+
+- **Color**, en la caja, la flecha, el rótulo, el bloque y el fondo de los
+  rótulos: la paleta, «Otro color…» y «Quitar el color», en ese orden.
+- **Ajustes con pocas opciones**: botones a la vista, nunca un desplegable
+  dentro del menú. Los menús de la barra que se prestan (líneas, secuencia,
+  gráfica, calendario, sectores) ocultan su selector, que sigue guardando el
+  valor, y muestran sus opciones como botones.
+- **Listas de opciones dibujadas** (tipo de línea, puntas, tipo de borde):
+  un apartado plegable con la opción actual dibujada en la cabecera, el
+  mismo en el menú de líneas, en el de una flecha y en el de un bloque.
+- **Listas con icono** (dirección del diagrama y de un bloque): una opción
+  por fila con su flecha y su nombre, y la actual resaltada.
+- **Títulos de apartado**: uno solo, en gris y pequeño.
+- **Camino hacia el submenú**: quien va en diagonal hasta él pasa por encima
+  de otras entradas. Con un submenú abierto, esas entradas solo lo cambian si
+  el ratón se queda en ellas 300 ms, y el cambio se anula al entrar en el
+  submenú; las entradas de dentro del submenú nunca lo cierran. Antes, ir
+  hasta los colores de «Todos los bloques» o hasta las opciones de «Bloque»
+  de una caja cerraba el submenú por el camino.
+
 El objeto se identifica en el SVG que dibuja Mermaid: las cajas llevan su
 identificador en el id (`…-flowchart-A-0`) y las flechas van en el mismo orden
 que los índices de `linkStyle` (comprobado con ELK y con Dagre). El rótulo de
