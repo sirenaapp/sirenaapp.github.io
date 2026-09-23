@@ -352,6 +352,9 @@ window.SIRENA_LANG.eu = {
   creditsTitle: 'Kredituak eta lizentziak',
   creditsText: 'Sirena Juan José de Harorena da; kodea AGPL v3 lizentziapean dago eta edukiak CC BY-SA 4.0 lizentziapean. Diagramak Mermaid-ekin marrazten ditu (Knut Sveidqvist eta laguntzaileak, MIT), eta Mermaid-ek beste liburutegi libre batzuk ditu barruan, besteak beste D3 (ISC), ELK (EPL 2.0 edo GPL 3.0), KaTeX (MIT), Cytoscape (MIT) eta DOMPurify (MPL 2.0 edo Apache 2.0). Ikonoak Luciderenak dira (ISC).',
   creditsList: 'Liburutegi guztiak eta haien lizentziak',
+  aiBefore: 'Sirena AAren laguntzaz programatu da (Claude), ',
+  aiLink: 'elkarrekin sortuz, MIAEren 4. mailan',
+  aiAfter: ': egileak erabaki ditu diseinua eta funtzioak, eta programa askotan probatu du, egoera desberdinetan, akatsak eta hobetu beharrekoak aurkitzeko.',
   helpClose: 'Itxi',
   restoreWarning: 'Estekak irakurri ezin izan den diagrama bat dauka.'
 };

@@ -630,6 +630,8 @@ function applyLang(code) {
   strings = window.SIRENA_LANG[lang];
   localStorage.setItem(STORE.lang, lang);
   document.documentElement.lang = lang;
+  // El nivel de uso de IA se enlaza en la web del MIAE en el idioma de la página.
+  $('ai-link').href = 'https://jjdeharo.github.io/miae/' + lang + '/?nivel=4';
 
   document.querySelectorAll('[data-i18n]').forEach((node) => {
     node.textContent = t(node.dataset.i18n);

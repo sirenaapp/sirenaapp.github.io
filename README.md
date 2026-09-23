@@ -170,12 +170,20 @@ Mermaid es de Knut Sveidqvist y colaboradores, con licencia MIT
 ([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)), y lleva dentro
 otras bibliotecas libres (D3, ELK, KaTeX, Cytoscape, DOMPurify…), cada una con
 la suya: están todas en
-[vendor/mermaid/TERCEROS.md](vendor/mermaid/TERCEROS.md). Dentro de la
-aplicación, los créditos están en la ayuda. Los iconos son de
+[vendor/mermaid/TERCEROS.md](vendor/mermaid/TERCEROS.md). Los iconos son de
 [Lucide](https://lucide.dev), con licencia ISC
-([vendor/lucide/LICENSE.txt](vendor/lucide/LICENSE.txt)).
+([vendor/lucide/LICENSE.txt](vendor/lucide/LICENSE.txt)). Dentro de la
+aplicación, los créditos están en la ayuda.
 
 Sirena es un proyecto independiente y no está asociado con el proyecto Mermaid
 ni con Mermaid Chart.
+
+## Uso de IA
+
+Sirena se ha programado con ayuda de IA (Claude), en
+[cocreación, nivel 4 del MIAE](https://jjdeharo.github.io/miae/es/?nivel=4):
+el autor ha decidido el diseño y las funciones, y ha probado el programa
+numerosas veces, en situaciones diferentes, para detectar errores y aspectos
+que mejorar.
 
 © [Juan José de Haro](https://bilateria.org)

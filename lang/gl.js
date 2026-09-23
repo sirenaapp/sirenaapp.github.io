@@ -352,6 +352,9 @@ window.SIRENA_LANG.gl = {
   creditsTitle: 'Créditos e licenzas',
   creditsText: 'Sirena é de Juan José de Haro, co código baixo AGPL v3 e os contidos baixo CC BY-SA 4.0. Debuxa os diagramas con Mermaid, de Knut Sveidqvist e colaboradores (MIT), que leva dentro outras bibliotecas libres, entre elas D3 (ISC), ELK (EPL 2.0 ou GPL 3.0), KaTeX (MIT), Cytoscape (MIT) e DOMPurify (MPL 2.0 ou Apache 2.0). As iconas son de Lucide (ISC).',
   creditsList: 'Todas as bibliotecas e as súas licenzas',
+  aiBefore: 'Sirena programouse con axuda de IA (Claude), en ',
+  aiLink: 'cocreación, nivel 4 do MIAE',
+  aiAfter: ': o autor decidiu o deseño e as funcións, e probou o programa moitas veces, en situacións diferentes, para detectar erros e aspectos que mellorar.',
   helpClose: 'Pechar',
   restoreWarning: 'A ligazón contén un diagrama que non se puido ler.'
 };
