@@ -31,14 +31,29 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   estados, clases y entidad-relación); las cuatro flechas sueltas ocupaban
   sitio y se agruparon a petición del autor. Escribe
   en el código como antes (`flowchart LR` o una línea `direction`).
-- **Colores.** Un solo menú con dos secciones. «Todo el diagrama» es el color
-  principal de antes (paleta de cinco colores o colores propios de relleno,
-  borde, líneas, texto y, desde el 22-09-2026, fondo de los rótulos de
-  flecha, `edgeLabelBackground`, que solo se escribe si se ha tocado; el fondo
-  de un solo rótulo no lo permite Mermaid). Al elegir «Color propio…» los
-  cinco selectores toman los colores que el diagrama tiene en pantalla, leídos
-  del SVG dibujado, de modo que nada cambia hasta que se toca algo; antes
-  partían de un azul fijo y el diagrama cambiaba de golpe. «Color del elemento donde está el cursor», solo en
+- **Tema.** Desde el 23-09-2026, un botón propio (icono `swatch-book` de
+  Lucide) con una sola lista de los colores del diagrama entero: los temas de
+  Mermaid (predeterminado, neutro, bosque y oscuro) y, tras una raya, la
+  paleta de Sirena (cinco colores) y «Color propio…». Antes el tema y el
+  color principal eran dos filas del menú de colores, y el primero quedaba
+  deshabilitado al elegir el segundo, porque Mermaid solo admite colores
+  propios sobre el tema `base`; para quien usa el programa son la misma
+  elección, y el autor pidió sacarla a la vista. Cada opción se ve dibujada
+  (dos cajas y una flecha con su relleno, su borde y su línea, los de las
+  variables de tema de Mermaid 12), y la del predeterminado sigue al modo
+  claro u oscuro, como el propio tema. «Base» no figura porque sin colores
+  propios apenas se distingue del predeterminado; solo aparece, marcado, si
+  el código ya lo trae. Al elegir «Color propio…» el menú sigue abierto con
+  los selectores de relleno, borde, líneas y texto, que toman los colores
+  que el diagrama tiene en pantalla, leídos del SVG dibujado, de modo que
+  nada cambia hasta que se toca algo. En el botón derecho sobre el fondo,
+  «Tema» es la primera entrada.
+- **Colores.** Solo en flujo, estados, clases, bloques y entidad-relación,
+  que son los tipos con rótulos en las flechas. Dos secciones: el color del
+  elemento del cursor y el fondo de los rótulos de flecha
+  (`edgeLabelBackground`, desde el 22-09-2026), que se escribe solo si se ha
+  elegido y vale para todos a la vez, porque el de un solo rótulo no lo
+  permite Mermaid. «Color del elemento donde está el cursor», solo en
   flujo, estados, clases y bloques, toma el elemento de la línea del cursor
   (si hay varios, el que está bajo el cursor) o los de las líneas
   seleccionadas, y deja elegir qué se colorea: toda la caja, solo el texto o
@@ -85,14 +100,12 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   con cualquier motor; numeración en secuencia; valores en sectores. La
   orientación se oculta con los motores que no la atienden (tensión, fuerzas,
   cajas y empaquetado). Cada botón abre la lista de opciones con la actual
-  marcada. El selector de tema de Mermaid pasa también de la barra superior
-  al menú de colores, como primera fila: es un juego de colores y ahí lo buscó
-  el autor. Y desde ese momento el tema se escribe en la cabecera
+  marcada. El tema de Mermaid salió de la barra superior al pasar a esta
+  barra, y desde ese momento se escribe en la cabecera
   (`"theme":"forest"`), porque el autor señaló que lo que no está en el
   editor no se comparte; «Predeterminado» no escribe nada y sigue al modo
-  claro u oscuro. Con un color principal elegido el tema es `base` y el
-  selector queda deshabilitado, porque Mermaid solo admite colores propios
-  sobre ese tema.
+  claro u oscuro. Con un color de la paleta o propio, el tema escrito es
+  `base`.
 - **Forma de la caja.** En flujo, un botón con las 52 formas que Mermaid 12
   dibuja (comprobadas una a una; `datastore` se dejó fuera porque sale como
   rectángulo), agrupadas en básicas, proceso, datos y documentos y otras, con

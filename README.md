@@ -17,7 +17,8 @@ propia dirección.
   tipos agrupados como los ejemplos, el mapa conceptual, los carriles y el
   árbol entre ellos); un
   desplegable con las cuatro orientaciones, en los diagramas que la admiten;
-  el menú de colores, con el color principal de todo el diagrama y el color
+  el tema, con los temas de Mermaid y los colores de Sirena dibujados en una
+  sola lista; el menú de colores, con el fondo de los rótulos de flecha y el color
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto, solo del borde o de la flecha de esa línea, escrito en el
   código como línea `style`, clase `classDef` o `linkStyle`; el trazo, solo en los tipos donde cambia algo; la tipografía, con el tamaño
@@ -62,12 +63,12 @@ propia dirección.
   y se retira al usarlo o al cerrarlo.
 - Elegir entre 27 ejemplos agrupados por tipo (procesos, tiempo, estructuras,
   datos y comunicación), pensados para el ámbito educativo.
-- Cambiar el aspecto del diagrama: en el menú de colores, los cinco temas de
-  Mermaid (escritos en la cabecera del código, como todo lo demás) y, en la
-  barra del editor, el trazo (clásico, a mano alzada o moderno), el tamaño del texto, el
-  color principal (una paleta de cinco colores, o uno propio con selector
-  independiente para el relleno, el borde, las líneas, el texto y el fondo de
-  los rótulos de flecha) y, en los
+- Cambiar el aspecto del diagrama: en el botón del tema, los temas de Mermaid
+  (predeterminado, neutro, bosque y oscuro) y los colores de Sirena (una paleta
+  de cinco colores, o uno propio con selector independiente para el relleno,
+  el borde, las líneas y el texto), cada uno dibujado con sus colores; en el
+  menú de colores, el fondo de los rótulos de flecha; y en la barra del editor,
+  el trazo (clásico, a mano alzada o moderno), el tamaño del texto y, en los
   diagramas de
   flujo, la forma de las líneas y la distribución. Cada ajuste se escribe en el
   código como cabecera `%%{init: …}%%`, de modo que viaja con el archivo y se ve

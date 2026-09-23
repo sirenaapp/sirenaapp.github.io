@@ -161,6 +161,7 @@ const el = {
   downloadMenu: $('download-menu'),
   shareMenu: $('share-menu'),
   colorMenu: $('color-menu'),
+  themeMenu: $('theme-menu'),
   strokeMenu: $('stroke-menu'),
   engineSelect: $('engine-select'),
   arrowWidthSelect: $('arrow-width-select'),
@@ -2266,10 +2267,9 @@ function cargarColoresActuales() {
     const propio = hexDeCSS(cabecera[clave]) || dibujo();
     const valor = propio || hexDeCSS(tema[clave]);
     if (valor) input.value = valor;
-    // El fondo de los rótulos se fija al que ya se veía: el tema «base», que
-    // es el que admite colores propios, lo derivaría del relleno y el dibujo
-    // cambiaría solo con abrir este panel.
-    if (clave === 'edgeLabelBackground' && propio) coloresTocados.add('labelbg');
+    // El fondo de los rótulos se elige aparte, en el menú de colores: aquí
+    // solo cuenta como tocado si el código ya lo trae.
+    if (clave === 'edgeLabelBackground' && hexDeCSS(cabecera[clave])) coloresTocados.add('labelbg');
   });
 }
 
@@ -2375,6 +2375,9 @@ const CON_SALTO = ['flowchart', 'concept', 'state', 'class', 'sequence', 'journe
 
 // Tipos en los que se puede colorear un elemento suelto.
 const COLORABLE = ['flowchart', 'state', 'class', 'block'];
+// Tipos con rótulos en las flechas, cuyo fondo se puede cambiar: el botón de
+// colores sale en ellos.
+const CON_ROTULOS = COLORABLE.concat('er');
 
 // Un código que solo tiene la línea que define el tipo (más comentarios y
 // textos accesibles) todavía no es un diagrama: se muestra como vacío en vez
@@ -2449,6 +2452,7 @@ function updateEditorTools() {
   $('dir-sep').hidden = !conDireccion;
   if (conDireccion) readDirection();
   el.nodeColorBox.hidden = !COLORABLE.includes(kind);
+  $('wrap-color').hidden = !CON_ROTULOS.includes(kind);
   $('btn-salto').hidden = !CON_SALTO.includes(tipo);
   $('btn-formula').hidden = !CON_FORMULA.includes(tipo);
   const conFormato = CON_SALTO.includes(tipo);
@@ -3545,6 +3549,86 @@ function buildNodeColorSection() {
   });
 }
 
+/* --- Tema --- */
+
+// Los temas de Mermaid y la paleta de Sirena son una sola elección: los
+// colores del diagrama entero. Cada opción se ve dibujada con su relleno, su
+// borde y sus líneas (los de Mermaid 12, leídos de sus variables de tema).
+const MUESTRAS_TEMA = {
+  default: ['#ececff', '#9370db', '#333333'],
+  neutral: ['#eeeeee', '#999999', '#666666'],
+  forest: ['#cde498', '#13540c', '#000000'],
+  dark: ['#1f2020', '#cccccc', '#d3d3d3'],
+  base: ['#fff4dd', '#eeddbb', '#0b0b0b']
+};
+
+function dibujoDeTema([relleno, borde, linea]) {
+  return '<svg class="muestra-tema" viewBox="0 0 58 20" aria-hidden="true">'
+    + `<rect x="1" y="3" width="18" height="14" rx="2" fill="${relleno}" stroke="${borde}" stroke-width="1.5"/>`
+    + `<path d="M20 10h13" stroke="${linea}" stroke-width="1.5" fill="none"/>`
+    + `<path d="M33 6.5l5 3.5-5 3.5z" fill="${linea}"/>`
+    + `<rect x="39" y="3" width="18" height="14" rx="2" fill="${relleno}" stroke="${borde}" stroke-width="1.5"/>`
+    + '</svg>';
+}
+
+function buildThemeMenu() {
+  const lista = $('lista-temas');
+  lista.innerHTML = '';
+  const color = el.colorSelect.value;
+  const tema = el.themeSelect.value || 'default';
+  const opcion = (dibujo, texto, actual, alElegir) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.innerHTML = dibujo;
+    const span = document.createElement('span');
+    span.textContent = texto;
+    boton.appendChild(span);
+    boton.setAttribute('aria-current', actual ? 'true' : 'false');
+    boton.addEventListener('click', alElegir);
+    lista.appendChild(boton);
+  };
+  // «Base» solo sale si el código ya lo trae: sin colores propios apenas se
+  // distingue del predeterminado, y con ellos es «Color propio».
+  MERMAID_THEMES.filter((nombre) => nombre !== 'base' || (tema === 'base' && !color)).forEach((nombre) => {
+    // El predeterminado sigue al modo claro u oscuro de la página.
+    const muestra = MUESTRAS_TEMA[nombre === 'default' && isDark() ? 'dark' : nombre];
+    opcion(dibujoDeTema(muestra), t(THEME_KEYS[nombre]), !color && tema === nombre, () => elegirTema(nombre, ''));
+  });
+  lista.appendChild(document.createElement('hr'));
+  COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
+    opcion(dibujoDeTema([vars.primaryColor, vars.primaryBorderColor, vars.lineColor]), t(clave), color === nombre, () => elegirTema('default', nombre));
+  });
+  const propio = [el.colorFill.value, el.colorBorder.value, el.colorLine.value];
+  opcion(dibujoDeTema(propio), t('colorCustom'), color === 'custom', () => elegirTema('default', 'custom'));
+}
+
+function elegirTema(tema, color) {
+  el.themeSelect.value = tema;
+  if (color) {
+    el.colorSelect.value = color;
+    // El cambio del color pasa por su selector, que es quien escribe la
+    // cabecera y, con «Color propio», toma los colores que hay en pantalla.
+    el.colorSelect.dispatchEvent(new Event('change'));
+  } else {
+    el.colorSelect.value = '';
+    try { localStorage.setItem(STORE.color, ''); } catch (_) { /* sin almacenamiento */ }
+    updateColorInput();
+    initMermaid();
+    writeAppearance();
+  }
+  // Con «Color propio» el menú se queda abierto para ajustar cada color.
+  if (color === 'custom') buildThemeMenu();
+  else el.themeMenu.hidden = true;
+}
+
+// El menú de colores: el del elemento del cursor y el fondo de los rótulos.
+function prepararMenuColores() {
+  buildNodeColorSection();
+  const fondo = $('fondo-rotulos');
+  fondo.innerHTML = '';
+  construirFondoRotulos(fondo);
+}
+
 /* --- Limpiar formato --- */
 
 // Deja el diagrama sin formato: fuera colores, tema, trazo, tipografía,
@@ -3617,7 +3701,7 @@ function limpiarFormato() {
   readAppearance();
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'themeMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -3785,9 +3869,13 @@ function setupEditorTools() {
     event.stopPropagation();
     alternarMenuEditor(el.typeMenu, $('btn-type'));
   });
+  $('btn-theme').addEventListener('click', (event) => {
+    event.stopPropagation();
+    alternarMenuEditor(el.themeMenu, $('btn-theme'), buildThemeMenu);
+  });
   $('btn-color').addEventListener('click', (event) => {
     event.stopPropagation();
-    alternarMenuEditor(el.colorMenu, $('btn-color'), buildNodeColorSection);
+    alternarMenuEditor(el.colorMenu, $('btn-color'), prepararMenuColores);
   });
   $('btn-stroke').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -4726,6 +4814,7 @@ function construirFondoRotulos(caja) {
     }
     writeAppearance();
     cerrarSubmenu();
+    el.colorMenu.hidden = true;
   };
   const muestras = document.createElement('div');
   muestras.className = 'swatches';
@@ -4759,7 +4848,7 @@ function construirFondoRotulos(caja) {
   quitar.className = 'accion-menu';
   quitar.innerHTML = '<svg aria-hidden="true"><use href="#i-trash"></use></svg>';
   const span = document.createElement('span');
-  span.textContent = t('labelBgTheme');
+  span.textContent = t('nodeColorClear');
   quitar.appendChild(span);
   quitar.addEventListener('click', () => aplicar(null));
   caja.appendChild(quitar);
@@ -4768,8 +4857,8 @@ function construirFondoRotulos(caja) {
 // Submenús disponibles: cada uno presta el menú de la barra que le toca, o
 // construye su propio contenido.
 const SUBMENUS = {
-  fondoRotulos: { titulo: 'colorLabelBg', icono: 'i-palette', construir: construirFondoRotulos },
-  colores: { titulo: 'colorMenu', icono: 'i-palette', boton: 'btn-color', menu: () => el.colorMenu, preparar: buildNodeColorSection },
+  fondoRotulos: { titulo: 'colorLabelBg', icono: 'i-paint-bucket', construir: construirFondoRotulos },
+  tema: { titulo: 'themeMenu', icono: 'i-swatch-book', boton: 'btn-theme', menu: () => el.themeMenu, preparar: buildThemeMenu },
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
   tamano: { titulo: 'typography', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
@@ -5050,7 +5139,8 @@ function construirContextual(objeto) {
 
 
   titulo.textContent = t('ctxAll');
-  entradaSubmenu(menu, objeto, 'colores');
+  entradaSubmenu(menu, objeto, 'tema');
+  if (CON_ROTULOS.includes(diagramKind())) entradaSubmenu(menu, objeto, 'fondoRotulos');
   entradaSubmenu(menu, objeto, 'lineas');
   if (!$('wrap-shape').hidden) {
     if (diagramKind() === 'flowchart') accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));

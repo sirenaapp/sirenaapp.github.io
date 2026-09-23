@@ -1219,3 +1219,19 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 /* Al arrastrar un archivo sobre la ventana se marca el editor, que es donde va
    a caer el contenido. */
 .arrastrando .editor-wrap { outline: 2px dashed var(--accent); outline-offset: -3px; }
+
+/* Temas: cada opción dibujada con sus colores, en lista vertical. */
+.menu-temas { min-width: 230px; }
+.lista-temas { display: grid; gap: 2px; }
+.lista-temas hr { width: 100%; margin: 4px 0; border: 0; border-top: 1px solid var(--border); }
+.menu .lista-temas button { display: flex; align-items: center; gap: 10px; padding: 5px 8px; }
+.menu .lista-temas button[aria-current="true"] { background: var(--accent-soft); }
+.muestra-tema { flex: none; width: 58px; height: 20px; }
+.menu-temas .colores-propios { margin-top: 8px; }
+
+/* Menú de colores: el elemento del cursor y, debajo, el fondo de los rótulos.
+   La raya solo separa los dos apartados cuando se ven los dos. */
+#color-menu > .color-elemento { margin-top: 0; padding-top: 0; border-top: 0; }
+#node-color-box:not([hidden]) + #fondo-rotulos-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+#fondo-rotulos > .accion-menu { color: var(--text-soft); font-size: 12.5px; }
+#fondo-rotulos > .accion-menu svg { display: none; }
