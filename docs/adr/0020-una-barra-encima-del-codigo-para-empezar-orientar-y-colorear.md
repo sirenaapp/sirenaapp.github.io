@@ -44,9 +44,13 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   claro u oscuro, como el propio tema. «Base» no figura porque sin colores
   propios apenas se distingue del predeterminado; solo aparece, marcado, si
   el código ya lo trae. Al elegir «Color propio…» el menú sigue abierto con
-  los selectores de relleno, borde, líneas y texto, que toman los colores
-  que el diagrama tiene en pantalla, leídos del SVG dibujado, de modo que
-  nada cambia hasta que se toca algo. En el botón derecho sobre el fondo,
+  los selectores de relleno, borde, líneas, texto y fondo de los rótulos de
+  flecha, que toman los colores que el diagrama tiene en pantalla, leídos del
+  SVG dibujado, de modo que nada cambia hasta que se toca algo. El fondo de
+  los rótulos está también aquí, a petición del autor, porque es uno de los
+  colores del diagrama entero, y con color propio se escribe siempre (el del
+  relleno mientras no se toque): el tema `base` lo sacaría girando el tono
+  del relleno, y un relleno verde daba un rótulo rojo. En el botón derecho sobre el fondo,
   «Tema» es la primera entrada.
 - **Colores.** Solo en flujo, estados, clases, bloques y entidad-relación,
   que son los tipos con rótulos en las flechas. Dos secciones: el color del

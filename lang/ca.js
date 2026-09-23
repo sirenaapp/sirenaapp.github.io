@@ -79,7 +79,7 @@ window.SIRENA_LANG.ca = {
   labelBgTheme: 'El del tema',
   colorLabelBg: 'Fons dels rètols de fletxa',
   colorText: 'Text',
-  colorHint: "En canviar el farciment, la vora, les línies i el text s'ajusten sols mentre no es toquin.",
+  colorHint: "En canviar el farciment, la vora, les línies, el text i el fons dels rètols s'ajusten sols mentre no es toquin.",
   conceptHint: '%% Mapa conceptual: cada enllaç porta un verb, per exemple A[Aigua] -- es presenta en --> B[Tres estats]',
   colorMenu: "Colors de l'element i del fons dels rètols",
   themeMenu: 'Tema',

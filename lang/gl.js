@@ -79,7 +79,7 @@ window.SIRENA_LANG.gl = {
   labelBgTheme: 'O do tema',
   colorLabelBg: 'Fondo dos rótulos de frecha',
   colorText: 'Texto',
-  colorHint: 'Ao cambiar o recheo, o bordo, as liñas e o texto axústanse sós mentres non se toquen.',
+  colorHint: 'Ao cambiar o recheo, o bordo, as liñas, o texto e o fondo dos rótulos axústanse sós mentres non se toquen.',
   conceptHint: '%% Mapa conceptual: cada ligazón leva un verbo, por exemplo A[Auga] -- preséntase en --> B[Tres estados]',
   colorMenu: 'Cores do elemento e do fondo dos rótulos',
   themeMenu: 'Tema',

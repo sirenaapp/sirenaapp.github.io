@@ -7,11 +7,11 @@
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/sirena.css?v=e849db4c">
-<script src="lang/es.js?v=3ba61e6c"></script>
-<script src="lang/ca.js?v=5a59ef31"></script>
-<script src="lang/gl.js?v=e8edbc81"></script>
-<script src="lang/eu.js?v=f8397e41"></script>
-<script src="lang/en.js?v=9709c5af"></script>
+<script src="lang/es.js?v=e68f787d"></script>
+<script src="lang/ca.js?v=a9629011"></script>
+<script src="lang/gl.js?v=a300c07f"></script>
+<script src="lang/eu.js?v=2e3e3b88"></script>
+<script src="lang/en.js?v=f19bfb6d"></script>
 <script src="js/examples.js?v=dbcfde1b"></script>
 <script src="js/sintaxis.js?v=da7b933b"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -173,6 +173,7 @@
             <label class="color-fila"><span data-i18n="colorBorder"></span><input type="color" id="color-border" value="#1971c2"></label>
             <label class="color-fila"><span data-i18n="colorLine"></span><input type="color" id="color-line" value="#1971c2"></label>
             <label class="color-fila"><span data-i18n="colorText"></span><input type="color" id="color-text" value="#17262b"></label>
+            <label class="color-fila"><span data-i18n="colorLabelBg"></span><input type="color" id="color-label-bg" value="#e9ecef"></label>
             <p class="ajuste-nota" data-i18n="colorHint"></p>
           </div>
         </div>
@@ -334,7 +335,6 @@
       <div hidden>
         <select id="theme-select"></select>
         <select id="color-select"></select>
-        <input type="color" id="color-label-bg" value="#e9ecef">
         <select id="engine-select"></select>
         <select id="size-select"></select>
         <select id="spacing-select"></select>
@@ -489,6 +489,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=b043986a"></script>
+<script type="module" src="js/sirena.js?v=f9649205"></script>
 </body>
 </html>

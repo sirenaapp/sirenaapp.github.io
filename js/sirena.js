@@ -1608,7 +1608,10 @@ function appearanceConfig() {
   }
   // El fondo de los rótulos de flecha vale con cualquier tema, así que se
   // escribe aparte y solo si se ha elegido; si no, sigue el gris del tema.
-  if (coloresTocados.has('labelbg')) variables.edgeLabelBackground = el.colorLabelBg.value;
+  // Con color propio se escribe siempre (el del relleno mientras no se toque):
+  // el tema base lo sacaría girando el tono del relleno, y un verde daría un
+  // rótulo rojo que no se ha pedido.
+  if (coloresTocados.has('labelbg') || el.colorSelect.value === 'custom') variables.edgeLabelBackground = el.colorLabelBg.value;
   if (diagramKind() === 'pie') {
     Object.entries(coloresSectores).forEach(([i, valor]) => { if (valor) variables['pie' + i] = valor; });
     if (Object.keys(coloresSectores).some((i) => coloresSectores[i]) && !config.theme) config.theme = 'base';
@@ -6050,15 +6053,19 @@ function setupToolbar() {
     select.addEventListener('change', () => writeAppearance());
   });
 
+  // La muestra de «Color propio» en la lista de temas sigue a los selectores.
+  const refrescarMuestra = () => { if (!el.themeMenu.hidden) buildThemeMenu(); };
   el.colorFill.addEventListener('input', () => {
     deriveColors();
     writeAppearance();
+    refrescarMuestra();
   });
 
   [['border', el.colorBorder], ['line', el.colorLine], ['text', el.colorText], ['labelbg', el.colorLabelBg]].forEach(([clave, input]) => {
     input.addEventListener('input', () => {
       coloresTocados.add(clave);
       writeAppearance();
+      refrescarMuestra();
     });
   });
 

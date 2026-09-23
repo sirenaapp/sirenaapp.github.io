@@ -79,7 +79,7 @@ window.SIRENA_LANG.eu = {
   labelBgTheme: 'Gaiarena',
   colorLabelBg: 'Gezi-etiketen atzealdea',
   colorText: 'Testua',
-  colorHint: 'Betegarria aldatzean, ertza, marrak eta testua bakarrik doitzen dira ukitzen ez diren bitartean.',
+  colorHint: 'Betegarria aldatzean, ertza, marrak, testua eta etiketen hondoa bakarrik doitzen dira ukitzen ez diren bitartean.',
   conceptHint: '%% Kontzeptu-mapa: lotura bakoitzak aditz bat darama, adibidez A[Ura] -- egoera hauetan agertzen da --> B[Hiru egoera]',
   colorMenu: 'Elementuaren eta etiketen hondoaren koloreak',
   themeMenu: 'Gaia',

@@ -79,7 +79,7 @@ window.SIRENA_LANG.en = {
   labelBgTheme: 'The theme\'s',
   colorLabelBg: 'Arrow label background',
   colorText: 'Text',
-  colorHint: 'Changing the fill adjusts border, lines and text on its own until they are set by hand.',
+  colorHint: 'Changing the fill adjusts border, lines, text and label background on its own until they are set by hand.',
   conceptHint: '%% Concept map: every link carries a verb, for example A[Water] -- is found as --> B[Three states]',
   colorMenu: 'Colours of the element and of the label background',
   themeMenu: 'Theme',
