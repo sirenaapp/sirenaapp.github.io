@@ -5049,7 +5049,7 @@ function abrirContextual(event) {
 /* --- Aviso del botón derecho --- */
 
 // Se enseña al entrar y se retira al usar el menú contextual, al cerrarla a
-// mano o a los 20 segundos de estar en pantalla. Solo dura esa visita: al volver a la página vuelve a salir, porque no
+// mano (con la ✕ o pulsando en ella) o a los 20 segundos de estar en pantalla. Solo dura esa visita: al volver a la página vuelve a salir, porque no
 // se guarda nada en el navegador. Como lo que cuenta solo vale en los
 // diagramas de flujo (y el mapa conceptual, que lo es), con otro tipo cargado
 // no sale, y vuelve a salir si se pasa a uno de flujo sin haberla cerrado.
@@ -5080,7 +5080,8 @@ function mostrarPista() {
 
 function setupContextual() {
   el.viewport.addEventListener('contextmenu', abrirContextual);
-  $('pista-formato-cerrar').addEventListener('click', (event) => {
+  // Se cierra con la ✕ o pulsando en cualquier parte del aviso.
+  el.pistaFormato.addEventListener('click', (event) => {
     event.stopPropagation();
     ocultarPista(true);
   });

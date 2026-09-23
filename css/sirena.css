@@ -666,6 +666,7 @@ body > div[id^="dsirena-diagram-"] .nodeLabel > div {
   color: var(--text);
   font-size: 12.5px;
   line-height: 1.35;
+  cursor: pointer;
   animation: pista-entra .45s ease both .6s;
 }
 
