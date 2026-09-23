@@ -4058,14 +4058,28 @@ function llevaMarkdown(texto) {
   return /^`[\s\S]*`$/.test(texto.trim());
 }
 
-// Envuelve lo elegido con las marcas del formato. Si había algo elegido, el
-// cursor queda detrás, listo para seguir escribiendo sin formato; si no,
-// queda en medio de las marcas, para escribir ya con él.
+// Pone o quita la negrita o la cursiva de lo elegido, sin acumular marcas.
+// Cuenta los asteriscos que lo rodean, dentro o justo fuera de la selección:
+// dos son negrita, uno cursiva y tres las dos. Cada formato añade o quita los
+// suyos. Lo elegido sigue elegido (sin las marcas), para poder volver a
+// pulsar; sin nada elegido, el cursor queda entre las marcas.
 function marcarTexto(texto, inicio, fin, marca) {
   const elegido = texto.slice(inicio, fin);
-  const nuevo = marca + elegido + marca;
-  const cursor = elegido ? inicio + nuevo.length : inicio + marca.length;
-  return { texto: texto.slice(0, inicio) + nuevo + texto.slice(fin), cursor };
+  const dentroIzq = /^\**/.exec(elegido)[0].length;
+  const dentroDer = dentroIzq === elegido.length ? 0 : /\**$/.exec(elegido)[0].length;
+  const fueraIzq = /\**$/.exec(texto.slice(0, inicio))[0].length;
+  const fueraDer = /^\**/.exec(texto.slice(fin))[0].length;
+  const desde = inicio - fueraIzq;
+  const hasta = fin + fueraDer;
+  const zona = texto.slice(desde, hasta);
+  const n = Math.min(3, fueraIzq + dentroIzq, fueraDer + dentroDer);
+  const nucleo = zona.slice(n, zona.length - n);
+  const negrita = n >= 2;
+  const cursiva = n === 1 || n === 3;
+  const nuevoN = marca === '**' ? n + (negrita ? -2 : 2) : n + (cursiva ? -1 : 1);
+  const marcas = '*'.repeat(nuevoN);
+  const selInicio = desde + nuevoN;
+  return { texto: texto.slice(0, desde) + marcas + nucleo + marcas + texto.slice(hasta), selInicio, selFin: selInicio + nucleo.length };
 }
 
 // Aplica negrita o cursiva a lo que haya elegido en el editor, pasando el
@@ -4093,7 +4107,7 @@ function aplicarFormato(formato) {
   const hecho = marcarTexto(el.editor.value, inicio, fin, marca);
   el.editor.value = hecho.texto;
   el.editor.focus();
-  el.editor.setSelectionRange(hecho.cursor, hecho.cursor);
+  el.editor.setSelectionRange(hecho.selInicio, hecho.selFin);
   codigoPrevio = el.editor.value;
   updateStatus();
   renderGutter();
@@ -4407,7 +4421,7 @@ function formatoEnElSitio(formato) {
   const hecho = marcarTexto(campo.value, campo.selectionStart, campo.selectionEnd, MARCAS[formato]);
   campo.value = hecho.texto;
   campo.focus();
-  campo.setSelectionRange(hecho.cursor, hecho.cursor);
+  campo.setSelectionRange(hecho.selInicio, hecho.selFin);
 }
 
 function cerrarEditorSitio(guardar) {
@@ -4524,12 +4538,17 @@ function cursorEnRotulo() {
   let m;
   while ((m = zonas.exec(linea))) {
     if (columna > m.index && columna < m.index + m[0].length) {
-      return {
-        inicio: desde + m.index + 1,
-        fin: desde + m.index + m[0].length - 1,
-        cursor: el.editor.selectionStart,
-        entrecomillado: m[0][0] === '"'
-      };
+      let inicio = desde + m.index + 1;
+      let fin = desde + m.index + m[0].length - 1;
+      let entrecomillado = m[0][0] === '"';
+      // A["…"]: el rótulo es lo que va entre las comillas, dentro de los corchetes.
+      const dentro = texto.slice(inicio, fin);
+      if (!entrecomillado && /^"[\s\S]*"$/.test(dentro)) {
+        inicio += 1;
+        fin -= 1;
+        entrecomillado = true;
+      }
+      return { inicio, fin, cursor: el.editor.selectionStart, entrecomillado };
     }
   }
   return null;
