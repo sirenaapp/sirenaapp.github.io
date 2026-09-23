@@ -33,6 +33,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [25](0025-el-calendario-del-diagrama-de-gantt-se-ajusta-desde-la-barra-y-se-escribe-en-el-cuerpo.md) | El calendario del diagrama de Gantt se ajusta desde la barra y se escribe en el cuerpo | aceptado |
 | [26](0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md) | Sirena recoloca los rótulos de flecha que Mermaid deja fuera de su línea | aceptado |
 | [27](0027-limpiar-formato-deja-el-diagrama-sin-aspecto-propio-y-conserva-su-estructura.md) | Limpiar formato deja el diagrama sin aspecto propio y conserva su estructura | aceptado |
+| [28](0028-formato-de-los-bloques-con-style-propio-y-una-clase-comun.md) | Formato de los bloques con style propio y una clase común | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

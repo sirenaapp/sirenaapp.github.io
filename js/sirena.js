@@ -1334,6 +1334,7 @@ async function renderOnce() {
       ajustarRotulosHtml();
     }
     rotulosSobreSuLinea();
+    colorTitulosBloques();
     prepararEnlaces();
     ocultarAnclas();
     hideEmpty();
@@ -1755,6 +1756,188 @@ function alternarResaltado(linea) {
   aplicarCodigo(lineas);
 }
 
+/* --- Formato de los bloques --- */
+
+// Un bloque se colorea con una línea «style» con su id, como una caja; todos a
+// la vez, con la clase «bloques» (classDef y su asignación). Mermaid 12
+// ignora la clase entera en un bloque que tiene línea style propia, así que
+// esa línea lleva también lo común que el bloque no cambia; y al cambiar lo
+// común, lo que el bloque seguía del común lo sigue siendo.
+const CLASE_BLOQUES = 'bloques';
+const TRAZOS_BORDE = [['', 'borderSolid'], ['3', 'borderDotted'], ['8 4', 'borderDashed'], ['10 3 2 3', 'borderDashDot']];
+
+function propsDe(lineas, cabeza) {
+  const re = new RegExp(`^\\s*${escapaRe(cabeza)}\\s+(.*)$`);
+  const linea = lineas.find((l) => re.test(l));
+  const props = {};
+  if (!linea) return props;
+  re.exec(linea)[1].split(',').forEach((x) => {
+    const i = x.indexOf(':');
+    if (i > 0) props[x.slice(0, i).trim()] = x.slice(i + 1).trim();
+  });
+  return props;
+}
+
+function escribirProps(lineas, cabeza, props, sangria) {
+  const re = new RegExp(`^\\s*${escapaRe(cabeza)}\\s`);
+  const i = lineas.findIndex((l) => re.test(l));
+  const texto = Object.entries(props).map(([k, v]) => `${k}:${v}`).join(',');
+  if (!texto) { if (i >= 0) lineas.splice(i, 1); return; }
+  const linea = `${sangria}${cabeza} ${texto}`;
+  if (i >= 0) lineas[i] = linea;
+  else lineas.push(linea);
+}
+
+function aplicarCambios(props, cambios, base) {
+  const nuevo = { ...props };
+  Object.entries(cambios).forEach(([k, v]) => {
+    if (v) nuevo[k] = v;
+    else if (base && base[k]) nuevo[k] = base[k];
+    else delete nuevo[k];
+  });
+  return nuevo;
+}
+
+// Formato actual: el del bloque (o el común, si id es null).
+function formatoDeBloque(id) {
+  const lineas = el.editor.value.split('\n');
+  const propio = id ? propsDe(lineas, 'style ' + id) : {};
+  return Object.keys(propio).length ? propio : propsDe(lineas, 'classDef ' + CLASE_BLOQUES);
+}
+
+function escribirFormatoBloque(id, cambios) {
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const sangria = sangriaDelCodigo(lineas);
+  const comun = propsDe(lineas, 'classDef ' + CLASE_BLOQUES);
+  const ids = bloquesDelCodigo().map((b) => b.id);
+  if (id) {
+    const propio = propsDe(lineas, 'style ' + id);
+    const nuevo = aplicarCambios(Object.keys(propio).length ? propio : comun, cambios, comun);
+    const igual = Object.keys(nuevo).length === Object.keys(comun).length
+      && Object.keys(nuevo).every((k) => nuevo[k] === comun[k]);
+    escribirProps(lineas, 'style ' + id, igual ? {} : nuevo, sangria);
+  } else {
+    const nuevoComun = aplicarCambios(comun, cambios);
+    escribirProps(lineas, 'classDef ' + CLASE_BLOQUES, nuevoComun, sangria);
+    const asigna = new RegExp(`^\\s*class\\s+\\S+\\s+${CLASE_BLOQUES}\\s*$`);
+    const i = lineas.findIndex((l) => asigna.test(l));
+    if (i >= 0) lineas.splice(i, 1);
+    if (Object.keys(nuevoComun).length) lineas.push(`${sangria}class ${ids.join(',')} ${CLASE_BLOQUES}`);
+    // Lo que un bloque con línea propia tenía igual que el común sigue al común.
+    ids.forEach((b) => {
+      const propio = propsDe(lineas, 'style ' + b);
+      if (!Object.keys(propio).length) return;
+      const siguen = {};
+      Object.keys(cambios).forEach((k) => { if (propio[k] === comun[k]) siguen[k] = nuevoComun[k] || null; });
+      escribirProps(lineas, 'style ' + b, aplicarCambios(propio, siguen), sangria);
+    });
+  }
+  aplicarCodigo(lineas);
+}
+
+// Mermaid 12 no dibuja el color del título de un bloque (ni con style ni con
+// clase; solo la variable titleColor, para todos). El código lo lleva escrito
+// en la sintaxis de Mermaid y Sirena lo aplica al dibujo.
+function colorTitulosBloques() {
+  if (diagramKind() !== 'flowchart') return;
+  const lineas = el.editor.value.split('\n');
+  const comun = propsDe(lineas, 'classDef ' + CLASE_BLOQUES);
+  bloquesDelCodigo().forEach((b) => {
+    const propio = propsDe(lineas, 'style ' + b.id);
+    const color = (Object.keys(propio).length ? propio : comun).color;
+    if (!color) return;
+    const cluster = el.canvas.querySelector('g.cluster[id$="-' + b.id + '"], g.cluster[id="' + b.id + '"]');
+    if (!cluster) return;
+    cluster.querySelectorAll('.cluster-label text, .cluster-label tspan').forEach((n) => n.style.setProperty('fill', color, 'important'));
+    cluster.querySelectorAll('.cluster-label span, .cluster-label p').forEach((n) => n.style.setProperty('color', color, 'important'));
+  });
+}
+
+// Cambia la lista de bloques con el formato común, si lo hay: un bloque
+// nuevo lo recibe y uno deshecho sale de ella (Mermaid haría una caja con él).
+function claseDeBloques(lineas, cambiar) {
+  const asigna = new RegExp(`^(\\s*class\\s+)(\\S+)(\\s+${CLASE_BLOQUES}\\s*)$`);
+  const i = lineas.findIndex((l) => asigna.test(l));
+  if (i < 0) return lineas;
+  const m = asigna.exec(lineas[i]);
+  const ids = cambiar(m[2].split(','));
+  if (ids.length) lineas[i] = m[1] + ids.join(',') + m[3];
+  else lineas.splice(i, 1);
+  return lineas;
+}
+
+// Parte del bloque que se colorea: todo, solo el título o solo el borde.
+let parteBloque = 'todo';
+
+// Los controles van en su propia caja, que se rehace al cambiar la parte.
+function formatoBloqueEn(contenedor, id) {
+  const cuerpo = document.createElement('div');
+  contenedor.appendChild(cuerpo);
+  const pintar = () => { cuerpo.innerHTML = ''; construirFormatoBloque(cuerpo, id, pintar); };
+  pintar();
+}
+
+function construirFormatoBloque(caja, id, alCambiar) {
+  const actual = formatoDeBloque(id);
+  const escribir = (cambios) => { cerrarContextual(); escribirFormatoBloque(id, cambios); };
+  segmentosDe(caja, [['todo', t('blockColorAll')], ['texto', t('blockColorTitle')], ['borde', t('nodeColorBorder')]], parteBloque, (valor) => {
+    parteBloque = valor;
+    alCambiar();
+  });
+  const colorear = (color, borde) => {
+    if (parteBloque === 'texto') escribir({ color });
+    else if (parteBloque === 'borde') escribir({ stroke: color });
+    else {
+      const v = nodeColorValues(color, borde);
+      escribir({ fill: v.fill, stroke: v.stroke, color: v.color });
+    }
+  };
+  muestrasDeColor(caja, parteBloque !== 'todo', colorear);
+  const propio = document.createElement('label');
+  propio.className = 'swatch-propio';
+  const input = document.createElement('input');
+  input.type = 'color';
+  const clave = { todo: 'fill', texto: 'color', borde: 'stroke' }[parteBloque];
+  input.value = hexDeCSS(actual[clave]) || '#d0ebff';
+  input.addEventListener('change', () => colorear(input.value, null));
+  const texto = document.createElement('span');
+  texto.textContent = t('nodeColorCustom');
+  propio.append(input, texto);
+  caja.appendChild(propio);
+  accionContextual(caja, t('nodeColorClear'), 'i-trash', () => {
+    if (parteBloque === 'texto') escribirFormatoBloque(id, { color: null });
+    else if (parteBloque === 'borde') escribirFormatoBloque(id, { stroke: null });
+    else escribirFormatoBloque(id, { fill: null, stroke: null, color: null });
+  });
+  caja.appendChild(document.createElement('hr'));
+  const grupo = document.createElement('p');
+  grupo.className = 'menu-grupo';
+  grupo.textContent = t('borderWidth');
+  caja.appendChild(grupo);
+  const grosor = (actual['stroke-width'] || '').replace('px', '');
+  segmentosDe(caja, BORDER_WIDTHS.map(([v, k]) => [v, t(k)]), grosor, (valor) => escribir({ 'stroke-width': valor ? valor + 'px' : null }));
+  campoGrosor(caja, grosor, (valor) => escribir({ 'stroke-width': valor + 'px' }));
+  const grupoTrazo = document.createElement('p');
+  grupoTrazo.className = 'menu-grupo';
+  grupoTrazo.textContent = t('borderLine');
+  caja.appendChild(grupoTrazo);
+  const lista = document.createElement('div');
+  lista.className = 'lista-flechas';
+  const trazo = (actual['stroke-dasharray'] || '').replace(/\s+/g, ' ');
+  TRAZOS_BORDE.forEach(([valor, k]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.innerHTML = `<svg viewBox="0 0 40 16" aria-hidden="true"><path d="M2 8h36"${valor ? ` stroke-dasharray="${valor}"` : ''} stroke-linecap="butt"/></svg>`;
+    const span = document.createElement('span');
+    span.textContent = t(k);
+    boton.appendChild(span);
+    boton.setAttribute('aria-current', trazo === valor ? 'true' : 'false');
+    boton.addEventListener('click', () => escribir({ 'stroke-dasharray': valor || null }));
+    lista.appendChild(boton);
+  });
+  caja.appendChild(lista);
+}
+
 /* --- Bloques (subgraph … end) --- */
 
 // Los bloques del código: id, título, líneas que ocupa, dirección propia y
@@ -1809,7 +1992,7 @@ function crearBloque(ids) {
   const id = idDeBloqueLibre();
   const nuevas = [`${sangria}subgraph ${id} [${t('blockDefault')}]`].concat(cajas.map((c) => `${sangria}${sangria || '    '}${c}`), [`${sangria}end`]);
   lineas.splice(posicionParaFlecha(lineas), 0, ...nuevas);
-  aplicarCodigo(lineas);
+  aplicarCodigo(claseDeBloques(lineas, (ids) => ids.concat(id)));
   editarBloqueCuandoAparezca(id);
 }
 
@@ -1900,8 +2083,8 @@ function deshacerBloque(idBloque) {
   if (!b) return;
   const quitar = new Set([b.inicio, b.fin]);
   for (let i = b.inicio + 1; i < b.fin; i += 1) if (/^[ \t]*direction[ \t]+/.test(lineas[i])) quitar.add(i);
-  const restantes = lineas.filter((l, i) => !quitar.has(i));
-  aplicarCodigo(limpiarSueltos(restantes));
+  const restantes = lineas.filter((l, i) => !quitar.has(i) && !new RegExp(`^\\s*style\\s+${escapaRe(idBloque)}\\s`).test(l));
+  aplicarCodigo(limpiarSueltos(claseDeBloques(restantes, (ids) => ids.filter((x) => x !== idBloque))));
 }
 
 // Al aparecer el bloque recién creado, se escribe su título encima.
@@ -2462,6 +2645,7 @@ function updateEditorTools() {
   $('btn-negrita').hidden = !conFormato;
   $('btn-cursiva').hidden = !conFormato;
   $('btn-limpiar').disabled = !hayFormato();
+  $('btn-bloque').hidden = kind !== 'flowchart';
   updateAppearanceVisibility();
 }
 
@@ -4911,6 +5095,7 @@ const SUBMENUS = {
   motor: { titulo: 'engine', icono: 'i-workflow', boton: 'btn-engine', menu: () => el.engineMenu, preparar: buildEngineMenu },
   direccion: { titulo: 'direction', icono: 'i-arrow-down', boton: 'btn-dir', menu: () => el.dirMenu },
   bloque: { titulo: 'blockMenu', icono: 'i-group', construir: construirMenuBloque },
+  todosBloques: { titulo: 'blockAll', icono: 'i-group', construir: (caja) => formatoBloqueEn(caja, null) },
   bloqueDir: { titulo: 'direction', icono: 'i-arrow-down', construir: construirDireccionBloque },
   lineaTipo: { titulo: 'lineType', icono: 'i-spline', construir: (caja) => construirTipoFlecha(caja, 'linea') },
   puntas: { titulo: 'arrowHead', icono: 'i-arrow-right', construir: (caja) => construirTipoFlecha(caja, 'puntas') }
@@ -5131,6 +5316,8 @@ function construirContextual(objeto) {
     const codigo = document.createElement('code');
     codigo.textContent = b ? b.titulo : objeto.id;
     titulo.appendChild(codigo);
+    formatoBloqueEn(menu, objeto.id);
+    menu.appendChild(document.createElement('hr'));
     accionContextual(menu, t('blockTitle'), 'i-pencil', () => {
       const cluster = el.canvas.querySelector('g.cluster[id$="-' + objeto.id + '"]');
       const etiqueta = cluster && cluster.querySelector('.cluster-label');
@@ -5201,6 +5388,7 @@ function construirContextual(objeto) {
     });
   }
   entradaSubmenu(menu, objeto, 'direccion');
+  if (diagramKind() === 'flowchart' && bloquesDelCodigo().length) entradaSubmenu(menu, objeto, 'todosBloques');
   if (hayFormato()) accionContextual(menu, t('clearFormat'), 'i-clear-format', limpiarFormato);
   if (diagramKind() === 'flowchart') {
     menu.appendChild(document.createElement('hr'));
@@ -5981,6 +6169,17 @@ function setupToolbar() {
 
   $('btn-a11y').addEventListener('click', abrirAccesibilidad);
   $('btn-limpiar').addEventListener('click', limpiarFormato);
+  // Con líneas seleccionadas, el bloque nace con sus cajas; sin selección, vacío.
+  $('btn-bloque').addEventListener('click', () => {
+    const { selectionStart: inicio, selectionEnd: fin, value: texto } = el.editor;
+    const ids = [];
+    if (fin > inicio) {
+      const desde = texto.lastIndexOf('\n', inicio - 1) + 1;
+      const hasta = texto.indexOf('\n', fin - 1);
+      texto.slice(desde, hasta === -1 ? texto.length : hasta).split('\n').forEach((l) => idsDeLinea(l, 'flowchart', ids));
+    }
+    crearBloque(ids);
+  });
 
   $('a11y-apply').addEventListener('click', () => {
     writeAccessibility(el.a11yTitle.value, el.a11yDescr.value);
