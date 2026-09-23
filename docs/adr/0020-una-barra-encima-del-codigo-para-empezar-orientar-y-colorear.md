@@ -76,7 +76,12 @@ El panel del código lleva una barra de herramientas propia, con tres grupos:
   aparición desde 0 y contando las que suman «&» y las encadenadas, que es lo
   que más cuesta hacer a mano. El fondo del rótulo de una sola flecha no se
   puede cambiar en Mermaid; el de todos es la variable `edgeLabelBackground`.
-- **Trazo** y **Tamaño del texto**, cada uno en su botón. El del tamaño ofrece
+- **Estilo del trazo** y **Tamaño del texto**, cada uno en su botón. El del
+  estilo del trazo (antes «Trazo», renombrado el 23-09-2026 a petición del
+  autor) abre directamente la lista de los tres estilos, cada uno dibujado:
+  clásico con esquinas vivas, a mano alzada con líneas repasadas que se
+  cruzan en las esquinas y moderno redondeado con sombra; antes abría un
+  desplegable dentro del menú. El del tamaño ofrece
   los cuatro de la lista y un campo para escribir cualquier número de píxeles
   (de 8 a 72), a petición del autor; el valor libre se conserva en el selector
   y se lee de vuelta de la cabecera.

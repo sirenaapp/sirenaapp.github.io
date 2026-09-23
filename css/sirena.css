@@ -1235,3 +1235,4 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 #node-color-box:not([hidden]) + #fondo-rotulos-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 #fondo-rotulos > .accion-menu { color: var(--text-soft); font-size: 12.5px; }
 #fondo-rotulos > .accion-menu svg { display: none; }
+.muestra-trazo { flex: none; width: 38px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }

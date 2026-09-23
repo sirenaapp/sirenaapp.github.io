@@ -6,12 +6,12 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=e849db4c">
-<script src="lang/es.js?v=e68f787d"></script>
-<script src="lang/ca.js?v=a9629011"></script>
-<script src="lang/gl.js?v=a300c07f"></script>
-<script src="lang/eu.js?v=2e3e3b88"></script>
-<script src="lang/en.js?v=f19bfb6d"></script>
+<link rel="stylesheet" href="css/sirena.css?v=b9596458">
+<script src="lang/es.js?v=d1451784"></script>
+<script src="lang/ca.js?v=53148b5a"></script>
+<script src="lang/gl.js?v=fa0a3d34"></script>
+<script src="lang/eu.js?v=0d43ae0a"></script>
+<script src="lang/en.js?v=a68d5eef"></script>
 <script src="js/examples.js?v=dbcfde1b"></script>
 <script src="js/sintaxis.js?v=da7b933b"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -202,8 +202,9 @@
       </div>
       <div class="menu-wrap" id="wrap-stroke">
         <button type="button" id="btn-stroke" class="tb" data-i18n-title="strokeMenu"><svg><use href="#i-brush"></use></svg></button>
-        <div class="menu menu-izq menu-ajustes" id="stroke-menu" hidden>
-          <label class="ajuste"><svg aria-hidden="true"><use href="#i-brush"></use></svg><span data-i18n="look"></span><select id="look-select"></select></label>
+        <div class="menu menu-izq menu-ajustes menu-temas" id="stroke-menu" hidden>
+          <p class="menu-titulo" data-i18n="strokeMenu"></p>
+          <div class="lista-temas lista-trazos" id="lista-trazos"></div>
         </div>
       </div>
       <div class="menu-wrap">
@@ -334,6 +335,7 @@
       <button type="button" id="btn-redo" class="tb" data-i18n-title="redo" disabled><svg><use href="#i-redo"></use></svg></button>
       <div hidden>
         <select id="theme-select"></select>
+        <select id="look-select"></select>
         <select id="color-select"></select>
         <select id="engine-select"></select>
         <select id="size-select"></select>
@@ -489,6 +491,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=f9649205"></script>
+<script type="module" src="js/sirena.js?v=876b23d0"></script>
 </body>
 </html>

@@ -3552,6 +3552,38 @@ function buildNodeColorSection() {
   });
 }
 
+/* --- Estilo del trazo --- */
+
+// Cada estilo se ve dibujado: el clásico con esquinas vivas, el de mano
+// alzada con líneas temblorosas y repasadas, el moderno redondeado y con sombra.
+const DIBUJOS_TRAZO = {
+  classic: '<rect x="3" y="3" width="32" height="14"/>',
+  handDrawn: '<path d="M1.5 4.5Q18 2.5 37.5 3.8M35.8 1.8Q36.8 10 35.6 18.5M37.8 16.2Q20 17.8 1.8 16.6M3.4 18.6Q2.2 11 3.1 1.8"/>'
+    + '<path d="M2.2 3.4Q19 4.6 36.4 2.9M36.9 2.6Q35.4 9 36.7 17.4M36.2 17.3Q18 15.8 2.6 17.5M2.1 17.1Q3.8 9 2.2 3"/>',
+  neo: '<rect x="5" y="5" width="32" height="14" rx="4" fill="currentColor" stroke="none" opacity=".18"/>'
+    + '<rect x="3" y="3" width="32" height="14" rx="4"/>'
+};
+
+function buildStrokeMenu() {
+  const lista = $('lista-trazos');
+  lista.innerHTML = '';
+  LOOKS.forEach(([valor, clave]) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.innerHTML = '<svg class="muestra-trazo" viewBox="0 0 40 20" aria-hidden="true">' + DIBUJOS_TRAZO[valor] + '</svg>';
+    const span = document.createElement('span');
+    span.textContent = t(clave);
+    boton.appendChild(span);
+    boton.setAttribute('aria-current', el.lookSelect.value === valor ? 'true' : 'false');
+    boton.addEventListener('click', () => {
+      el.strokeMenu.hidden = true;
+      el.lookSelect.value = valor;
+      el.lookSelect.dispatchEvent(new Event('change'));
+    });
+    lista.appendChild(boton);
+  });
+}
+
 /* --- Tema --- */
 
 // Los temas de Mermaid y la paleta de Sirena son una sola elección: los
@@ -3881,7 +3913,7 @@ function setupEditorTools() {
   });
   $('btn-stroke').addEventListener('click', (event) => {
     event.stopPropagation();
-    alternarMenuEditor(el.strokeMenu, $('btn-stroke'));
+    alternarMenuEditor(el.strokeMenu, $('btn-stroke'), buildStrokeMenu);
   });
   // Un botón por ajuste: su menú lista las opciones del selector y marca la actual.
   $('btn-merge').addEventListener('click', (event) => {
@@ -4862,7 +4894,7 @@ const SUBMENUS = {
   fondoRotulos: { titulo: 'colorLabelBg', icono: 'i-paint-bucket', construir: construirFondoRotulos },
   tema: { titulo: 'themeMenu', icono: 'i-swatch-book', boton: 'btn-theme', menu: () => el.themeMenu, preparar: buildThemeMenu },
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
-  trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu },
+  trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu, preparar: buildStrokeMenu },
   tamano: { titulo: 'typography', icono: 'i-text-size', boton: 'btn-size', menu: () => el.sizeMenu, preparar: buildSizeMenu },
   ancho: { titulo: 'boxWidth', icono: 'i-width', boton: 'btn-shape', menu: () => el.widthMenu, preparar: buildWidthMenu },
   calendario: { titulo: 'calendar', icono: 'i-calendar', boton: 'btn-calendar', menu: () => el.calendarMenu, preparar: readGantt },
