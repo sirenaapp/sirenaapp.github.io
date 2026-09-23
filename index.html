@@ -152,7 +152,6 @@
         <button type="button" id="btn-engine" class="tb" data-i18n-title="engine"><svg><use href="#i-workflow"></use></svg></button>
         <div class="menu menu-izq menu-ancho menu-motores" id="menu-engine" hidden></div>
       </div>
-      <span class="tb-sep" id="dir-sep" hidden></span>
       <div class="menu-wrap" id="dir-group" hidden>
         <button type="button" id="btn-dir" class="tb" data-i18n-title="direction"><svg><use id="dir-icon" href="#i-arrow-down"></use></svg></button>
         <div class="menu menu-izq menu-iconos menu-direccion" id="dir-menu" hidden>
@@ -161,6 +160,17 @@
           <button type="button" data-dir="BT"><svg><use href="#i-arrow-up"></use></svg><span data-i18n="dirBT"></span></button>
           <button type="button" data-dir="RL"><svg><use href="#i-arrow-left"></use></svg><span data-i18n="dirRL"></span></button>
         </div>
+      </div>
+      <div class="menu-wrap" id="wrap-spacing" hidden>
+        <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>
+        <div class="menu menu-izq menu-opciones" id="menu-spacing" data-select="spacing-select" hidden></div>
+      </div>
+      <div class="menu-wrap" id="wrap-padding" hidden>
+        <button type="button" id="btn-padding" class="tb" data-i18n-title="padding"><svg><use href="#i-frame"></use></svg></button>
+        <div class="menu menu-izq menu-opciones" id="menu-padding" data-select="padding-select" hidden></div>
+      </div>
+      <div class="menu-wrap" id="wrap-merge" hidden>
+        <button type="button" id="btn-merge" class="tb" data-i18n-title="merge" aria-pressed="false"><svg><use href="#i-merge"></use></svg></button>
       </div>
       <span class="tb-sep"></span>
       <div class="menu-wrap">
@@ -219,7 +229,6 @@
           <label class="tamano-propio"><span data-i18n="fontCustom"></span><input type="text" id="font-custom" size="14" placeholder="Georgia, serif"></label>
         </div>
       </div>
-      <span class="tb-sep" id="sep-ajustes" hidden></span>
       <div class="menu-wrap" id="wrap-lines" hidden>
         <button type="button" id="btn-lines" class="tb" data-i18n-title="lines"><svg><use href="#i-spline"></use></svg></button>
         <div class="menu menu-izq menu-ajustes" id="lines-menu" hidden>
@@ -266,18 +275,7 @@
           <label class="tamano-propio"><span data-i18n="widthCustomBox"></span><input type="number" id="width-custom" min="60" max="800" step="10" inputmode="numeric"><span>px</span></label>
         </div>
       </div>
-      <button type="button" id="btn-bloque" class="tb" data-i18n-title="blockNewTip" hidden><svg><use href="#i-group"></use></svg></button>
-      <div class="menu-wrap" id="wrap-spacing" hidden>
-        <button type="button" id="btn-spacing" class="tb" data-i18n-title="spacing"><svg><use href="#i-distribute"></use></svg></button>
-        <div class="menu menu-izq menu-opciones" id="menu-spacing" data-select="spacing-select" hidden></div>
-      </div>
-      <div class="menu-wrap" id="wrap-padding" hidden>
-        <button type="button" id="btn-padding" class="tb" data-i18n-title="padding"><svg><use href="#i-frame"></use></svg></button>
-        <div class="menu menu-izq menu-opciones" id="menu-padding" data-select="padding-select" hidden></div>
-      </div>
-      <div class="menu-wrap" id="wrap-merge" hidden>
-        <button type="button" id="btn-merge" class="tb" data-i18n-title="merge" aria-pressed="false"><svg><use href="#i-merge"></use></svg></button>
-      </div>
+      <span class="tb-sep"></span>
       <div class="menu-wrap" id="wrap-numbering" hidden>
         <button type="button" id="btn-numbering" class="tb" data-i18n-title="sequenceMenu"><svg><use href="#i-messages"></use></svg></button>
         <div class="menu menu-izq menu-ajustes" id="sequence-menu" hidden>
@@ -324,6 +322,8 @@
         </div>
       </div>
       <button type="button" id="btn-limpiar" class="tb" data-i18n-title="clearFormatTip"><svg><use href="#i-clear-format"></use></svg></button>
+      <span class="tb-sep"></span>
+      <button type="button" id="btn-bloque" class="tb" data-i18n-title="blockNewTip" hidden><svg><use href="#i-group"></use></svg></button>
       <button type="button" id="btn-negrita" class="tb" data-i18n-title="bold" hidden><svg><use href="#i-negrita"></use></svg></button>
       <button type="button" id="btn-cursiva" class="tb" data-i18n-title="italic" hidden><svg><use href="#i-cursiva"></use></svg></button>
       <button type="button" id="btn-formula" class="tb" data-i18n-title="formula" hidden><svg><use href="#i-formula"></use></svg></button>
@@ -492,6 +492,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=fe938b42"></script>
+<script type="module" src="js/sirena.js?v=c74b8511"></script>
 </body>
 </html>

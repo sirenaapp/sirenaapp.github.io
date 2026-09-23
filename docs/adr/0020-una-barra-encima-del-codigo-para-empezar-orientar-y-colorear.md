@@ -153,6 +153,17 @@ Todo se escribe en el propio código, como el resto de ajustes (ADR 8), de modo
 que el diagrama se ve igual en cualquier sitio y quien lo lee aprende la
 sintaxis. Los iconos son de Lucide y los rótulos están en los cinco idiomas.
 
+**Orden de la barra** (23-09-2026, a petición del autor, que pidió un orden
+más lógico y coherente): primero lo que condiciona el resto, que es la
+distribución (tipo, motor, dirección, separación, márgenes y unir flechas);
+luego el aspecto, del conjunto a lo concreto (tema, colores, estilo del
+trazo, tipografía, líneas y cajas); después lo propio de cada tipo de
+diagrama y «Limpiar formato»; luego lo que escribe contenido (nuevo bloque,
+negrita, cursiva, fórmula y salto de línea); y al final accesibilidad, ayuda,
+deshacer y rehacer. Un separador solo se ve si tiene botones visibles a los
+dos lados, porque según el tipo de diagrama un grupo entero puede quedar
+vacío.
+
 ## Alternativas descartadas
 
 - **Mantener los ajustes del dibujo en la barra superior.** Descartado: el

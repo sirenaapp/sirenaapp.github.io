@@ -865,7 +865,6 @@ function updateAppearanceVisibility() {
   btnShape.setAttribute('aria-label', btnShape.title);
   updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
-  $('sep-ajustes').hidden = !Object.entries(visibles).some(([id, v]) => v && id !== 'engine');
   readShowData();
 }
 
@@ -2615,7 +2614,6 @@ function updateEditorTools() {
   const kind = diagramKind();
   const conDireccion = CON_MOTOR.includes(kind) && !ENGINES_SIN_DIRECCION.includes(el.engineSelect.value);
   el.dirGroup.hidden = !conDireccion;
-  $('dir-sep').hidden = !conDireccion;
   if (conDireccion) readDirection();
   el.nodeColorBox.hidden = !COLORABLE.includes(kind);
   $('wrap-color').hidden = !CON_ROTULOS.includes(kind);
@@ -2627,6 +2625,24 @@ function updateEditorTools() {
   $('btn-limpiar').disabled = !hayFormato();
   $('btn-bloque').hidden = kind !== 'flowchart';
   updateAppearanceVisibility();
+  ajustarSeparadores();
+}
+
+// Un separador solo se ve si tiene botones visibles a los dos lados: según el
+// tipo de diagrama, un grupo entero puede quedarse vacío.
+function ajustarSeparadores() {
+  const hijos = [...$('editor-tools').children];
+  const esSep = (n) => n.classList.contains('tb-sep') && !n.classList.contains('tb-fin');
+  const visible = (n) => !n.hidden && !n.classList.contains('tb-sep');
+  let hayAntes = false;
+  hijos.forEach((n, i) => {
+    if (n.classList.contains('tb-fin')) { hayAntes = false; return; }
+    if (!esSep(n)) { if (visible(n)) hayAntes = true; return; }
+    let hayDespues = false;
+    for (let k = i + 1; k < hijos.length && !hijos[k].classList.contains('tb-sep'); k += 1) if (visible(hijos[k])) hayDespues = true;
+    n.hidden = !(hayAntes && hayDespues);
+    if (!n.hidden) hayAntes = false;
+  });
 }
 
 // Identificadores de los elementos que hay en las líneas donde está el cursor
@@ -4850,11 +4866,15 @@ function objetoDelDiagrama(event) {
     objetivo = document.elementFromPoint(event.clientX, event.clientY) || objetivo;
   }
 
+  // Una caja: Mermaid pone su id tras el del dibujo, con el tipo delante y un
+  // número detrás (flowchart-A-0, state-A-1, classId-A-0) o solo (bloques).
   const nodo = objetivo.closest && objetivo.closest('g.node');
-  if (nodo) {
-    const m = /-flowchart-(.+)-\d+$/.exec(nodo.id || '');
-    const id = m && m[1];
-    if (id && allNodes().includes(id)) return { tipo: 'nodo', id };
+  if (nodo && COLORABLE.includes(diagramKind())) {
+    const resto = (nodo.id || '').slice(svg.id.length + 1);
+    const m = /^(?:flowchart|state|classId)-(.+)-\d+$/.exec(resto);
+    const id = m ? m[1] : resto;
+    const escrito = new RegExp('(^|[^\\w-])' + escapaRe(id) + '(?![\\w-])', 'm').test(el.editor.value.replace(INIT_RE, ''));
+    if (id && (allNodes().includes(id) || escrito)) return { tipo: 'nodo', id };
   }
 
   const flecha = objetivo.closest && objetivo.closest('.edgePaths path, path.flowchart-link');
@@ -5347,12 +5367,16 @@ function construirContextual(objeto) {
       cerrarContextual();
       escribirGrosor('borde', ids, [], valor);
     });
-    accionContextual(menu, t('ctxShape'), 'i-square', () => abrirFormas('esta'));
     if (diagramKind() === 'flowchart') {
+      accionContextual(menu, t('ctxShape'), 'i-square', () => abrirFormas('esta'));
+      // Aspecto | contenido | estructura | borrar, como en los demás objetos.
+      menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
         const nodo = el.canvas.querySelector('[id$="-flowchart-' + objeto.id + '-' + '"], [id*="-flowchart-' + objeto.id + '-"]');
         editarEnElSitio(objeto, nodo && nodo.getBoundingClientRect());
       });
+      accionContextual(menu, t(enlaceDeCaja(objeto.id) ? 'ctxLinkEdit' : 'ctxLink'), 'i-link', () => abrirEnlace(objeto.id));
+      menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxAddLinked'), 'i-plus', () => {
         const id = idLibre();
         crearFlecha(objeto.id, id, '');
@@ -5362,7 +5386,7 @@ function construirContextual(objeto) {
         editarCajaCuandoAparezca(id);
       });
       entradaSubmenu(menu, objeto, 'bloque');
-      accionContextual(menu, t(enlaceDeCaja(objeto.id) ? 'ctxLinkEdit' : 'ctxLink'), 'i-link', () => abrirEnlace(objeto.id));
+      menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxDeleteBox'), 'i-trash', () => borrarNodo(objeto.id));
     }
     return;
@@ -5380,10 +5404,6 @@ function construirContextual(objeto) {
     menu.appendChild(document.createElement('hr'));
     // El fondo del rótulo solo se puede cambiar para todos a la vez.
     entradaSubmenu(menu, objeto, 'fondoRotulos');
-    accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
-      construirContextual({ tipo: 'flecha', indice: objeto.indice });
-      ajustarContextualEnPantalla();
-    }, true);
     if (diagramKind() === 'flowchart') {
       menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
@@ -5391,6 +5411,12 @@ function construirContextual(objeto) {
         editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
       });
     }
+    // Lleva a otro menú: va al final.
+    menu.appendChild(document.createElement('hr'));
+    accionContextual(menu, t('ctxArrowProps'), 'i-spline', () => {
+      construirContextual({ tipo: 'flecha', indice: objeto.indice });
+      ajustarContextualEnPantalla();
+    }, true, true);
     return;
   }
 
@@ -5419,6 +5445,7 @@ function construirContextual(objeto) {
     });
     accionContextual(menu, t('blockAddBox'), 'i-plus', () => crearCajaEnBloque(objeto.id));
     entradaSubmenu(menu, objeto, 'bloqueDir');
+    menu.appendChild(document.createElement('hr'));
     accionContextual(menu, t('blockDissolve'), 'i-trash', () => deshacerBloque(objeto.id));
     return;
   }
@@ -5451,10 +5478,12 @@ function construirContextual(objeto) {
       const tipo = tipoDeFlecha(objeto.indice);
       pliegueDibujado(menu, t('lineType'), LINE_TYPES, tipo.linea, dibujoDeFlechaOVacio('linea'), (valor) => aplicarTipoFlecha([objeto.indice], { linea: valor }, false));
       pliegueDibujado(menu, t('arrowHead'), ARROW_HEADS, tipo.puntas, dibujoDeFlechaOVacio('puntas'), (valor) => aplicarTipoFlecha([objeto.indice], { puntas: valor }, false));
+      menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
         const destino = rotuloDeLaFlecha(objeto.indice);
         editarEnElSitio({ tipo: 'rotulo', indice: objeto.indice }, destino && destino.getBoundingClientRect());
       });
+      menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxDeleteArrow'), 'i-trash', () => borrarFlecha(objeto.indice));
     }
     return;
@@ -5463,36 +5492,46 @@ function construirContextual(objeto) {
 
 
   titulo.textContent = t('ctxAll');
-  entradaSubmenu(menu, objeto, 'tema');
-  if (CON_ROTULOS.includes(diagramKind())) entradaSubmenu(menu, objeto, 'fondoRotulos');
-  entradaSubmenu(menu, objeto, 'lineas');
-  if (!$('wrap-shape').hidden) {
-    if (diagramKind() === 'flowchart') accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
-    entradaSubmenu(menu, objeto, 'ancho');
-  }
-  entradaSubmenu(menu, objeto, 'trazo');
-  entradaSubmenu(menu, objeto, 'tamano');
+  // El mismo orden que la barra del editor: lo que condiciona el resto
+  // (distribución), el aspecto, lo propio del tipo, crear y accesibilidad.
+  // Una raya separa los grupos que tengan algo.
+  const raya = () => {
+    const ultimo = menu.lastElementChild;
+    if (ultimo && ultimo !== titulo && ultimo.tagName !== 'HR') menu.appendChild(document.createElement('hr'));
+  };
   entradaSubmenu(menu, objeto, 'motor');
-  entradaSubmenu(menu, objeto, 'calendario');
-  entradaSubmenu(menu, objeto, 'sectores');
-  entradaSubmenu(menu, objeto, 'secuencia');
-  entradaSubmenu(menu, objeto, 'grafica');
+  entradaSubmenu(menu, objeto, 'direccion');
   if (!$('wrap-merge').hidden) {
     interruptorContextual(menu, t('merge'), 'i-merge', unirFlechasPuesto(), () => {
       alternarUnirFlechas();
       construirContextual(objeto);
     });
   }
-  entradaSubmenu(menu, objeto, 'direccion');
+  raya();
+  entradaSubmenu(menu, objeto, 'tema');
+  if (CON_ROTULOS.includes(diagramKind())) entradaSubmenu(menu, objeto, 'fondoRotulos');
+  entradaSubmenu(menu, objeto, 'trazo');
+  entradaSubmenu(menu, objeto, 'tamano');
+  entradaSubmenu(menu, objeto, 'lineas');
+  if (!$('wrap-shape').hidden) {
+    if (diagramKind() === 'flowchart') accionContextual(menu, t('shapeAll'), 'i-square', () => abrirFormas('todas'));
+    entradaSubmenu(menu, objeto, 'ancho');
+  }
   if (diagramKind() === 'flowchart' && bloquesDelCodigo().length) entradaSubmenu(menu, objeto, 'todosBloques');
+  raya();
+  entradaSubmenu(menu, objeto, 'calendario');
+  entradaSubmenu(menu, objeto, 'sectores');
+  entradaSubmenu(menu, objeto, 'secuencia');
+  entradaSubmenu(menu, objeto, 'grafica');
   if (hayFormato()) accionContextual(menu, t('clearFormat'), 'i-clear-format', limpiarFormato);
+  raya();
   if (diagramKind() === 'flowchart') {
-    menu.appendChild(document.createElement('hr'));
     accionContextual(menu, t('ctxAddBox'), 'i-plus', () => {
       const id = crearCaja('');
       editarCajaCuandoAparezca(id);
     });
     accionContextual(menu, t('blockNew'), 'i-group', () => crearBloque([]));
+    raya();
   }
   accionContextual(menu, t('a11y'), 'i-a11y', abrirAccesibilidad);
 }

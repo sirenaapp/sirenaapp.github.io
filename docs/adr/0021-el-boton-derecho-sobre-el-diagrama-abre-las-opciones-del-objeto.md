@@ -69,6 +69,16 @@ aspecto y funcionamiento:
   submenú; las entradas de dentro del submenú nunca lo cierran. Antes, ir
   hasta los colores de «Todos los bloques» o hasta las opciones de «Bloque»
   de una caja cerraba el submenú por el camino.
+- **Orden**: el menú del fondo sigue el de la barra del editor (ADR 20):
+  distribución, aspecto, lo propio del tipo y «Limpiar formato», crear y
+  accesibilidad. Los menús de un objeto tienen los mismos grupos, separados
+  por una raya: aspecto (color, grosor, forma o tipo de línea), contenido
+  (escribir el texto, enlace), estructura (añadir una caja, bloque,
+  dirección) y, al final, borrar o deshacer. En el del rótulo, «Propiedades
+  de la flecha» va la última, porque lleva a otro menú.
+- **Cajas de estados, clases y bloques**: el botón derecho sobre ellas abre
+  su menú (color y grosor), no el del fondo; Mermaid les da otro id
+  (`state-A-1`, `classId-A-0` o el id solo) que antes no se reconocía.
 
 El objeto se identifica en el SVG que dibuja Mermaid: las cajas llevan su
 identificador en el id (`…-flowchart-A-0`) y las flechas van en el mismo orden
