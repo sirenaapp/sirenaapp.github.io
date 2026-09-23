@@ -5048,15 +5048,17 @@ function abrirContextual(event) {
 
 /* --- Aviso del botón derecho --- */
 
-// Se enseña al entrar y se retira al usar el menú contextual o al cerrarla a
-// mano. Solo dura esa visita: al volver a la página vuelve a salir, porque no
+// Se enseña al entrar y se retira al usar el menú contextual, al cerrarla a
+// mano o a los 20 segundos de estar en pantalla. Solo dura esa visita: al volver a la página vuelve a salir, porque no
 // se guarda nada en el navegador. Como lo que cuenta solo vale en los
 // diagramas de flujo (y el mapa conceptual, que lo es), con otro tipo cargado
 // no sale, y vuelve a salir si se pasa a uno de flujo sin haberla cerrado.
 let pistaDescartada = false;
+let pistaTempo = null;
 
 function ocultarPista(descartar) {
   if (descartar) pistaDescartada = true;
+  clearTimeout(pistaTempo);
   const pista = el.pistaFormato;
   if (pista.hidden) return;
   pista.classList.add('saliendo');
@@ -5073,6 +5075,7 @@ function mostrarPista() {
   const tactil = window.matchMedia('(hover: none)').matches;
   $('pista-formato-texto').textContent = t(tactil ? 'hintTouch' : 'hintMouse');
   el.pistaFormato.hidden = false;
+  pistaTempo = setTimeout(() => ocultarPista(true), 20000);
 }
 
 function setupContextual() {
