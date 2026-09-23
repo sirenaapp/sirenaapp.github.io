@@ -176,6 +176,7 @@ window.SIRENA_LANG.ca = {
   hintMouse: 'En diagrames de flux i mapes conceptuals:\nBotó dret sobre una caixa, una fletxa o el fons: canvia el seu format.\nDoble clic: edita el text.',
   hintTouch: 'En diagrames de flux i mapes conceptuals:\nPulsació llarga sobre una caixa, una fletxa o el fons: canvia el seu format.\nDoble pulsació: edita el text.',
   hintClose: 'Tancar l\'avís',
+  hintNever: 'No tornar a mostrar',
   bold: 'Negreta',
   italic: 'Cursiva',
   formatNoFormula: 'La negreta i la cursiva no es poden fer servir en un text que porta una fórmula.',

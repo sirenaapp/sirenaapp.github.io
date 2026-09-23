@@ -6,12 +6,12 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=012b6b2c">
-<script src="lang/es.js?v=8099a727"></script>
-<script src="lang/ca.js?v=b0ae344a"></script>
-<script src="lang/gl.js?v=a4a11022"></script>
-<script src="lang/eu.js?v=760c71b5"></script>
-<script src="lang/en.js?v=10725e53"></script>
+<link rel="stylesheet" href="css/sirena.css?v=388f14e3">
+<script src="lang/es.js?v=c5a73ad7"></script>
+<script src="lang/ca.js?v=d2ab52ae"></script>
+<script src="lang/gl.js?v=464c28d4"></script>
+<script src="lang/eu.js?v=cf7c2e72"></script>
+<script src="lang/en.js?v=7fad7481"></script>
 <script src="js/examples.js?v=dbcfde1b"></script>
 <script src="js/sintaxis.js?v=da7b933b"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -370,7 +370,10 @@
     </div>
     <div class="pista" id="pista-formato" hidden>
       <svg aria-hidden="true"><use href="#i-pointer"></use></svg>
-      <span id="pista-formato-texto"></span>
+      <div class="pista-cuerpo">
+        <span id="pista-formato-texto"></span>
+        <button type="button" id="pista-no-mostrar" data-i18n="hintNever"></button>
+      </div>
       <button type="button" id="pista-formato-cerrar" data-i18n-title="hintClose"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
     </div>
     <div class="error-box" id="error-box" hidden></div>
@@ -492,6 +495,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=d2d0ce67"></script>
+<script type="module" src="js/sirena.js?v=a3442675"></script>
 </body>
 </html>

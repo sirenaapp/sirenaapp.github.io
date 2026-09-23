@@ -1251,3 +1251,17 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 #pista-formato-texto { white-space: pre-line; }
 #pista-formato { border-radius: 16px; }
 #pista-formato-texto::first-line { font-weight: 600; }
+.pista-cuerpo { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.pista #pista-no-mostrar {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 11.5px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.pista #pista-no-mostrar:hover { background: none; color: var(--accent); }

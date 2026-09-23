@@ -176,6 +176,7 @@ window.SIRENA_LANG.es = {
   hintMouse: 'En diagramas de flujo y mapas conceptuales:\nBotón derecho sobre una caja, una flecha o el fondo: cambia su formato.\nDoble clic: edita el texto.',
   hintTouch: 'En diagramas de flujo y mapas conceptuales:\nPulsación larga sobre una caja, una flecha o el fondo: cambia su formato.\nDoble pulsación: edita el texto.',
   hintClose: 'Cerrar el aviso',
+  hintNever: 'No volver a mostrar',
   bold: 'Negrita',
   italic: 'Cursiva',
   formatNoFormula: 'La negrita y la cursiva no se pueden usar en un texto que lleva una fórmula.',

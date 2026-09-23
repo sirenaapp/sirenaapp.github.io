@@ -100,9 +100,14 @@ pantalla táctil cuando no hay ratón). Dice desde la primera palabra que vale
 en los diagramas de flujo y los mapas conceptuales, y solo sale cuando el
 diagrama cargado es de esos: con otro tipo se retira, y vuelve si se pasa a
 uno de flujo sin haberlo cerrado. Se retira al usar el menú, al cerrarlo a
-mano (con la ✕ o pulsando en cualquier parte del aviso) o a los 20 segundos de estar en pantalla, para que no tape el diagrama, pero solo durante esa visita: al volver a entrar o al recargar vuelve a
-salir, porque no se guarda nada en el navegador. Así lo pidió el autor, para
-que un menú que no se ve no se olvide. No aparece en el modo visor.
+mano (con la ✕ o pulsando en cualquier parte del aviso) o a los 20 segundos de
+estar en pantalla, para que no tape el diagrama, pero solo durante esa visita:
+al volver a entrar o al recargar vuelve a salir, para que un menú que no se ve
+no se olvide, como pidió el autor. Desde el 23-09-2026, también a petición
+suya, lleva además «No volver a mostrar», que lo desactiva para siempre en ese
+navegador (`sirena.pistaNoMostrar` en el almacenamiento local); si el
+navegador no deja guardar, vale solo para esa visita. Va en tres líneas
+cortas: dónde vale, qué hace el botón derecho y qué hace el doble clic. No aparece en el modo visor.
 
 ## Alternativas descartadas
 

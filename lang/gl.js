@@ -176,6 +176,7 @@ window.SIRENA_LANG.gl = {
   hintMouse: 'Nos diagramas de fluxo e mapas conceptuais:\nBotón dereito sobre unha caixa, unha frecha ou o fondo: cambia o seu formato.\nDobre clic: edita o texto.',
   hintTouch: 'Nos diagramas de fluxo e mapas conceptuais:\nPulsación longa sobre unha caixa, unha frecha ou o fondo: cambia o seu formato.\nDobre pulsación: edita o texto.',
   hintClose: 'Pechar o aviso',
+  hintNever: 'Non volver amosar',
   bold: 'Negra',
   italic: 'Cursiva',
   formatNoFormula: 'A negra e a cursiva non se poden usar nun texto que leva unha fórmula.',

@@ -176,6 +176,7 @@ window.SIRENA_LANG.eu = {
   hintMouse: 'Fluxu-diagrametan eta kontzeptu-mapetan:\nEskuineko botoia kutxa, gezi edo hondo baten gainean: haren formatua aldatzen du.\nKlik bikoitza: testua editatzen du.',
   hintTouch: 'Fluxu-diagrametan eta kontzeptu-mapetan:\nLuze sakatu kutxa, gezi edo hondo baten gainean: haren formatua aldatzen du.\nSakatze bikoitza: testua editatzen du.',
   hintClose: 'Oharra itxi',
+  hintNever: 'Ez erakutsi berriro',
   bold: 'Lodia',
   italic: 'Etzana',
   formatNoFormula: 'Lodia eta etzana ezin dira erabili formula bat daukan testu batean.',

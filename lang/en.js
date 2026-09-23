@@ -176,6 +176,7 @@ window.SIRENA_LANG.en = {
   hintMouse: 'In flowcharts and concept maps:\nRight-click a box, an arrow or the background: change its format.\nDouble-click: edit the text.',
   hintTouch: 'In flowcharts and concept maps:\nLong press a box, an arrow or the background: change its format.\nDouble tap: edit the text.',
   hintClose: 'Close the notice',
+  hintNever: 'Don\'t show again',
   bold: 'Bold',
   italic: 'Italic',
   formatNoFormula: 'Bold and italic cannot be used in a text that contains a formula.',
