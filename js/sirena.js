@@ -4814,16 +4814,23 @@ let vigilante = null;
 function devolverMenu() {
   if (vigilante) { vigilante.disconnect(); vigilante = null; }
   if (!menuPrestado) return;
-  const { nodo, padre, siguiente } = menuPrestado;
+  const { nodo, padre, siguiente, repetido } = menuPrestado;
   menuPrestado = null;
+  if (repetido) repetido.hidden = false;
   nodo.hidden = true;
   nodo.classList.remove('prestado');
   padre.insertBefore(nodo, siguiente);
 }
 
-function prestarMenu(nodo, destino) {
+function prestarMenu(nodo, destino, titulo) {
   devolverMenu();
-  menuPrestado = { nodo, padre: nodo.parentNode, siguiente: nodo.nextSibling };
+  // El submenú ya lleva el título en su cabecera: si el menú prestado empieza
+  // con el mismo, se oculta mientras está prestado.
+  const primero = nodo.firstElementChild;
+  const repetido = primero && primero.matches('.menu-titulo, .menu-seccion') && !primero.hidden
+    && primero.textContent.trim().toLowerCase() === (titulo || '').trim().toLowerCase() ? primero : null;
+  if (repetido) repetido.hidden = true;
+  menuPrestado = { nodo, padre: nodo.parentNode, siguiente: nodo.nextSibling, repetido };
   nodo.classList.add('prestado');
   nodo.style.left = '';
   nodo.style.top = '';
@@ -4959,7 +4966,7 @@ function abrirSubmenuCascada(clave, boton) {
   if (submenu.construir) submenu.construir(caja);
   else {
     if (submenu.preparar) submenu.preparar();
-    prestarMenu(submenu.menu(), caja);
+    prestarMenu(submenu.menu(), caja, t(submenu.titulo));
   }
   boton.setAttribute('aria-expanded', 'true');
   caja.style.left = '0px';
@@ -5024,7 +5031,7 @@ function construirContextual(objeto) {
     if (submenu.construir) submenu.construir(menu);
     else {
       if (submenu.preparar) submenu.preparar();
-      prestarMenu(submenu.menu(), menu);
+      prestarMenu(submenu.menu(), menu, t(submenu.titulo));
     }
     return;
   }
