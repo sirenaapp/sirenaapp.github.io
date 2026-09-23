@@ -177,6 +177,7 @@ window.SIRENA_LANG.eu = {
   hintTouch: 'Fluxu-diagrametan eta kontzeptu-mapetan:\nLuze sakatu kutxa, gezi edo hondo baten gainean: haren formatua aldatzen du.\nSakatze bikoitza: testua editatzen du.',
   hintClose: 'Oharra itxi',
   hintNever: 'Ez erakutsi berriro',
+  splitterLabel: 'Kode-panelaren zabalera',
   bold: 'Lodia',
   italic: 'Etzana',
   formatNoFormula: 'Lodia eta etzana ezin dira erabili formula bat daukan testu batean.',
@@ -348,6 +349,9 @@ window.SIRENA_LANG.eu = {
   helpIntro: 'Diagrama testu gisa idazten da ezkerreko panelean eta marrazkia eskuinean agertzen da. Dena nabigatzailean bertan prozesatzen da: diagrama ez da inongo zerbitzarira bidaltzen.',
   helpShare: 'Partekatzeko botoiak diagrama konprimituta daraman helbide bat sortzen du, beraz, inora igo gabe parteka daiteke. Esteka editorean edo pantaila osoan ireki daiteke, diagrama bakarrik, eta beste orri batean txertatzeko kodea ere lor daiteke.',
   helpSyntax: 'Mermaid sintaxiaren erreferentzia',
+  creditsTitle: 'Kredituak eta lizentziak',
+  creditsText: 'Sirena Juan José de Harorena da; kodea AGPL v3 lizentziapean dago eta edukiak CC BY-SA 4.0 lizentziapean. Diagramak Mermaid-ekin marrazten ditu (Knut Sveidqvist eta laguntzaileak, MIT), eta Mermaid-ek beste liburutegi libre batzuk ditu barruan, besteak beste D3 (ISC), ELK (EPL 2.0 edo GPL 3.0), KaTeX (MIT), Cytoscape (MIT) eta DOMPurify (MPL 2.0 edo Apache 2.0). Ikonoak Luciderenak dira (ISC).',
+  creditsList: 'Liburutegi guztiak eta haien lizentziak',
   helpClose: 'Itxi',
   restoreWarning: 'Estekak irakurri ezin izan den diagrama bat dauka.'
 };

@@ -177,6 +177,7 @@ window.SIRENA_LANG.ca = {
   hintTouch: 'En diagrames de flux i mapes conceptuals:\nPulsació llarga sobre una caixa, una fletxa o el fons: canvia el seu format.\nDoble pulsació: edita el text.',
   hintClose: 'Tancar l\'avís',
   hintNever: 'No tornar a mostrar',
+  splitterLabel: 'Amplada del tauler del codi',
   bold: 'Negreta',
   italic: 'Cursiva',
   formatNoFormula: 'La negreta i la cursiva no es poden fer servir en un text que porta una fórmula.',
@@ -348,6 +349,9 @@ window.SIRENA_LANG.ca = {
   helpIntro: "El diagrama s'escriu com a text al plafó esquerre i el dibuix apareix a la dreta. Tot es processa al mateix navegador: el diagrama no s'envia a cap servidor.",
   helpShare: "El botó de compartir genera una adreça que porta el diagrama comprimit a dins, de manera que es pot compartir sense pujar-lo enlloc. L'enllaç es pot obrir a l'editor o a pantalla completa, amb el diagrama sol, i també s'obté el codi per incrustar-lo en una altra pàgina.",
   helpSyntax: 'Referència de la sintaxi de Mermaid',
+  creditsTitle: 'Crèdits i llicències',
+  creditsText: 'Sirena és de Juan José de Haro, amb el codi sota AGPL v3 i els continguts sota CC BY-SA 4.0. Dibuixa els diagrames amb Mermaid, de Knut Sveidqvist i col·laboradors (MIT), que porta dins altres biblioteques lliures, entre les quals D3 (ISC), ELK (EPL 2.0 o GPL 3.0), KaTeX (MIT), Cytoscape (MIT) i DOMPurify (MPL 2.0 o Apache 2.0). Les icones són de Lucide (ISC).',
+  creditsList: 'Totes les biblioteques i les seves llicències',
   helpClose: 'Tancar',
   restoreWarning: "L'enllaç conté un diagrama que no s'ha pogut llegir."
 };

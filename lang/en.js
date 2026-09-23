@@ -177,6 +177,7 @@ window.SIRENA_LANG.en = {
   hintTouch: 'In flowcharts and concept maps:\nLong press a box, an arrow or the background: change its format.\nDouble tap: edit the text.',
   hintClose: 'Close the notice',
   hintNever: 'Don\'t show again',
+  splitterLabel: 'Width of the code panel',
   bold: 'Bold',
   italic: 'Italic',
   formatNoFormula: 'Bold and italic cannot be used in a text that contains a formula.',
@@ -348,6 +349,9 @@ window.SIRENA_LANG.en = {
   helpIntro: 'The diagram is written as text in the left panel and the drawing appears on the right. Everything runs in the browser itself: the diagram is not sent to any server.',
   helpShare: 'The share button builds an address that carries the compressed diagram inside, so it can be shared without uploading it anywhere. The link can open in the editor or full screen, with the diagram alone, and the code to embed it in another page is available too.',
   helpSyntax: 'Mermaid syntax reference',
+  creditsTitle: 'Credits and licences',
+  creditsText: 'Sirena is by Juan José de Haro, with the code under AGPL v3 and the content under CC BY-SA 4.0. It draws the diagrams with Mermaid, by Knut Sveidqvist and contributors (MIT), which bundles other free libraries, among them D3 (ISC), ELK (EPL 2.0 or GPL 3.0), KaTeX (MIT), Cytoscape (MIT) and DOMPurify (MPL 2.0 or Apache 2.0). The icons are from Lucide (ISC).',
+  creditsList: 'All libraries and their licences',
   helpClose: 'Close',
   restoreWarning: 'The link contains a diagram that could not be read.'
 };

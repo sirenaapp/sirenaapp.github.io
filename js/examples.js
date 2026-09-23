@@ -1551,7 +1551,7 @@ flowchart TD
     accTitle: Gráfico de ejes
     accDescr: Evolución de la nota media a lo largo de los tres trimestres.
     title "Notas medias por trimestre"
-    x-axis [1r, 2o, 3r]
+    x-axis ["1.er", "2.º", "3.er"]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,

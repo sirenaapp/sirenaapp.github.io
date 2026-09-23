@@ -167,7 +167,11 @@ Las decisiones técnicas que condicionan el proyecto están en [docs/adr](docs/a
 Código bajo [AGPL v3](LICENSE.txt) y contenidos bajo
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.es).
 Mermaid es de Knut Sveidqvist y colaboradores, con licencia MIT
-([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)). Los iconos son de
+([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)), y lleva dentro
+otras bibliotecas libres (D3, ELK, KaTeX, Cytoscape, DOMPurify…), cada una con
+la suya: están todas en
+[vendor/mermaid/TERCEROS.md](vendor/mermaid/TERCEROS.md). Dentro de la
+aplicación, los créditos están en la ayuda. Los iconos son de
 [Lucide](https://lucide.dev), con licencia ISC
 ([vendor/lucide/LICENSE.txt](vendor/lucide/LICENSE.txt)).
 

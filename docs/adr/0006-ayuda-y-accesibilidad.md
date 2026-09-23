@@ -25,6 +25,34 @@ descripción se guardan como comentario (ver [ADR 20](0020-una-barra-encima-del-
 Los ejemplos también están traducidos a los cinco idiomas, y al cambiar de
 idioma el ejemplo que esté cargado se sustituye por su versión traducida.
 
+### Revisión del 23-09-2026
+
+Una revisión con axe-core 4.13 (reglas WCAG 2.1 A y AA y buenas prácticas) y
+con el teclado, en escritorio con tema claro y oscuro, con menús y ventanas
+abiertos y en móvil, llevó a estos cambios:
+
+- El separador entre el código y el dibujo tiene nombre («Ancho del panel del
+  código») y dice su valor (`aria-valuenow`, del 15 al 75 %).
+- Cada ventana toma su nombre de su título (`aria-labelledby`); al abrirse, el
+  foco entra en ella, y al cerrarse vuelve a donde estaba.
+- Al cerrar un menú de la barra con Escape, el foco vuelve a su botón.
+- El editor de código marca el foco cuando se llega con el teclado.
+- El color de acento y el gris secundario del tema claro se oscurecen un poco
+  (`#0c7585` y `#5a6d75`) para llegar a 4,5 sobre el fondo de las opciones
+  marcadas; antes daban 4,21 y 4,46.
+- Con la página en modo oscuro y el diagrama en el tema predeterminado, el
+  fondo de los rótulos de flecha pasa de `#585858` a `#505050` (contraste
+  5,02 en vez de 4,43). No se escribe en el código: solo vale mientras el
+  diagrama sigue al modo de la página, y Mermaid se vuelve a iniciar al dejar
+  de seguirlo, para que no pase a otros temas. Con el tema «Oscuro» elegido
+  queda el 4,43 de Mermaid.
+- La ayuda lleva un apartado de créditos y licencias, con la lista completa
+  de las bibliotecas que incluye Mermaid en `vendor/mermaid/TERCEROS.md`.
+
+El dibujo no se recorre con el teclado: el menú del botón derecho es un atajo,
+y todo lo que ofrece está también en la barra del editor, que actúa sobre el
+elemento de la línea donde está el cursor.
+
 ## Alternativas descartadas
 
 - **Enlazar la documentación oficial y ya está.** Descartada: está en inglés y

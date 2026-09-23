@@ -1017,15 +1017,29 @@ function restaurarSaltos(dentro) {
   return true;
 }
 
+// El diagrama sigue al modo claro u oscuro de la página: tema
+// predeterminado y sin colores propios.
+function sigueAlModo() {
+  return (!el.themeSelect.value || el.themeSelect.value === 'default') && !el.colorSelect.value;
+}
+
+let mermaidOscuroPropio = false;
+
 function initMermaid() {
   const conFormulas = hayFormulas();
   mermaidConFormulas = conFormulas;
+  mermaidOscuroPropio = sigueAlModo() && isDark();
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
     // «Predeterminado» sigue al modo claro u oscuro; los demás temas van en
     // la cabecera del código y Mermaid los aplica desde ahí.
     theme: el.themeSelect.value && el.themeSelect.value !== 'default' ? el.themeSelect.value : defaultMermaidTheme(),
+    // En el modo oscuro de la página, el tema oscuro de Mermaid deja los
+    // rótulos de flecha con un contraste de 4,43 (#ccc sobre #585858), por
+    // debajo del 4,5 que pide la WCAG: se oscurece un poco su fondo. Solo
+    // cuando el diagrama sigue al modo de la página y no trae colores propios.
+    ...(mermaidOscuroPropio ? { themeVariables: { edgeLabelBackground: '#505050' } } : {}),
     fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
     // Sin htmlLabels: los rótulos van como texto SVG, de modo que el diagrama
     // no lleva <foreignObject> y el navegador deja convertirlo en PNG.
@@ -1304,7 +1318,9 @@ function rotulosSobreSuLinea() {
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
-  if (hayFormulas(code) !== mermaidConFormulas) initMermaid();
+  // Se vuelve a iniciar Mermaid si cambia algo de su configuración de arranque:
+  // las fórmulas o el ajuste del modo oscuro, que no debe pasar a otros temas.
+  if (hayFormulas(code) !== mermaidConFormulas || (sigueAlModo() && isDark()) !== mermaidOscuroPropio) initMermaid();
   codigoPrevio = el.editor.value;
   localStorage.setItem(STORE.code, el.editor.value);
   guardarDocActivo();
@@ -6116,9 +6132,17 @@ function enableViewer(params) {
 
 /* --- Divisor de paneles --- */
 
+// El separador dice a los lectores de pantalla qué parte del ancho ocupa el
+// panel del código, en tanto por ciento.
+function anchoDelSplitter() {
+  const ancho = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--editor-width')) || 38;
+  el.splitter.setAttribute('aria-valuenow', String(Math.round(ancho)));
+}
+
 function setupSplitter() {
   const saved = localStorage.getItem(STORE.width);
   if (saved) document.documentElement.style.setProperty('--editor-width', saved);
+  anchoDelSplitter();
 
   let dragging = false;
 
@@ -6128,6 +6152,7 @@ function setupSplitter() {
     const percent = ((event.clientX - rect.left) / rect.width) * 100;
     const clamped = Math.min(75, Math.max(15, percent));
     document.documentElement.style.setProperty('--editor-width', clamped.toFixed(1) + '%');
+    anchoDelSplitter();
   };
 
   const stop = () => {
@@ -6154,12 +6179,31 @@ function setupSplitter() {
       const next = Math.min(75, Math.max(15, current + (event.key === 'ArrowLeft' ? -2 : 2)));
       document.documentElement.style.setProperty('--editor-width', next + '%');
       localStorage.setItem(STORE.width, next + '%');
+      anchoDelSplitter();
       fitToWindow();
     }
   });
 }
 
 /* --- Acciones de la barra --- */
+
+// Al abrirse una ventana, el foco entra en ella; al cerrarse, vuelve a donde
+// estaba. Vale para todas, sin tocar el código que abre cada una.
+function focoEnVentanas() {
+  document.querySelectorAll('.modal-overlay').forEach((capa) => {
+    let antes = null;
+    new MutationObserver(() => {
+      if (!capa.hidden) {
+        antes = document.activeElement;
+        const primero = capa.querySelector('input:not([type="hidden"]):not([disabled]), select, textarea, button:not([disabled]), a[href]');
+        if (primero && !capa.contains(document.activeElement)) setTimeout(() => primero.focus(), 0);
+      } else if (antes && (capa.contains(document.activeElement) || document.activeElement === document.body)) {
+        antes.focus();
+        antes = null;
+      }
+    }).observe(capa, { attributes: true, attributeFilter: ['hidden'] });
+  });
+}
 
 function setupToolbar() {
   $('btn-new').addEventListener('click', () => {
@@ -6505,6 +6549,11 @@ function setupToolbar() {
       downloadAs('mmd');
     }
     if (event.key === 'Escape') {
+      // El foco vuelve al botón del menú que estaba abierto.
+      const abierto = MENUS_EDITOR.map((clave) => el[clave]).concat([el.langMenu, el.downloadMenu])
+        .find((menu) => menu && !menu.hidden && !menu.classList.contains('prestado'));
+      const boton = abierto && abierto.closest('.menu-wrap') && abierto.closest('.menu-wrap').querySelector('button');
+      if (boton) setTimeout(() => boton.focus(), 0);
       el.helpModal.hidden = true;
       el.a11yModal.hidden = true;
       el.linkModal.hidden = true;
@@ -6540,6 +6589,7 @@ async function start() {
   buildAppearanceSelects();
   setupToolbar();
   setupSplitter();
+  focoEnVentanas();
   setupPan();
 
   const fromLink = await loadFromHash();

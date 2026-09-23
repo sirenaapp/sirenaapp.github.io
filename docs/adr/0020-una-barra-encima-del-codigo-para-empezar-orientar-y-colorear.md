@@ -195,6 +195,14 @@ Lo que no se puede es juntar el marcado con una fórmula: Mermaid deja los
 asteriscos a la vista. Si el rótulo lleva `$$…$$`, los botones no hacen nada y
 lo dicen con un aviso, en vez de escribir algo que saldría mal.
 
+Desde el 23-09-2026, a petición del autor, los dos botones ponen y quitan,
+como en un procesador de textos: antes cada pulsación añadía asteriscos. Se
+cuentan los que rodean lo elegido, dentro o justo fuera de la selección (dos
+son negrita, uno cursiva y tres las dos), y cada botón añade o quita solo los
+suyos. Lo elegido sigue elegido, para poder volver a pulsar. «Limpiar
+formato» no los quita (ADR 27): son énfasis del texto, no aspecto del
+diagrama, y su rótulo emergente lo dice.
+
 ## Consecuencias
 
 Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,
