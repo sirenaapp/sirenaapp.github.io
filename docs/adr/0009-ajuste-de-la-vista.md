@@ -18,6 +18,15 @@ corto, sin pasar del tamaño natural, y el diagrama se recorre desplazándolo.
 En los demás casos se encaja entero, ampliando hasta dos veces y media si es
 pequeño.
 
+El 23-09-2026, a petición del autor, la barra del zoom lleva además un botón
+«Ajustar al espacio disponible» (icono `fullscreen` de Lucide, esquinas con un
+rectángulo dentro, para no confundirlo con el de pantalla completa, que son
+solo las esquinas). Encaja el diagrama entero en el lienzo, lo más grande que
+quepa y centrado, con 16 píxeles de margen y entre el 10 % y el 800 %, como el
+zoom de los botones. A diferencia del ajuste automático al dibujar, no se queda
+en el lado corto de un diagrama alargado ni limita la ampliación a 2,5: quien
+lo pulsa quiere verlo todo.
+
 ## Alternativas descartadas
 
 - **Encajarlo siempre entero.** Descartada: es lo que dejaba el texto ilegible.

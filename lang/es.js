@@ -325,6 +325,7 @@ window.SIRENA_LANG.es = {
   language: 'Idioma',
   fullscreen: 'Pantalla completa',
   zoomIn: 'Acercar',
+  zoomFit: 'Ajustar al espacio disponible',
   zoomOut: 'Alejar',
   zoomReset: 'Volver al 100 %',
   help: 'Ayuda',

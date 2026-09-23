@@ -325,6 +325,7 @@ window.SIRENA_LANG.en = {
   language: 'Language',
   fullscreen: 'Fullscreen',
   zoomIn: 'Zoom in',
+  zoomFit: 'Fit to the available space',
   zoomOut: 'Zoom out',
   zoomReset: 'Back to 100 %',
   help: 'Help',

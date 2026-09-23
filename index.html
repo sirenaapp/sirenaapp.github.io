@@ -7,11 +7,11 @@
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/sirena.css?v=e7173335">
-<script src="lang/es.js?v=83ba164b"></script>
-<script src="lang/ca.js?v=8fb06bb0"></script>
-<script src="lang/gl.js?v=da181a1c"></script>
-<script src="lang/eu.js?v=7e2dc775"></script>
-<script src="lang/en.js?v=54b3c928"></script>
+<script src="lang/es.js?v=7d47fbd6"></script>
+<script src="lang/ca.js?v=08ba72e8"></script>
+<script src="lang/gl.js?v=d762dbf6"></script>
+<script src="lang/eu.js?v=ec5d31d6"></script>
+<script src="lang/en.js?v=3410b682"></script>
 <script src="js/examples.js?v=29c88c64"></script>
 <script src="js/sintaxis.js?v=da7b933b"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -44,6 +44,7 @@
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /> <path d="M2 12h20" /></symbol>
   <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
   <symbol id="i-code" viewBox="0 0 24 24"><path d="m18 16 4-4-4-4" /> <path d="m6 8-4 4 4 4" /> <path d="m14.5 4-5 16" /></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /> <path d="M17 3h2a2 2 0 0 1 2 2v2" /> <path d="M21 17v2a2 2 0 0 1-2 2h-2" /> <path d="M7 21H5a2 2 0 0 1-2-2v-2" /> <rect width="10" height="8" x="7" y="8" rx="1" /></symbol>
   <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3" /> <path d="M21 8V5a2 2 0 0 0-2-2h-3" /> <path d="M3 16v3a2 2 0 0 0 2 2h3" /> <path d="M16 21h3a2 2 0 0 0 2-2v-3" /></symbol>
   <symbol id="i-brush" viewBox="0 0 24 24"><path d="m11 10 3 3" /> <path d="M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z" /> <path d="M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031" /></symbol>
   <symbol id="i-text-size" viewBox="0 0 24 24"><path d="m15 16 2.536-7.328a1.02 1.02 1 0 1 1.928 0L22 16" /> <path d="M15.697 14h5.606" /> <path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" /> <path d="M3.304 13h6.392" /></symbol>
@@ -363,6 +364,7 @@
       <button type="button" id="btn-zoom-out" class="tb" data-i18n-title="zoomOut"><svg><use href="#i-zoom-out"></use></svg></button>
       <button type="button" class="zoom-value" id="zoom-value" data-i18n-title="zoomReset">100 %</button>
       <button type="button" id="btn-zoom-in" class="tb" data-i18n-title="zoomIn"><svg><use href="#i-zoom-in"></use></svg></button>
+      <button type="button" id="btn-zoom-fit" class="tb" data-i18n-title="zoomFit"><svg><use href="#i-fit"></use></svg></button>
       <button type="button" id="btn-full" class="tb" data-i18n-title="fullscreen"><svg><use href="#i-full"></use></svg></button>
     </div>
     <div class="preview-viewport" id="viewport">
@@ -499,6 +501,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=668fcfbf"></script>
+<script type="module" src="js/sirena.js?v=e78e3bad"></script>
 </body>
 </html>

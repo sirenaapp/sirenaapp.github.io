@@ -1485,6 +1485,28 @@ function fitToWindow() {
   applyView();
 }
 
+// Botón de ajustar: el diagrama entero, lo más grande que quepa en el lienzo
+// (ampliando o reduciendo), centrado. A diferencia del ajuste automático al
+// dibujar, no se queda en el lado corto de un diagrama alargado.
+function ajustarAlEspacio() {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return;
+  view.scale = 1;
+  view.x = 0;
+  view.y = 0;
+  applyView();
+  const box = el.canvas.getBoundingClientRect();
+  const port = el.viewport.getBoundingClientRect();
+  if (!box.width || !box.height) return;
+  const margen = 16;
+  const scale = Math.min((port.width - margen * 2) / box.width, (port.height - margen * 2) / box.height);
+  // Los mismos límites que el zoom con los botones.
+  view.scale = scale > 0 ? Math.min(8, Math.max(0.1, scale)) : 1;
+  view.x = (port.width - box.width * view.scale) / 2;
+  view.y = (port.height - box.height * view.scale) / 2;
+  applyView();
+}
+
 function setupPan() {
   // Se lleva la cuenta de todos los dedos (o punteros) que hay encima: con uno
   // se arrastra y con dos se amplía o se reduce pellizcando.
@@ -6525,6 +6547,7 @@ function setupToolbar() {
 
   $('btn-zoom-in').addEventListener('click', () => zoomBy(1.2));
   $('btn-zoom-out').addEventListener('click', () => zoomBy(1 / 1.2));
+  $('btn-zoom-fit').addEventListener('click', ajustarAlEspacio);
   el.zoomValue.addEventListener('click', resetZoom);
 
   const fullButton = $('btn-full');

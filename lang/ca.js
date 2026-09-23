@@ -325,6 +325,7 @@ window.SIRENA_LANG.ca = {
   language: 'Idioma',
   fullscreen: 'Pantalla completa',
   zoomIn: 'Apropar',
+  zoomFit: "Ajustar a l'espai disponible",
   zoomOut: 'Allunyar',
   zoomReset: 'Tornar al 100 %',
   help: 'Ajuda',

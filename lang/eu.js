@@ -325,6 +325,7 @@ window.SIRENA_LANG.eu = {
   language: 'Hizkuntza',
   fullscreen: 'Pantaila osoa',
   zoomIn: 'Handitu',
+  zoomFit: 'Doitu erabilgarri dagoen tokira',
   zoomOut: 'Txikitu',
   zoomReset: 'Itzuli %100era',
   help: 'Laguntza',
