@@ -219,6 +219,8 @@ window.SIRENA_LANG.gl = {
   nodeColorMany: 'Colorear os elementos',
   nodeColorCustom: 'Outra cor…',
   nodeColorClear: 'Quitar a cor',
+  clearFormat: 'Limpar o formato',
+  clearFormatTip: 'Limpar o formato: quitar cores, estilos, trazo, tipografía e grosores',
   direction: 'Dirección',
   dirTD: 'De arriba abaixo',
   dirBT: 'De abaixo arriba',

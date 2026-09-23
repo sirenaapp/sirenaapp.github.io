@@ -32,6 +32,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [24](0024-tipo-de-linea-y-puntas-de-las-flechas-escritos-en-cada-flecha.md) | Tipo de línea y puntas de las flechas, escritos en cada flecha | aceptado |
 | [25](0025-el-calendario-del-diagrama-de-gantt-se-ajusta-desde-la-barra-y-se-escribe-en-el-cuerpo.md) | El calendario del diagrama de Gantt se ajusta desde la barra y se escribe en el cuerpo | aceptado |
 | [26](0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md) | Sirena recoloca los rótulos de flecha que Mermaid deja fuera de su línea | aceptado |
+| [27](0027-limpiar-formato-deja-el-diagrama-sin-aspecto-propio-y-conserva-su-estructura.md) | Limpiar formato deja el diagrama sin aspecto propio y conserva su estructura | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

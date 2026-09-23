@@ -219,6 +219,8 @@ window.SIRENA_LANG.eu = {
   nodeColorMany: 'Elementuak koloreztatu',
   nodeColorCustom: 'Beste kolore bat…',
   nodeColorClear: 'Kolorea kendu',
+  clearFormat: 'Formatua garbitu',
+  clearFormatTip: 'Formatua garbitu: koloreak, estiloak, trazua, tipografia eta lodierak kendu',
   direction: 'Norabidea',
   dirTD: 'Goitik behera',
   dirBT: 'Behetik gora',

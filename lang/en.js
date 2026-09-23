@@ -219,6 +219,8 @@ window.SIRENA_LANG.en = {
   nodeColorMany: 'Colour the elements',
   nodeColorCustom: 'Another colour…',
   nodeColorClear: 'Remove the colour',
+  clearFormat: 'Clear formatting',
+  clearFormatTip: 'Clear formatting: remove colours, styles, stroke, typography and widths',
   direction: 'Direction',
   dirTD: 'Top to bottom',
   dirBT: 'Bottom to top',

@@ -219,6 +219,8 @@ window.SIRENA_LANG.ca = {
   nodeColorMany: 'Acolorir els elements',
   nodeColorCustom: 'Un altre color…',
   nodeColorClear: 'Treure el color',
+  clearFormat: 'Netejar el format',
+  clearFormatTip: 'Netejar el format: treure colors, estils, traç, tipografia i gruixos',
   direction: 'Direcció',
   dirTD: 'De dalt a baix',
   dirBT: 'De baix a dalt',

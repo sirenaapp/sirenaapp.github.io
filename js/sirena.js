@@ -2454,6 +2454,7 @@ function updateEditorTools() {
   const conFormato = CON_SALTO.includes(tipo);
   $('btn-negrita').hidden = !conFormato;
   $('btn-cursiva').hidden = !conFormato;
+  $('btn-limpiar').disabled = !hayFormato();
   updateAppearanceVisibility();
 }
 
@@ -3542,6 +3543,78 @@ function buildNodeColorSection() {
     });
     el.swatches.appendChild(boton);
   });
+}
+
+/* --- Limpiar formato --- */
+
+// Deja el diagrama sin formato: fuera colores, tema, trazo, tipografía,
+// grosores, forma de las líneas, separaciones, ancho de las cajas y estilos
+// (style, classDef, class, :::clase, linkStyle), y las flechas punteadas o
+// gruesas vuelven a la línea normal. Se queda lo que dice qué es el diagrama o
+// cómo se reparte: tipo, orientación, motor, cajas y sus formas, puntas de las
+// flechas, bloques, textos, enlaces, accesibilidad y las opciones de las
+// gráficas (numeración, valores, leyenda…).
+const CABECERA_SIN_FORMATO = ['layout', 'elk', 'sequence', 'xyChart', 'sankey', 'pie'];
+const LINEAS_CON_TRAZO = ['punteada', 'gruesa', 'discontinua', 'rayapunto'];
+
+function codigoSinFormato(codigo) {
+  const tipo = diagramKind();
+  let cabecera = [];
+  const encontrado = INIT_RE.exec(codigo);
+  if (encontrado) {
+    let config = null;
+    try { config = JSON.parse(encontrado[1]); } catch (_) { config = null; }
+    if (config) {
+      const queda = {};
+      CABECERA_SIN_FORMATO.forEach((clave) => { if (clave in config) queda[clave] = config[clave]; });
+      if (Object.keys(queda).length) cabecera = ['%%{init: ' + JSON.stringify(queda) + '}%%'];
+    } else {
+      // Una cabecera que no se entiende no se toca.
+      cabecera = [encontrado[0].replace(/\n$/, '')];
+    }
+  }
+  // En un diagrama de clases «class X» define una clase: ahí la asignación de
+  // estilo es cssClass.
+  const asigna = tipo === 'class' ? 'cssClass' : 'class';
+  const ESTILO = new RegExp(`^\\s*(?:style|classDef|linkStyle|${asigna})\\s`);
+  let lineas = codigo.replace(INIT_RE, '').replace(/\s+$/, '').split('\n')
+    .filter((l) => !ESTILO.test(l) && !/^\s*:::/.test(l))
+    .map((l) => (/^\s*%%/.test(l) ? l : l.replace(/[ \t]*:::[\w-]+/g, '')));
+  if (tipo === 'flowchart') {
+    lineas = lineas.map((l) => {
+      if (/^\s*%%/.test(l) || !enlacesDeLinea(l)) return l;
+      const { flechas, trozos } = trocearLinea(l);
+      let cambia = false;
+      const nuevas = flechas.map((f) => {
+        const a = analizarFlecha(f.texto);
+        if (!LINEAS_CON_TRAZO.includes(a.linea)) return f.texto;
+        cambia = true;
+        return escribirFlecha({ ...a, linea: 'normal' });
+      });
+      return cambia ? (l.match(/^[ \t]*/) || [''])[0] + rehacerLinea(trozos, nuevas, '').trim() : l;
+    });
+    const i = lineas.findIndex((l) => FLECHA_GENERAL_RE.test(l));
+    if (i >= 0) {
+      const m = FLECHA_GENERAL_RE.exec(lineas[i]);
+      if (LINEAS_CON_TRAZO.includes(m[1])) {
+        const puntas = ARROW_HEADS.some(([v]) => v === m[2]) ? m[2] : 'flecha';
+        escribirFlechaGeneral(lineas, { linea: 'normal', puntas });
+      }
+    }
+  }
+  return cabecera.concat(lineas).join('\n') + '\n';
+}
+
+function hayFormato() {
+  const codigo = el.editor.value.replace(/\s+$/, '') + '\n';
+  return codigoSinFormato(el.editor.value) !== codigo;
+}
+
+function limpiarFormato() {
+  if (!hayFormato()) return;
+  aplicarCodigo(codigoSinFormato(el.editor.value).replace(/\n$/, '').split('\n'));
+  coloresTocados.clear();
+  readAppearance();
 }
 
 const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
@@ -4997,6 +5070,7 @@ function construirContextual(objeto) {
     });
   }
   entradaSubmenu(menu, objeto, 'direccion');
+  if (hayFormato()) accionContextual(menu, t('clearFormat'), 'i-clear-format', limpiarFormato);
   if (diagramKind() === 'flowchart') {
     menu.appendChild(document.createElement('hr'));
     accionContextual(menu, t('ctxAddBox'), 'i-plus', () => {
@@ -5775,6 +5849,7 @@ function setupToolbar() {
   });
 
   $('btn-a11y').addEventListener('click', abrirAccesibilidad);
+  $('btn-limpiar').addEventListener('click', limpiarFormato);
 
   $('a11y-apply').addEventListener('click', () => {
     writeAccessibility(el.a11yTitle.value, el.a11yDescr.value);
