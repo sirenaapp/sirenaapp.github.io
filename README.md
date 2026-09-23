@@ -173,7 +173,8 @@ la suya: están todas en
 [vendor/mermaid/TERCEROS.md](vendor/mermaid/TERCEROS.md). Los iconos son de
 [Lucide](https://lucide.dev), con licencia ISC
 ([vendor/lucide/LICENSE.txt](vendor/lucide/LICENSE.txt)). Dentro de la
-aplicación, los créditos están en la ayuda.
+aplicación, los créditos y el uso de IA están en el botón de información
+de la barra superior.
 
 Sirena es un proyecto independiente y no está asociado con el proyecto Mermaid
 ni con Mermaid Chart.

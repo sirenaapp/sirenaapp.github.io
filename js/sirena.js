@@ -149,6 +149,7 @@ const el = {
   splitter: $('splitter'),
   workspace: $('workspace'),
   helpModal: $('help-modal'),
+  creditosModal: $('creditos-modal'),
   viewerLink: $('viewer-link'),
   gutter: $('gutter'),
   a11yModal: $('a11y-modal'),
@@ -6429,6 +6430,13 @@ function setupToolbar() {
     el.helpModal.hidden = false;
   });
   $('help-close').addEventListener('click', () => { el.helpModal.hidden = true; });
+  // Créditos, licencias y uso de IA, en su propia ventana (no en la ayuda de
+  // la sintaxis), desde la barra superior.
+  $('btn-creditos').addEventListener('click', () => { el.creditosModal.hidden = false; });
+  $('creditos-close').addEventListener('click', () => { el.creditosModal.hidden = true; });
+  el.creditosModal.addEventListener('click', (event) => {
+    if (event.target === el.creditosModal) el.creditosModal.hidden = true;
+  });
   el.helpModal.addEventListener('click', (event) => {
     if (event.target === el.helpModal) el.helpModal.hidden = true;
   });
@@ -6574,6 +6582,7 @@ function setupToolbar() {
       downloadAs('mmd');
     }
     if (event.key === 'Escape') {
+      el.creditosModal.hidden = true;
       // El foco vuelve al botón del menú que estaba abierto.
       const abierto = MENUS_EDITOR.map((clave) => el[clave]).concat([el.langMenu, el.downloadMenu])
         .find((menu) => menu && !menu.hidden && !menu.classList.contains('prestado'));

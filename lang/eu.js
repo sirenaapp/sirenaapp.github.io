@@ -351,6 +351,7 @@ window.SIRENA_LANG.eu = {
   helpShare: 'Partekatzeko botoiak diagrama konprimituta daraman helbide bat sortzen du, beraz, inora igo gabe parteka daiteke. Esteka editorean edo pantaila osoan ireki daiteke, diagrama bakarrik, eta beste orri batean txertatzeko kodea ere lor daiteke.',
   helpSyntax: 'Mermaid sintaxiaren erreferentzia',
   creditsTitle: 'Kredituak eta lizentziak',
+  creditsTip: 'Kredituak, lizentziak eta AAren erabilera',
   creditsText: 'Sirena Juan José de Harorena da; kodea AGPL v3 lizentziapean dago eta edukiak CC BY-SA 4.0 lizentziapean. Diagramak Mermaid-ekin marrazten ditu (Knut Sveidqvist eta laguntzaileak, MIT), eta Mermaid-ek beste liburutegi libre batzuk ditu barruan, besteak beste D3 (ISC), ELK (EPL 2.0 edo GPL 3.0), KaTeX (MIT), Cytoscape (MIT) eta DOMPurify (MPL 2.0 edo Apache 2.0). Ikonoak Luciderenak dira (ISC).',
   creditsList: 'Liburutegi guztiak eta haien lizentziak',
   aiBefore: 'Sirena AAren laguntzaz programatu da (Claude), ',

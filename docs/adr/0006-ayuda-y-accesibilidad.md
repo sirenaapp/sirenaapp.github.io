@@ -46,8 +46,11 @@ abiertos y en móvil, llevó a estos cambios:
   diagrama sigue al modo de la página, y Mermaid se vuelve a iniciar al dejar
   de seguirlo, para que no pase a otros temas. Con el tema «Oscuro» elegido
   queda el 4,43 de Mermaid.
-- La ayuda lleva un apartado de créditos y licencias, con la lista completa
-  de las bibliotecas que incluye Mermaid en `vendor/mermaid/TERCEROS.md`.
+- Los créditos, las licencias y la declaración de uso de IA (nivel 4 del
+  MIAE) van en su propia ventana, con un botón de información en la barra
+  superior, y no en la ayuda, que es la de la sintaxis: así lo pidió el autor.
+  La lista completa de las bibliotecas que incluye Mermaid está en
+  `vendor/mermaid/TERCEROS.md`.
 
 El dibujo no se recorre con el teclado: el menú del botón derecho es un atajo,
 y todo lo que ofrece está también en la barra del editor, que actúa sobre el

@@ -7,11 +7,11 @@
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/sirena.css?v=e7173335">
-<script src="lang/es.js?v=7d47fbd6"></script>
-<script src="lang/ca.js?v=08ba72e8"></script>
-<script src="lang/gl.js?v=d762dbf6"></script>
-<script src="lang/eu.js?v=ec5d31d6"></script>
-<script src="lang/en.js?v=3410b682"></script>
+<script src="lang/es.js?v=9c920e11"></script>
+<script src="lang/ca.js?v=87288ffd"></script>
+<script src="lang/gl.js?v=25870142"></script>
+<script src="lang/eu.js?v=834e6967"></script>
+<script src="lang/en.js?v=7c8e7ffd"></script>
 <script src="js/examples.js?v=29c88c64"></script>
 <script src="js/sintaxis.js?v=da7b933b"></script>
 <script src="js/formas.js?v=ba6aed44"></script>
@@ -44,6 +44,7 @@
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /> <path d="M2 12h20" /></symbol>
   <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol>
   <symbol id="i-code" viewBox="0 0 24 24"><path d="m18 16 4-4-4-4" /> <path d="m6 8-4 4 4 4" /> <path d="m14.5 4-5 16" /></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol>
   <symbol id="i-fit" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /> <path d="M17 3h2a2 2 0 0 1 2 2v2" /> <path d="M21 17v2a2 2 0 0 1-2 2h-2" /> <path d="M7 21H5a2 2 0 0 1-2-2v-2" /> <rect width="10" height="8" x="7" y="8" rx="1" /></symbol>
   <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3" /> <path d="M21 8V5a2 2 0 0 0-2-2h-3" /> <path d="M3 16v3a2 2 0 0 0 2 2h3" /> <path d="M16 21h3a2 2 0 0 0 2-2v-3" /></symbol>
   <symbol id="i-brush" viewBox="0 0 24 24"><path d="m11 10 3 3" /> <path d="M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z" /> <path d="M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031" /></symbol>
@@ -134,6 +135,7 @@
       <button type="button" id="btn-lang" class="tb" data-i18n-title="language"><svg><use href="#i-lang"></use></svg></button>
       <div class="menu" id="lang-menu" hidden></div>
     </div>
+    <button type="button" id="btn-creditos" class="tb" data-i18n-title="creditsTip"><svg><use href="#i-info"></use></svg></button>
   </div>
 </header>
 
@@ -427,11 +429,17 @@
     <p data-i18n="helpShare"></p>
     <div class="syntax" id="syntax-box"></div>
     <p><a href="https://mermaid.js.org/intro/syntax-reference.html" target="_blank" rel="noopener noreferrer" data-i18n="helpSyntax">Referencia de la sintaxis de Mermaid</a></p>
-    <h3 data-i18n="creditsTitle">Créditos y licencias</h3>
+    <div class="modal-actions"><button type="button" id="help-close" class="btn" data-i18n="helpClose">Cerrar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="creditos-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-creditos">
+    <h2 id="titulo-creditos" data-i18n="creditsTip">Créditos, licencias y uso de IA</h2>
     <p data-i18n="creditsText"></p>
     <p><a href="https://github.com/sirenaapp/sirenaapp.github.io/blob/main/vendor/mermaid/TERCEROS.md" target="_blank" rel="noopener noreferrer" data-i18n="creditsList">Todas las bibliotecas y sus licencias</a></p>
     <p><span data-i18n="aiBefore"></span><a id="ai-link" href="https://jjdeharo.github.io/miae/es/?nivel=4" target="_blank" rel="noopener noreferrer" data-i18n="aiLink"></a><span data-i18n="aiAfter"></span></p>
-    <div class="modal-actions"><button type="button" id="help-close" class="btn" data-i18n="helpClose">Cerrar</button></div>
+    <div class="modal-actions"><button type="button" id="creditos-close" class="btn" data-i18n="helpClose">Cerrar</button></div>
   </div>
 </div>
 
@@ -501,6 +509,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=e78e3bad"></script>
+<script type="module" src="js/sirena.js?v=69793032"></script>
 </body>
 </html>

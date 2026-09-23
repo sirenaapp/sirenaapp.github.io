@@ -351,6 +351,7 @@ window.SIRENA_LANG.es = {
   helpShare: 'El botón de compartir genera una dirección que lleva el diagrama comprimido dentro, de modo que se puede compartir sin subirlo a ningún sitio. El enlace puede abrirse en el editor o a pantalla completa, con el diagrama solo, y también se obtiene el código para incrustarlo en otra página.',
   helpSyntax: 'Referencia de la sintaxis de Mermaid',
   creditsTitle: 'Créditos y licencias',
+  creditsTip: 'Créditos, licencias y uso de IA',
   creditsText: 'Sirena es de Juan José de Haro, con el código bajo AGPL v3 y los contenidos bajo CC BY-SA 4.0. Dibuja los diagramas con Mermaid, de Knut Sveidqvist y colaboradores (MIT), que lleva dentro otras bibliotecas libres, entre ellas D3 (ISC), ELK (EPL 2.0 o GPL 3.0), KaTeX (MIT), Cytoscape (MIT) y DOMPurify (MPL 2.0 o Apache 2.0). Los iconos son de Lucide (ISC).',
   creditsList: 'Todas las bibliotecas y sus licencias',
   aiBefore: 'Sirena se ha programado con ayuda de IA (Claude), en ',
