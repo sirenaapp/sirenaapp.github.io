@@ -333,6 +333,45 @@ async function cargarMermaidExe() {
   }
 }
 
+// Los ejemplos que el Mermaid de eXe no dibuja tal cual. Los tipos nuevos de
+// Mermaid 12 (carriles, Ishikawa, árbol, Venn) no existen en la 11, y el mapa
+// de árbol de la 11 no admite las líneas de accesibilidad. Para cada ejemplo
+// que falla se anota 'sinAccesibilidad' si lo entiende sin esas líneas, o null
+// si tampoco: entonces ni el ejemplo ni su tipo se ofrecen. Se pregunta al propio
+// Mermaid de eXe, así que al actualizarlo los ejemplos aparecen solos.
+const ejemplosExe = new Map();
+
+async function comprobarEjemplosExe() {
+  if (!mermaidExe || typeof mermaidExe.parse !== 'function') return;
+  const entiende = async (codigo) => {
+    try {
+      return (await mermaidExe.parse(codigo, { suppressErrors: true })) !== false;
+    } catch (_) {
+      return false;
+    }
+  };
+  ejemplosExe.clear();
+  for (const grupo of window.SIRENA_EXAMPLES || []) {
+    for (const item of grupo.items) {
+      const codigo = item.code[lang] || item.code.es;
+      if (await entiende(codigo)) continue;
+      const sinAcc = sinAccesibilidad(codigo);
+      ejemplosExe.set(item.id, sinAcc !== codigo && await entiende(sinAcc) ? 'sinAccesibilidad' : null);
+    }
+  }
+  buildExampleSelect();
+  buildTypeMenu();
+}
+
+function sinAccesibilidad(codigo) {
+  return codigo.split('\n').filter((linea) => !/^\s*acc(Title|Descr)\s*:/.test(linea)).join('\n');
+}
+
+// Si el ejemplo (y su tipo) se puede ofrecer: fuera de eXe, siempre.
+function ejemploDisponible(item) {
+  return ejemplosExe.get(item.id) !== null;
+}
+
 // El Mermaid con que se dibuja.
 function mermaidDeDibujo() {
   return mermaidExe || mermaid;
@@ -832,10 +871,10 @@ function buildExampleSelect() {
   (window.SIRENA_EXAMPLES || []).forEach((group) => {
     const optgroup = document.createElement('optgroup');
     optgroup.label = group.group[lang] || group.group.es;
-    group.items.forEach((item) => {
+    group.items.filter(ejemploDisponible).forEach((item) => {
       optgroup.appendChild(new Option(item.label[lang] || item.label.es, item.id));
     });
-    select.appendChild(optgroup);
+    if (optgroup.children.length) select.appendChild(optgroup);
   });
 }
 
@@ -1038,7 +1077,8 @@ function findExample(id) {
 }
 
 function exampleCode(item) {
-  return item.code[lang] || item.code.es;
+  const codigo = item.code[lang] || item.code.es;
+  return ejemplosExe.get(item.id) === 'sinAccesibilidad' ? sinAccesibilidad(codigo) : codigo;
 }
 
 // Si en el editor está un ejemplo tal cual, al cambiar de idioma se sustituye
@@ -2809,7 +2849,7 @@ function typeLabelFor(id) {
 function buildTypeMenu() {
   el.typeMenu.innerHTML = '';
   (window.SIRENA_EXAMPLES || []).forEach((grupo) => {
-    const items = grupo.items.filter((item) => TYPE_HEADERS[item.id]);
+    const items = grupo.items.filter((item) => TYPE_HEADERS[item.id] && ejemploDisponible(item));
     if (!items.length) return;
     const titulo = document.createElement('p');
     titulo.className = 'menu-grupo';
@@ -7004,6 +7044,7 @@ async function start() {
   if (exe) {
     prepararExe();
     await cargarMermaidExe();
+    await comprobarEjemplosExe();
   } else if (fromLink) {
     // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
     // toca: así abrirlo no ensucia lo que la persona tenga guardado.

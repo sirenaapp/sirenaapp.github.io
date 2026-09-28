@@ -11,7 +11,9 @@ probar-web http://localhost:8931/index.html -n chromium,firefox -d escritorio,mo
 Antes de publicar un cambio que toque el dibujo o la exportación conviene
 comprobar, con un script de pasos, estas tres cosas:
 
-1. Que todos los ejemplos se dibujan sin error en Chromium y en Firefox.
+1. Que todos los ejemplos se dibujan sin error en Chromium y en Firefox, en los
+   cinco idiomas: cada idioma tiene su propio código, y un texto sin comillas
+   puede fallar en uno y no en otro.
 2. Que cada ejemplo se exporta a PNG. Algunos tipos de diagrama (el recorrido de
    usuario, por ejemplo) colocan los rótulos en `<foreignObject>`; al exportar se
    sustituyen por texto SVG, porque si no el navegador impide convertir el
@@ -43,6 +45,11 @@ cargue el TinyMCE y `app/common/mermaidMaxSize.js` de un clon de eXe, defina
 `window.eXeLearning = { app: { locale: { lang } }, mermaidMaxSize }` y una
 función `window._`, y abra Sirena con
 `tinymce.activeEditor.windowManager.openUrl({ url: '…/index.html', buttons: [] })`.
+
+Los ejemplos se comprueban también con el Mermaid de eXe
+(`app/common/mermaid/mermaid.min.js` de su versión estática): todos, en los
+cinco idiomas. Los que no entienda no se ofrecen dentro de eXe (ADR 29), pero
+conviene que los demás valgan para las dos versiones.
 
 Conviene comprobar, en Chromium y en Firefox: insertar un diagrama nuevo (con
 `<`, `&` y `$$…$$`), el rechazo de una medida mal escrita, volver a abrir el

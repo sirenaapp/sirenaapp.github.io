@@ -1568,7 +1568,7 @@ flowchart TD
     accTitle: Gráfico de eixes
     accDescr: Evolución da nota media ao longo dos tres trimestres.
     title "Notas medias por trimestre"
-    x-axis [1º, 2º, 3º]
+    x-axis ["1.º", "2.º", "3.º"]
     y-axis "Nota" 0 --> 10
     bar [5.8, 6.4, 7.1]
     line [5.8, 6.4, 7.1]`,
@@ -1666,70 +1666,70 @@ flowchart TD
     title Herramientas del aula
     x-axis "Difícil de usar" --> "Fácil de usar"
     y-axis "Poco útil" --> "Muy útil"
-    quadrant-1 Recomendables
-    quadrant-2 Con formación
-    quadrant-3 Descartables
-    quadrant-4 Accesorias
-    Hoja de cálculo: [0.6, 0.8]
-    Cuaderno digital: [0.8, 0.9]
-    Pizarra digital: [0.7, 0.6]
-    Entorno virtual: [0.4, 0.85]`,
+    quadrant-1 "Recomendables"
+    quadrant-2 "Con formación"
+    quadrant-3 "Descartables"
+    quadrant-4 "Accesorias"
+    "Hoja de cálculo": [0.6, 0.8]
+    "Cuaderno digital": [0.8, 0.9]
+    "Pizarra digital": [0.7, 0.6]
+    "Entorno virtual": [0.4, 0.85]`,
           ca: `quadrantChart
     accTitle: Quadrants
     accDescr: Eines de l'aula situades segons la seva utilitat i facilitat d'ús.
     title Eines de l'aula
     x-axis "Difícil d'usar" --> "Fàcil d'usar"
     y-axis "Poc útil" --> "Molt útil"
-    quadrant-1 Recomanables
-    quadrant-2 Amb formació
-    quadrant-3 Descartables
-    quadrant-4 Accessòries
-    Full de càlcul: [0.6, 0.8]
-    Quadern digital: [0.8, 0.9]
-    Pissarra digital: [0.7, 0.6]
-    Entorn virtual: [0.4, 0.85]`,
+    quadrant-1 "Recomanables"
+    quadrant-2 "Amb formació"
+    quadrant-3 "Descartables"
+    quadrant-4 "Accessòries"
+    "Full de càlcul": [0.6, 0.8]
+    "Quadern digital": [0.8, 0.9]
+    "Pissarra digital": [0.7, 0.6]
+    "Entorn virtual": [0.4, 0.85]`,
           gl: `quadrantChart
     accTitle: Cuadrantes
     accDescr: Ferramentas da aula situadas segundo a súa utilidade e facilidade de uso.
     title Ferramentas da aula
     x-axis "Difícil de usar" --> "Fácil de usar"
     y-axis "Pouco útil" --> "Moi útil"
-    quadrant-1 Recomendables
-    quadrant-2 Con formación
-    quadrant-3 Descartables
-    quadrant-4 Accesorias
-    Folla de cálculo: [0.6, 0.8]
-    Caderno dixital: [0.8, 0.9]
-    Encerado dixital: [0.7, 0.6]
-    Contorno virtual: [0.4, 0.85]`,
+    quadrant-1 "Recomendables"
+    quadrant-2 "Con formación"
+    quadrant-3 "Descartables"
+    quadrant-4 "Accesorias"
+    "Folla de cálculo": [0.6, 0.8]
+    "Caderno dixital": [0.8, 0.9]
+    "Encerado dixital": [0.7, 0.6]
+    "Contorno virtual": [0.4, 0.85]`,
           eu: `quadrantChart
     accTitle: Koadranteak
     accDescr: Ikasgelako tresnak, erabilgarritasunaren eta erabilerraztasunaren arabera kokatuta.
     title Ikasgelako tresnak
     x-axis "Erabiltzen zaila" --> "Erabiltzen erraza"
     y-axis "Gutxi erabilgarria" --> "Oso erabilgarria"
-    quadrant-1 Gomendagarriak
-    quadrant-2 Prestakuntzarekin
-    quadrant-3 Baztertzekoak
-    quadrant-4 Osagarriak
-    Kalkulu-orria: [0.6, 0.8]
-    Koaderno digitala: [0.8, 0.9]
-    Arbel digitala: [0.7, 0.6]
-    Ingurune birtuala: [0.4, 0.85]`,
+    quadrant-1 "Gomendagarriak"
+    quadrant-2 "Prestakuntzarekin"
+    quadrant-3 "Baztertzekoak"
+    quadrant-4 "Osagarriak"
+    "Kalkulu-orria": [0.6, 0.8]
+    "Koaderno digitala": [0.8, 0.9]
+    "Arbel digitala": [0.7, 0.6]
+    "Ingurune birtuala": [0.4, 0.85]`,
           en: `quadrantChart
     accTitle: Quadrant chart
     accDescr: Classroom tools placed by usefulness and ease of use.
     title Classroom tools
     x-axis "Hard to use" --> "Easy to use"
     y-axis "Not very useful" --> "Very useful"
-    quadrant-1 Recommended
-    quadrant-2 Needs training
-    quadrant-3 Not worth it
-    quadrant-4 Nice to have
-    Spreadsheet: [0.6, 0.8]
-    Digital gradebook: [0.8, 0.9]
-    Interactive whiteboard: [0.7, 0.6]
-    Virtual classroom: [0.4, 0.85]`
+    quadrant-1 "Recommended"
+    quadrant-2 "Needs training"
+    quadrant-3 "Not worth it"
+    quadrant-4 "Nice to have"
+    "Spreadsheet": [0.6, 0.8]
+    "Digital gradebook": [0.8, 0.9]
+    "Interactive whiteboard": [0.7, 0.6]
+    "Virtual classroom": [0.4, 0.85]`
         }
       },
       {
@@ -1971,11 +1971,11 @@ Resit,Repeat year,3`
     nas:B -- T:kopia`,
           en: `architecture-beta
     accTitle: Architecture
-    accDescr: Classroom, on-site server and backup inside the school.
+    accDescr: Classroom, school server and backup inside the school.
     group school(cloud)[School]
 
     service room(server)[Classroom] in school
-    service nas(database)[On-site server] in school
+    service nas(database)[School server] in school
     service backup(disk)[Backup] in school
 
     room:R -- L:nas

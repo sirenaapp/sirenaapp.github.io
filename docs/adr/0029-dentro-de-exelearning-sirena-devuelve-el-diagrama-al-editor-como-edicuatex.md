@@ -77,6 +77,16 @@ lo que sale en el material:
 - Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
   el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
   Las herramientas que actúan sobre el dibujo aceptan las dos formas.
+- **Solo se ofrece lo que el Mermaid de eXe sabe dibujar** (versión 1.0.7).
+  Al abrirse, Sirena pregunta al Mermaid de eXe (`parse` con
+  `suppressErrors`, sin dibujar) si entiende cada ejemplo en el idioma de la
+  interfaz. Si no lo entiende, prueba sin las líneas de accesibilidad
+  (`accTitle`, `accDescr`); si así sí, el ejemplo se carga sin ellas, y si
+  tampoco, ni el ejemplo ni su tipo aparecen en la lista de ejemplos ni en el
+  menú de tipos. Con Mermaid 11 quedan fuera carriles, Ishikawa, árbol y Venn,
+  que no existen en esa versión, y el mapa de árbol se carga sin las líneas de
+  accesibilidad, que su Mermaid 11 no admite. Como se pregunta al propio Mermaid
+  de eXe, al actualizarlo los ejemplos vuelven solos.
 
 **Idiomas.** Se sigue el modelo de Edicuatex. Cada texto de `lang/en.js` va
 dentro de `_('…')`; en ese archivo `_` es una función que devuelve el texto tal
@@ -111,9 +121,14 @@ barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
 - La parte de eXe (dependencia de npm, script que copia Sirena, botón que la
   abre, pruebas) se prepara aparte, en una rama del fork de eXe.
 - Dentro de eXe, lo que no dibuja el Mermaid de eXe tampoco se ve en Sirena:
-  con Mermaid 11, los tipos en beta de los ejemplos (Venn, Ishikawa) dan error
-  y no hay motores ELK. Es lo correcto, porque tampoco saldrían en el material;
-  llegarán solos cuando eXe pase a Mermaid 12.
+  con Mermaid 11 no hay motores ELK ni los tipos nuevos de la 12, que no se
+  ofrecen. Es lo correcto, porque tampoco saldrían en el material; llegarán
+  solos cuando eXe pase a Mermaid 12. Quien escriba a mano uno de esos tipos
+  verá el error de Mermaid, igual que lo vería en eXe.
+- Los ejemplos se escriben de modo que valgan para las dos versiones de
+  Mermaid siempre que se pueda: textos con acentos o guiones entre comillas, por
+  ejemplo, porque Mermaid 11 no los admite sueltos en los cuadrantes ni en la
+  arquitectura.
 - Los arreglos de Sirena a fallos de Mermaid (ADR 26 y los de las fórmulas) no
   llegan a eXe: se han notificado a Mermaid (#8292, #8340, y un comentario con
   la corrección en #5543) para que lleguen con sus versiones.
@@ -165,6 +180,18 @@ Con el dibujo de eXe siguen funcionando el menú del botón derecho de cada
 caja, la edición con doble clic, el cambio de tema y la descarga en PNG. La
 web no cambia: letra del sistema, rótulos como texto SVG, elk por defecto, los
 27 ejemplos sin error y `probar-web` en las 18 combinaciones.
+
+28-09-2026, versión 1.0.7: los 27 ejemplos en los cinco idiomas (135 códigos)
+dibujados con el Mermaid 11 de eXe y con el 12 de Sirena. Con la versión 1.0.5
+fallaban dentro de eXe seis ejemplos (carriles, Ishikawa, árbol, Venn, mapa de
+árbol y cuadrantes), y en los idiomas distintos del castellano, dos más: el
+gráfico de ejes en gallego (también en la web, por los ordinales sin comillas)
+y la arquitectura en inglés (en eXe, por el guion de un rótulo). Tras corregir
+esos tres ejemplos y añadir la comprobación, con Mermaid 12 se dibujan los 135;
+con Mermaid 11, todos menos los cuatro tipos que no tiene, y el mapa de árbol
+sin las líneas de accesibilidad. Dentro de la versión estática de eXe, en
+Chromium y Firefox, Sirena ofrece 23 ejemplos y 20 tipos, y los 23 se dibujan
+sin error.
 
 28-09-2026, con la rama de eXe que abre Sirena desde su botón de Mermaid: sus
 cuatro pruebas E2E de ese botón (insertar y dibujar, editar un diagrama, el
