@@ -62,7 +62,12 @@ entra en este modo.
 dentro de `_('…')`; en ese archivo `_` es una función que devuelve el texto tal
 cual, así que fuera de eXe no cambia nada. En eXe, cada texto se pide a su
 catálogo por la frase inglesa; si eXe aún no la tiene traducida, se usa la
-traducción de Sirena, y si Sirena tampoco la tiene, la inglesa. La lengua de
+traducción de Sirena, y si Sirena tampoco la tiene, la inglesa. El catálogo de
+eXe guarda cada frase tal como está escrita en `lang/en.js`, sin interpretar los
+escapes (un apóstrofo entre comillas simples queda como `\'` y un salto de
+línea como `\n`), así que, si la frase no aparece tal cual, Sirena la pide
+también en esa forma escrita y convierte los `\n` de la respuesta en saltos de
+línea (versión 1.0.2). La lengua de
 los ejemplos y del diagrama de muestra es la de eXe si Sirena la tiene; el
 valenciano toma la del catalán y el resto, la del inglés. Los textos de la
 barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
@@ -124,7 +129,10 @@ prerrenderizado al previsualizar y conservar otros estilos al cambiar el ancho)
 pasan en Chromium y en Firefox. Esas pruebas mostraron que, en los dos
 navegadores, cuando Sirena termina de cargar el editor ya ha perdido la
 selección (se leía `P` en vez de `PRE`): de ahí el contexto que anota el botón,
-añadido en la versión 1.0.1.
+añadido en la versión 1.0.1. Con el servidor de eXe en francés, «Don't show
+again» solo se traducía al pedirlo en su forma escrita, `Don\'t show again`: de
+ahí la segunda consulta de la versión 1.0.2, con la que aparece «Ne plus
+afficher».
 
 Antes, en Chromium y Firefox:
 

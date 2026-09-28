@@ -676,17 +676,29 @@ function t(key) {
   return (strings && strings[key]) || window.SIRENA_LANG.es[key] || key;
 }
 
+// El catálogo de eXe guarda cada frase tal como está escrita en lang/en.js,
+// sin interpretar los escapes: un apóstrofo entre comillas simples queda como
+// \' y un salto de línea como \n. Esta es esa forma escrita de una frase.
+function formaEscrita(frase) {
+  return frase.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+}
+
 // En eXe, cada texto se pide a su catálogo por la frase inglesa, que es lo que
-// eXe recoge de lang/en.js. Si eXe aún no la ha traducido, se usa la traducción
-// de Sirena, y si Sirena tampoco la tiene, la frase inglesa.
+// eXe recoge de lang/en.js: primero tal cual y, si no está, en su forma
+// escrita. Si eXe aún no la ha traducido, se usa la traducción de Sirena, y si
+// Sirena tampoco la tiene, la frase inglesa.
 function traducirConExe(key) {
   const ingles = window.SIRENA_LANG.en[key];
   if (ingles) {
-    try {
-      const traducida = exe._(ingles);
-      if (typeof traducida === 'string' && traducida && traducida !== ingles) return traducida;
-    } catch (_) {
-      // Sin traducción de eXe: se sigue con la de Sirena.
+    for (const forma of [ingles, formaEscrita(ingles)]) {
+      try {
+        const traducida = exe._(forma);
+        if (typeof traducida === 'string' && traducida && traducida !== forma) {
+          return traducida.replace(/\\n/g, '\n').replace(/\\'/g, "'");
+        }
+      } catch (_) {
+        // Sin traducción de eXe: se sigue con la de Sirena.
+      }
     }
   }
   return (strings && strings[key]) || ingles || window.SIRENA_LANG.es[key] || key;
