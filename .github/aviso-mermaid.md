@@ -13,7 +13,8 @@ revisar además si ha cambiado la sintaxis de algún tipo de diagrama.
 
 ## Parches de Sirena a fallos de Mermaid
 
-Cada ejemplo se ha dibujado con Mermaid $ULTIMA sola. Si un fallo aparece como
+Cada ejemplo se ha dibujado con la versión nueva de Mermaid sola (la tabla dice
+cuál). Si un fallo aparece como
 **corregido**, al actualizar se quita su parche (y su fila de
 `scripts/parches-mermaid.json`) y se prueba el ejemplo en Sirena. Detalles en
 [docs/parches-mermaid.md](../blob/main/docs/parches-mermaid.md).
