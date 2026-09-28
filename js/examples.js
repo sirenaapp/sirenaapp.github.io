@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Ejemplos agrupados por tipo de diagrama, con el contenido en los cinco idiomas.
 // label: rótulo del menú; code: código Mermaid, uno por idioma.
 window.SIRENA_EXAMPLES = [

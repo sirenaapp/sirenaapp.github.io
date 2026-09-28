@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Sirena — editor de diagramas Mermaid.
 // Todo el trabajo se hace en el navegador: no hay servidor ni envío de datos.
 
@@ -694,8 +695,6 @@ function applyLang(code) {
   strings = window.SIRENA_LANG[lang];
   if (!exe) localStorage.setItem(STORE.lang, lang);
   document.documentElement.lang = (exe && idiomaExe()) || lang;
-  // El nivel de uso de IA se enlaza en la web del MIAE en el idioma de la página.
-  $('ai-link').href = 'https://jjdeharo.github.io/miae/' + lang + '/?nivel=4';
 
   document.querySelectorAll('[data-i18n]').forEach((node) => {
     node.textContent = t(node.dataset.i18n);

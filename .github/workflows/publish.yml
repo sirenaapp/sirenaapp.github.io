@@ -1,0 +1,63 @@
+name: Publish
+
+# Pushing a tag `vX.Y.Z` publishes that version to npm as `sirenaapp`. Nothing
+# else publishes: a release is a deliberate act, and an npm version can never
+# be replaced. Same scheme as EdiCuaTeX (edicuatex/edicuatex.github.io).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # npm authenticates this workflow as a trusted publisher over OIDC, so there
+  # is no token to store, rotate or leak. It also gets the release a
+  # provenance attestation, which npm shows on the package page.
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Must match the environment configured in npm's trusted publisher settings.
+    environment: npm
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # A tarball whose version does not match the tag it was announced under is
+      # the kind of mistake you only notice once it is public and immutable.
+      - name: Check the version matches the tag
+        if: github.event_name == 'push'
+        run: test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
+
+      # Nothing is built: the package is the site as it is served. What has to
+      # be checked is that the page, its code and Mermaid are inside, and that
+      # the repository-only folders (docs, scripts, workflows) are not.
+      - name: Check the tarball
+        run: |
+          npm pack --pack-destination .
+          tar -tzf sirenaapp-*.tgz
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/index.html$"
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/js/sirena.js$"
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/lang/en.js$"
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/vendor/mermaid/mermaid.esm.min.mjs$"
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/LICENSE-CONTENIDOS$"
+          ! tar -tzf sirenaapp-*.tgz | grep -qE "^package/(docs|scripts|\.github)/"
+
+      # The first version was published by hand, before npm could trust this
+      # workflow; running again on a version already on npm is not an error.
+      - name: Publish
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "sirenaapp@${version}" version >/dev/null 2>&1; then
+            echo "sirenaapp@${version} is already on npm: nothing to publish."
+          else
+            npm publish ./sirenaapp-*.tgz
+          fi

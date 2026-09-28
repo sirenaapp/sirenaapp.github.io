@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // English
 window.SIRENA_LANG = window.SIRENA_LANG || {};
 // Cada texto va dentro de _(): eXeLearning recoge esas llamadas para su

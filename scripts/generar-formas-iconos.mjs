@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Genera js/formas-iconos.js: una miniatura SVG de cada forma de caja de
 // js/formas.js, dibujada por el propio Mermaid del repositorio, para que el
 // menú de formas enseñe la forma real. Hay que volver a ejecutarlo al
@@ -119,5 +120,5 @@ iconos.text = '<svg viewBox="0 0 40 24" aria-hidden="true"><text x="20" y="17" t
 
 const lineas = Object.entries(iconos).map(([id, svg]) => `  '${id}': '${svg.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`);
 await writeFile(join(raiz, 'js/formas-iconos.js'),
-  '// Generado por scripts/generar-formas-iconos.mjs con el Mermaid del repositorio:\n// una miniatura de cada forma de js/formas.js, dibujada por Mermaid. No editar a mano.\nwindow.SIRENA_SHAPE_ICONS = {\n' + lineas.join(',\n') + '\n};\n');
+  '// SPDX-License-Identifier: AGPL-3.0-or-later\n// Generado por scripts/generar-formas-iconos.mjs con el Mermaid del repositorio:\n// una miniatura de cada forma de js/formas.js, dibujada por Mermaid. No editar a mano.\nwindow.SIRENA_SHAPE_ICONS = {\n' + lineas.join(',\n') + '\n};\n');
 console.log('formas generadas:', Object.keys(iconos).length);

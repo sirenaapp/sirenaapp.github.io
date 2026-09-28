@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Chuleta de sintaxis por tipo de diagrama, en los cinco idiomas.
 // c: fragmento de código (no se traduce); t: qué hace ese fragmento.
 window.SIRENA_SYNTAX = [

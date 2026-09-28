@@ -35,6 +35,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [27](0027-limpiar-formato-deja-el-diagrama-sin-aspecto-propio-y-conserva-su-estructura.md) | Limpiar formato deja el diagrama sin aspecto propio y conserva su estructura | aceptado |
 | [28](0028-formato-de-los-bloques-con-style-propio-y-una-clase-comun.md) | Formato de los bloques con style propio y una clase común | aceptado |
 | [29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md) | Dentro de eXeLearning, Sirena devuelve el diagrama al editor, como Edicuatex | aceptado |
+| [30](0030-sirena-se-publica-en-npm-como-sirenaapp.md) | Sirena se publica en npm como `sirenaapp` | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

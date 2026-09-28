@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Generado por scripts/generar-formas-iconos.mjs con el Mermaid del repositorio:
 // una miniatura de cada forma de js/formas.js, dibujada por Mermaid. No editar a mano.
 window.SIRENA_SHAPE_ICONS = {

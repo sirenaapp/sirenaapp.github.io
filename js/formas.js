@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Formas de las cajas de un diagrama de flujo, agrupadas y en los cinco idiomas.
 // classic: sintaxis clásica de Mermaid (apertura y cierre); sin ella se escribe
 // con la forma nueva, A@{ shape: nombre, label: "Texto" }. Se ha comprobado que

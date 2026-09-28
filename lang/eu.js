@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Euskara
 window.SIRENA_LANG = window.SIRENA_LANG || {};
 window.SIRENA_LANG.eu = {

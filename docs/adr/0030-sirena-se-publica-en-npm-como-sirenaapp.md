@@ -1,0 +1,77 @@
+# 30. Sirena se publica en npm como `sirenaapp`
+
+Fecha: 2026-09-28 · Estado: aceptado
+
+## Contexto
+
+Para que eXeLearning lleve Sirena dentro ([ADR 29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md))
+tiene que poder instalarla como el resto de sus dependencias. Así lleva
+Edicuatex: fija una versión del paquete de npm en su `package.json` y un script
+copia sus archivos en `public/app/common/edicuatex`. Actualizar es cambiar el
+número de versión.
+
+## Decisión
+
+Sirena se publica en npm con el nombre `sirenaapp`, el mismo de la organización
+de GitHub. El nombre `sirena` está ocupado por un paquete ajeno.
+
+- **Contenido.** El paquete es la web tal como se sirve, sin construir nada:
+  `index.html`, `favicon.svg`, `css`, `js`, `lang`, `vendor` (Mermaid y los
+  iconos), las dos licencias y el README. Quedan fuera `docs`, `scripts` y
+  `.github`, que solo sirven al repositorio. La lista está en `files` de
+  `package.json`.
+- **Licencia.** `AGPL-3.0-or-later`, como el resto de proyectos del autor. Cada
+  archivo de código lo indica en su primera línea con
+  `SPDX-License-Identifier`, y los contenidos (textos, ejemplos y
+  documentación) van con CC BY-SA 4.0 en `LICENSE-CONTENIDOS`.
+- **Versiones.** Se numeran con versionado semántico, empezando por la 1.0.0,
+  y cada una se marca con una etiqueta `vX.Y.Z` que no se mueve ni se reutiliza.
+- **Publicación.** Subir una etiqueta `vX.Y.Z` lanza
+  `.github/workflows/publish.yml`, que comprueba que la versión coincide con la
+  etiqueta y que el paquete lleva lo que tiene que llevar, y publica. npm confía
+  en ese flujo por OIDC («publicador de confianza»), con el entorno `npm` del
+  repositorio: no hay ningún token guardado. La primera versión se publica a
+  mano, porque la confianza se configura en npm sobre un paquete que ya existe;
+  por eso el flujo no falla si la versión ya está publicada.
+
+## Alternativas descartadas
+
+- **Nombres como `sirena-mermaid` o `@sirenaapp/sirena`.** `sirenaapp` coincide
+  con la organización y con la web, y no obliga a crear un ámbito en npm.
+- **Que eXe copie Sirena desde GitHub.** eXe ya resuelve sus dependencias con
+  npm y fija versiones; un caso aparte le obligaría a mantener otro mecanismo.
+- **Publicar con un token guardado en el repositorio.** Es lo que evita el
+  publicador de confianza, igual que en Edicuatex.
+
+## Consecuencias
+
+- Una versión publicada en npm no se puede sustituir: cada cambio que tenga que
+  llegar a eXe necesita una versión nueva y su etiqueta.
+- El paquete pesa 1,8 MB comprimido y 6,1 MB descomprimido, casi todo Mermaid.
+  Si eXe usa su propio Mermaid, su script puede dejar fuera `vendor/mermaid`.
+- La web no cambia: `package.json`, el flujo y la segunda licencia no afectan a
+  lo que se sirve.
+
+## Evidencia
+
+- Edicuatex: `.github/workflows/publish.yml` y `package.json` en
+  `edicuatex/edicuatex.github.io` (commit `c7e498f`). Su versión 1.5.0 no tiene
+  ejecución del flujo; la primera es la de la 1.5.1 (`gh run list`), así que la
+  primera versión se publicó a mano.
+- `npm view sirena` devuelve un paquete ajeno (1.1.4); `npm view sirenaapp`,
+  404 (28-09-2026).
+- El entorno `npm` del repositorio se creó con la misma configuración que el de
+  Edicuatex: sin reglas de protección.
+
+## Riesgos y limitaciones
+
+- Que la primera versión deba publicarse a mano sale de lo que hizo Edicuatex,
+  no de la documentación de npm: es una hipótesis pendiente de validación. Si
+  npm permitiera configurar la confianza antes, bastaría con la etiqueta.
+
+## Validación
+
+28-09-2026: `npm pack` produce 127 archivos. Extraído y servido aparte, el
+paquete carga, dibuja los 27 ejemplos en Chromium y Firefox sin errores ni
+archivos que falten, y mantiene la biblioteca y el idioma. Las comprobaciones
+del flujo, ejecutadas a mano sobre ese paquete, pasan.

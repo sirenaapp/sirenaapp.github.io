@@ -154,6 +154,20 @@ Por eso los textos de `lang/en.js` van dentro de `_('…')`: eXe recoge esas
 llamadas para su catálogo de traducciones. Todo texto nuevo de la interfaz se
 escribe así.
 
+Para que eXe pueda instalarla, Sirena se publica en npm como
+[`sirenaapp`](https://www.npmjs.com/package/sirenaapp): el paquete es la web tal
+como se sirve. Para sacar una versión se cambia el número en `package.json` y
+se sube una etiqueta con ese número:
+
+```bash
+npm version 1.0.1 --no-git-tag-version   # o editar package.json a mano
+git commit -am "chore(release): 1.0.1"
+git tag v1.0.1 && git push && git push origin v1.0.1
+```
+
+La etiqueta lanza la publicación en npm desde GitHub Actions, sin tokens
+guardados ([ADR 30](docs/adr/0030-sirena-se-publica-en-npm-como-sirenaapp.md)).
+
 ## Cómo funciona por dentro
 
 Es una página estática. Mermaid se sirve desde el propio repositorio
@@ -180,8 +194,9 @@ Las decisiones técnicas que condicionan el proyecto están en [docs/adr](docs/a
 
 ## Licencias
 
-Código bajo [AGPL v3](LICENSE.txt) y contenidos bajo
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.es).
+Código bajo [AGPL v3 o posterior](LICENSE.txt) y contenidos bajo
+[CC BY-SA 4.0](LICENSE-CONTENIDOS). Cada archivo de código lo indica en su
+primera línea (`SPDX-License-Identifier: AGPL-3.0-or-later`).
 Mermaid es de Knut Sveidqvist y colaboradores, con licencia MIT
 ([vendor/mermaid/LICENSE.txt](vendor/mermaid/LICENSE.txt)), y lleva dentro
 otras bibliotecas libres (D3, ELK, KaTeX, Cytoscape, DOMPurify…), cada una con
@@ -198,7 +213,7 @@ ni con Mermaid Chart.
 ## Uso de IA
 
 Sirena se ha programado con ayuda de IA (Claude), en
-[cocreación, nivel 4 del MIAE](https://jjdeharo.github.io/miae/es/?nivel=4):
+[cocreación, nivel 4 del MIAE](https://jjdeharo.github.io/miae/?nivel=4):
 el autor ha decidido el diseño y las funciones, y ha probado el programa
 numerosas veces, en situaciones diferentes, para detectar errores y aspectos
 que mejorar.

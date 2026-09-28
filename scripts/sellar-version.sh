@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Pone (o actualiza) un ?v=<huella> en los archivos propios de CSS y JS que
 # carga index.html, para que el navegador no siga sirviendo una versión
 # guardada cuando el archivo cambia. La huella sale del contenido, así que

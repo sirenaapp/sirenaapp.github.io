@@ -1,0 +1,33 @@
+{
+  "name": "sirenaapp",
+  "version": "1.0.0",
+  "description": "Free Mermaid diagram editor that runs entirely in the browser, for eXeLearning and any web page",
+  "keywords": [
+    "mermaid",
+    "diagram",
+    "diagram-editor",
+    "flowchart",
+    "exelearning",
+    "education"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "author": "Juan José de Haro (https://bilateria.org)",
+  "homepage": "https://sirenaapp.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirenaapp/sirenaapp.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sirenaapp/sirenaapp.github.io/issues"
+  },
+  "files": [
+    "index.html",
+    "favicon.svg",
+    "LICENSE.txt",
+    "LICENSE-CONTENIDOS",
+    "css",
+    "js",
+    "lang",
+    "vendor"
+  ]
+}

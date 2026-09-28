@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Actualiza la copia local de Mermaid que usa Sirena.
 # Uso: scripts/actualizar-mermaid.sh [version]   (por omisión, la última)
 set -euo pipefail
