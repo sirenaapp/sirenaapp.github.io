@@ -73,6 +73,7 @@ window.SIRENA_LANG.ca = {
   colorOrange: 'Taronja',
   colorPurple: 'Lila',
   colorGray: 'Gris',
+  colorBlackWhite: 'Blanc i negre',
   colorCustom: 'Color propi…',
   colorFill: 'Farciment',
   colorBorder: 'Vora',

@@ -73,6 +73,7 @@ window.SIRENA_LANG.es = {
   colorOrange: 'Naranja',
   colorPurple: 'Morado',
   colorGray: 'Gris',
+  colorBlackWhite: 'Blanco y negro',
   colorCustom: 'Color propio…',
   colorFill: 'Relleno',
   colorBorder: 'Borde',

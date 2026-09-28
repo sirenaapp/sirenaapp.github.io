@@ -73,6 +73,7 @@ window.SIRENA_LANG.eu = {
   colorOrange: 'Laranja',
   colorPurple: 'Morea',
   colorGray: 'Grisa',
+  colorBlackWhite: 'Zuri-beltza',
   colorCustom: 'Kolore propioa…',
   colorFill: 'Betegarria',
   colorBorder: 'Ertza',

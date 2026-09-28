@@ -73,6 +73,7 @@ window.SIRENA_LANG.gl = {
   colorOrange: 'Laranxa',
   colorPurple: 'Morado',
   colorGray: 'Gris',
+  colorBlackWhite: 'Branco e negro',
   colorCustom: 'Cor propia…',
   colorFill: 'Recheo',
   colorBorder: 'Bordo',

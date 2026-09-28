@@ -123,8 +123,36 @@ const COLORS = [
   ['orange', 'colorOrange', { primaryColor: '#ffe8cc', primaryBorderColor: '#e8590c', lineColor: '#e8590c' }],
   ['purple', 'colorPurple', { primaryColor: '#e5dbff', primaryBorderColor: '#6741d9', lineColor: '#6741d9' }],
   ['gray', 'colorGray', { primaryColor: '#e9ecef', primaryBorderColor: '#495057', lineColor: '#495057' }],
+  // Para imprimir en tinta negra o fotocopiar: cajas blancas, y bordes, líneas y
+  // texto en negro. Lo que Mermaid no puede dibujar sin distinguir colores
+  // (sectores, barras, secciones) va en grises. Los sectores no empiezan en
+  // blanco porque la leyenda dibuja el cuadro sin borde y no se vería; en la
+  // gráfica XY, la primera barra es gris para que se vea encima la línea negra.
+  // Es solo un tema de todo el diagrama: no sale entre las muestras de color
+  // de una caja.
+  ['bw', 'colorBlackWhite', {
+    primaryColor: '#ffffff', primaryBorderColor: '#000000', primaryTextColor: '#000000',
+    secondaryColor: '#ffffff', secondaryBorderColor: '#000000', secondaryTextColor: '#000000',
+    tertiaryColor: '#ffffff', tertiaryBorderColor: '#000000', tertiaryTextColor: '#000000',
+    lineColor: '#000000', textColor: '#000000', mainBkg: '#ffffff', nodeBorder: '#000000',
+    clusterBkg: '#ffffff', clusterBorder: '#000000', edgeLabelBackground: '#ffffff',
+    noteBkgColor: '#ffffff', noteBorderColor: '#000000', noteTextColor: '#000000',
+    pie1: '#e6e6e6', pie2: '#8c8c8c', pie3: '#c4c4c4', pie4: '#a3a3a3', pie5: '#d9d9d9', pie6: '#999999', pie7: '#b3b3b3', pie8: '#808080', pie9: '#cfcfcf', pie10: '#949494', pie11: '#bdbdbd', pie12: '#adadad',
+    pieOpacity: '1',
+    pieStrokeColor: '#000000', pieOuterStrokeColor: '#000000', pieSectionTextColor: '#000000',
+    pieTitleTextColor: '#000000', pieLegendTextColor: '#000000',
+    xyChart: {
+      plotColorPalette: '#a6a6a6, #000000, #595959, #d9d9d9', backgroundColor: '#ffffff', titleColor: '#000000',
+      xAxisLabelColor: '#000000', yAxisLabelColor: '#000000', xAxisLineColor: '#000000', yAxisLineColor: '#000000',
+      xAxisTickColor: '#000000', yAxisTickColor: '#000000', xAxisTitleColor: '#000000', yAxisTitleColor: '#000000'
+    }
+  }, { soloTema: true }],
   ['custom', 'colorCustom', null]
 ];
+
+// Colores que se ofrecen como muestras para una caja, una flecha o el fondo de
+// los rótulos: todos menos los que solo tienen sentido para el diagrama entero.
+const COLORES_MUESTRA = COLORS.filter(([, , vars, opciones]) => vars && !(opciones && opciones.soloTema));
 const THEME_KEYS = {
   default: 'themeDefault',
   neutral: 'themeNeutral',
@@ -1784,7 +1812,12 @@ function colorVariables(valor) {
     };
   }
   const encontrado = COLORS.find(([nombre]) => nombre === valor);
-  return encontrado ? encontrado[2] : null;
+  if (!encontrado || !encontrado[2]) return null;
+  // Los colores de los sectores y de la gráfica XY solo se escriben en el
+  // diagrama que los usa, para no cargar la cabecera de los demás.
+  const tipo = diagramKind();
+  return Object.fromEntries(Object.entries(encontrado[2]).filter(([clave]) =>
+    (!/^pie/.test(clave) || tipo === 'pie') && (clave !== 'xyChart' || tipo === 'xychart')));
 }
 
 // Oscurece un color para el borde y las líneas, a partir del color de relleno.
@@ -2535,13 +2568,19 @@ function readAppearance() {
   updateEditorTools();
   setSizeValue(variables.fontSize ? String(parseInt(variables.fontSize, 10)) : '16');
 
+  // Un color conocido se reconoce por el relleno, el borde y las líneas.
+  const conocido = COLORS.find(([, , vars]) => vars && ['primaryColor', 'primaryBorderColor', 'lineColor']
+    .every((clave) => vars[clave] === variables[clave]));
+  // Los sectores que trae el propio tema no cuentan como colores elegidos a mano.
   Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
-  for (let i = 1; i <= 12; i += 1) if (variables['pie' + i]) coloresSectores[i] = variables['pie' + i];
+  for (let i = 1; i <= 12; i += 1) {
+    const valor = variables['pie' + i];
+    if (valor && !(conocido && conocido[2]['pie' + i] === valor)) coloresSectores[i] = valor;
+  }
   const pie = config.pie || {};
   el.donutSelect.value = DONUTS.some(([v]) => Number(v) === Number(pie.donutHole)) ? String(pie.donutHole) : '0';
   el.legendSelect.value = LEGENDS.some(([v]) => v === pie.legendPosition) ? pie.legendPosition : 'right';
   const primario = variables.primaryColor || '';
-  const conocido = COLORS.find(([, , vars]) => vars && vars.primaryColor === primario);
   if (conocido) {
     el.colorSelect.value = conocido[0];
   } else if (primario) {
@@ -3207,7 +3246,7 @@ function nodeColorName(valor) {
 }
 
 // Nombres de clase que escribe Sirena: los de la paleta y los de color propio.
-const CLASE_SIRENA = new RegExp('^(' + COLORS.filter(([, , v]) => v).map(([n]) => n).join('|') + '|color[0-9a-f]{6})$');
+const CLASE_SIRENA = new RegExp('^(' + COLORES_MUESTRA.map(([n]) => n).join('|') + '|color[0-9a-f]{6})$');
 
 // Quita a esos elementos cualquier color puesto antes: sus líneas style y su
 // presencia en las asignaciones de clase. Las clases de Sirena que se quedan
@@ -3917,7 +3956,7 @@ function buildNodeColorSection() {
   el.swatches.innerHTML = '';
   // Para el texto y el borde, los colores de la paleta son los del borde,
   // que son oscuros; el relleno claro no se leería.
-  COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
+  COLORES_MUESTRA.forEach(([nombre, clave, vars]) => {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.title = t(clave);
@@ -5204,7 +5243,7 @@ function irAlObjeto(objeto) {
 function muestrasDeColor(contenedor, usarBorde, alElegir) {
   const caja = document.createElement('div');
   caja.className = 'swatches';
-  COLORS.filter(([, , vars]) => vars).forEach(([nombre, clave, vars]) => {
+  COLORES_MUESTRA.forEach(([nombre, clave, vars]) => {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.title = t(clave);
@@ -5398,7 +5437,7 @@ function construirFondoRotulos(caja) {
   muestras.className = 'swatches';
   // El blanco va el primero: es el fondo que más se usa en estos rótulos.
   [['#ffffff', 'colorWhite', 'var(--border)']].concat(
-    COLORS.filter(([, , vars]) => vars).map(([, clave, vars]) => [vars.primaryColor, clave, vars.primaryBorderColor])
+    COLORES_MUESTRA.map(([, clave, vars]) => [vars.primaryColor, clave, vars.primaryBorderColor])
   ).forEach(([color, clave, borde]) => {
     const boton = document.createElement('button');
     boton.type = 'button';

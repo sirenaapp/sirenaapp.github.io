@@ -75,6 +75,7 @@ window.SIRENA_LANG.en = (function (_) { return {
   colorOrange: _('Orange'),
   colorPurple: _('Purple'),
   colorGray: _('Grey'),
+  colorBlackWhite: _('Black and white'),
   colorCustom: _('Custom colour…'),
   colorFill: _('Fill'),
   colorBorder: _('Border'),
