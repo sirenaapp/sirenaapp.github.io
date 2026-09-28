@@ -110,6 +110,16 @@ barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
 
 ## Riesgos y limitaciones
 
+- Hay servidores que sirven la página como carpeta sin barra final (el que usa
+  eXe para sus pruebas de la versión estática, `serve`, redirige
+  `…/sirena/index.html` a `…/sirena`). Sin la barra, las rutas relativas de
+  Sirena apuntan a la carpeta de arriba y no carga ni su CSS ni su código. Desde
+  la versión 1.0.3, un pequeño guion al principio de `index.html` vuelve a
+  cargar la página con la barra; una marca en `sessionStorage` evita el bucle
+  con un servidor que la quite, y se borra al cargar bien. No usa `<base>`,
+  como Edicuatex, porque cambiaría la resolución de las referencias `#id` de
+  los iconos SVG.
+
 - En la aplicación de escritorio de eXe (Electron), la ventana emergente de
   Edicuatex que abre el botón de fórmula no se ha probado: hipótesis pendiente
   de validación.

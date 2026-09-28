@@ -3,6 +3,26 @@
 <html lang="es" data-theme="light">
 <head>
 <meta charset="utf-8">
+<script>
+// Hay servidores que sirven esta página como carpeta sin barra final
+// (…/sirena en vez de …/sirena/): entonces las rutas relativas de sus archivos
+// apuntarían a la carpeta de arriba. Se vuelve a cargar con la barra; la marca
+// evita un bucle con un servidor que la quite, y se borra al cargar bien.
+(function () {
+  var ruta = location.pathname;
+  try {
+    if (ruta.slice(-1) === '/') {
+      sessionStorage.removeItem('sirena.barra');
+      return;
+    }
+    if (/\.[^\/]+$/.test(ruta) || sessionStorage.getItem('sirena.barra') === ruta) return;
+    sessionStorage.setItem('sirena.barra', ruta);
+  } catch (e) {
+    return;
+  }
+  location.replace(ruta + '/' + location.search + location.hash);
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
