@@ -359,6 +359,7 @@ window.SIRENA_LANG.eu = {
   aiLink: 'elkarrekin sortuz, MIAEren 4. mailan',
   aiAfter: ': egileak erabaki ditu diseinua eta funtzioak, eta programa askotan probatu du, egoera desberdinetan, akatsak eta hobetu beharrekoak aurkitzeko.',
   helpClose: 'Itxi',
+  version: 'Bertsioa',
   restoreWarning: 'Estekak irakurri ezin izan den diagrama bat dauka.',
   exeInsert: 'Txertatu',
   exeMaxWidth: 'Gehienezko zabalera (aukerakoa)',

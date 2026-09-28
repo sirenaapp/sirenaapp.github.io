@@ -359,6 +359,7 @@ window.SIRENA_LANG.gl = {
   aiLink: 'cocreación, nivel 4 do MIAE',
   aiAfter: ': o autor decidiu o deseño e as funcións, e probou o programa moitas veces, en situacións diferentes, para detectar erros e aspectos que mellorar.',
   helpClose: 'Pechar',
+  version: 'Versión',
   restoreWarning: 'A ligazón contén un diagrama que non se puido ler.',
   exeInsert: 'Inserir',
   exeMaxWidth: 'Ancho máx. (opcional)',

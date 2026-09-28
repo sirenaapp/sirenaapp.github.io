@@ -5,6 +5,9 @@
 # guardada cuando el archivo cambia. La huella sale del contenido, así que
 # solo cambia lo que de verdad ha cambiado.
 #
+# También escribe en index.html el número de versión de package.json, en el
+# pie y en la ventana de créditos, con el enlace a las notas de esa versión.
+#
 # Se ejecuta desde la raíz del repositorio, antes de confirmar los cambios:
 #   scripts/sellar-version.sh
 set -euo pipefail
@@ -30,6 +33,11 @@ def sellar(m):
         return m.group(0)
 
 nuevo = re.sub(r'\b(href|src)="((?:css|js|lang)/[^"?]+\.(?:css|js))(?:\?v=[^"]*)?"', sellar, texto)
+
+import json
+version = json.load(io.open('package.json', encoding='utf-8'))['version']
+nuevo = re.sub(r'(<span class="version-num">)[^<]*(</span>)', r'\g<1>' + version + r'\g<2>', nuevo)
+nuevo = re.sub(r'(sirenaapp\.github\.io/releases/tag/v)[0-9][^"]*', r'\g<1>' + version, nuevo)
 if nuevo != texto:
     io.open(pagina, 'w', encoding='utf-8').write(nuevo)
     print('index.html sellado')

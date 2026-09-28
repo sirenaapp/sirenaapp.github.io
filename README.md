@@ -156,13 +156,15 @@ escribe así.
 
 Para que eXe pueda instalarla, Sirena se publica en npm como
 [`sirenaapp`](https://www.npmjs.com/package/sirenaapp): el paquete es la web tal
-como se sirve. Para sacar una versión se cambia el número en `package.json` y
-se sube una etiqueta con ese número:
+como se sirve. Para sacar una versión se cambia el número en `package.json`, se
+sella la página (que escribe ese número en el pie y en la ventana de créditos,
+enlazado a sus notas) y se sube una etiqueta con ese número:
 
 ```bash
-npm version 1.0.1 --no-git-tag-version   # o editar package.json a mano
-git commit -am "chore(release): 1.0.1"
-git tag v1.0.1 && git push && git push origin v1.0.1
+npm version 1.0.5 --no-git-tag-version   # o editar package.json a mano
+scripts/sellar-version.sh
+git commit -am "chore(release): 1.0.5"
+git tag v1.0.5 && git push && git push origin v1.0.5
 ```
 
 La etiqueta lanza la publicación en npm desde GitHub Actions, sin tokens

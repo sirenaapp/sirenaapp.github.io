@@ -359,6 +359,7 @@ window.SIRENA_LANG.ca = {
   aiLink: 'cocreació, nivell 4 del MIAE',
   aiAfter: ": l'autor n'ha decidit el disseny i les funcions, i ha provat el programa moltes vegades, en situacions diferents, per detectar-hi errors i aspectes que cal millorar.",
   helpClose: 'Tancar',
+  version: 'Versió',
   restoreWarning: "L'enllaç conté un diagrama que no s'ha pogut llegir.",
   exeInsert: 'Insereix',
   exeMaxWidth: 'Amplada màx. (opcional)',

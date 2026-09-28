@@ -361,6 +361,7 @@ window.SIRENA_LANG.en = (function (_) { return {
   aiLink: _('co-creation, level 4 of MIAE'),
   aiAfter: _(': the author decided the design and the features, and tested the program many times, in different situations, to find errors and things to improve.'),
   helpClose: _('Close'),
+  version: _('Version'),
   restoreWarning: _('The link contains a diagram that could not be read.'),
   exeInsert: _('Insert'),
   exeMaxWidth: _('Max. width (optional)'),
