@@ -1120,6 +1120,9 @@ body > div[id^="dsirena-diagram-"] .nodeLabel > div {
   cursor: pointer;
 }
 
+/* En oscuro el acento es claro: el texto blanco no se leería sobre él. */
+html[data-theme="dark"] .btn:not(.btn-secundario) { color: var(--bg); }
+
 /* Va después de .btn: si no, el fondo del botón principal lo pisa. */
 .btn-secundario { background: transparent; color: var(--text); }
 
@@ -1267,3 +1270,76 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
   cursor: pointer;
 }
 .pista #pista-no-mostrar:hover { background: none; color: var(--accent); }
+
+/* --- Dentro de eXeLearning: la barra de insertar ocupa el sitio del pie --- */
+
+/* Lo que no tiene sentido dentro de un material: la biblioteca del navegador,
+   compartir por enlace, imprimir y el idioma, que es el de eXe. La marca ya la
+   pone el título de la ventana de eXe. */
+body.exe #btn-library,
+body.exe #btn-print,
+body.exe #btn-share,
+body.exe #share-menu,
+body.exe #btn-lang,
+body.exe #lang-menu,
+body.exe #doc-name,
+body.exe .footer { display: none !important; }
+
+/* La marca no se ve (el título está en la ventana de eXe), pero el título de
+   la página sigue ahí para los lectores de pantalla. */
+body.exe .brand {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Sin la marca, los botones empiezan a la izquierda y no dejan un hueco. */
+body.exe .toolbar { margin-left: 0; }
+
+.barra-exe {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.campo-exe { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-soft); }
+
+.campo-exe input {
+  width: 7em;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.campo-exe input[aria-invalid="true"] { border-color: var(--danger); }
+.campo-exe input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.pista-exe { font-size: 12px; color: var(--text-soft); }
+
+.ayuda-exe {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font: 600 12px/1 system-ui, sans-serif;
+  cursor: help;
+}
+
+.ayuda-exe:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.error-exe { flex-basis: 100%; order: 10; font-size: 13px; color: var(--danger); }
+
+.acciones-exe { display: inline-flex; gap: 8px; margin-left: auto; }

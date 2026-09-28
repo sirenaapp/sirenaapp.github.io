@@ -33,3 +33,23 @@ no atiende a la forma de las líneas (`flowchart.curve`) ni a la separación
 siempre el motor en la cabecera; la tabla con lo medido está en
 [docs/adr/0012](adr/0012-motor-de-distribucion-escrito-en-la-cabecera.md). Al
 actualizar Mermaid conviene repetir esas medidas.
+
+## Modo eXeLearning
+
+El modo eXe ([ADR 29](adr/0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md))
+solo se activa con Sirena abierta dentro del editor de eXe y en su mismo origen.
+Para probarlo sin montar eXe basta una página, servida junto a Sirena, que
+cargue el TinyMCE y `app/common/mermaidMaxSize.js` de un clon de eXe, defina
+`window.eXeLearning = { app: { locale: { lang } }, mermaidMaxSize }` y una
+función `window._`, y abra Sirena con
+`tinymce.activeEditor.windowManager.openUrl({ url: '…/index.html', buttons: [] })`.
+
+Conviene comprobar, en Chromium y en Firefox: insertar un diagrama nuevo (con
+`<`, `&` y `$$…$$`), el rechazo de una medida mal escrita, volver a abrir el
+diagrama y sustituirlo en su sitio, deshacer, cancelar, que no se escribe nada
+en `localStorage` y el idioma (uno que traduzca eXe, uno de Sirena y el
+valenciano). Después, en un eXe de verdad: la versión web que lleva dentro la
+aplicación de escritorio (`resources/app.asar`, carpeta `dist/static`), con
+Sirena copiada en `app/common/sirena`. En una caja de texto hay dos editores
+(texto y retroalimentación): antes de abrir Sirena a mano hay que enfocar el
+visible, porque el diagrama va al editor activo.

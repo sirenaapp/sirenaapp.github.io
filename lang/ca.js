@@ -358,5 +358,13 @@ window.SIRENA_LANG.ca = {
   aiLink: 'cocreació, nivell 4 del MIAE',
   aiAfter: ": l'autor n'ha decidit el disseny i les funcions, i ha provat el programa moltes vegades, en situacions diferents, per detectar-hi errors i aspectes que cal millorar.",
   helpClose: 'Tancar',
-  restoreWarning: "L'enllaç conté un diagrama que no s'ha pogut llegir."
+  restoreWarning: "L'enllaç conté un diagrama que no s'ha pogut llegir.",
+  exeInsert: 'Insereix',
+  exeMaxWidth: 'Amplada màx. (opcional)',
+  exeMaxHeight: 'Alçada màx. (opcional)',
+  exeSizeHint: 'p. ex. 800px, 50%, 40em, 30rem',
+  exeWidthError: 'L\'amplada màx. ha de ser superior a 0 i usar px, em, rem o % (p. ex. 800px, 50%, 40em, 30rem).',
+  exeHeightError: 'L\'alçada màx. ha de ser superior a 0 i usar px, em, rem o % (p. ex. 600px, 70%, 30em, 20rem).',
+  exeSizeHelp: 'Limita la mida del diagrama a la pàgina. Si es deixa buit, el diagrama ocupa l\'amplada disponible.',
+  exeEmpty: 'No hi ha res per inserir: el codi és buit.'
 };

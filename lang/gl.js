@@ -358,5 +358,13 @@ window.SIRENA_LANG.gl = {
   aiLink: 'cocreación, nivel 4 do MIAE',
   aiAfter: ': o autor decidiu o deseño e as funcións, e probou o programa moitas veces, en situacións diferentes, para detectar erros e aspectos que mellorar.',
   helpClose: 'Pechar',
-  restoreWarning: 'A ligazón contén un diagrama que non se puido ler.'
+  restoreWarning: 'A ligazón contén un diagrama que non se puido ler.',
+  exeInsert: 'Inserir',
+  exeMaxWidth: 'Ancho máx. (opcional)',
+  exeMaxHeight: 'Alto máx. (opcional)',
+  exeSizeHint: 'p. ex. 800px, 50%, 40em, 30rem',
+  exeWidthError: 'O ancho máx. debe ser maior que 0 e usar px, em, rem ou % (p. ex. 800px, 50%, 40em, 30rem).',
+  exeHeightError: 'O alto máx. debe ser maior que 0 e usar px, em, rem ou % (p. ex. 600px, 70%, 30em, 20rem).',
+  exeSizeHelp: 'Limita o tamaño do diagrama na páxina. Se se deixa baleiro, o diagrama ocupa o ancho dispoñible.',
+  exeEmpty: 'Non hai nada que inserir: o código está baleiro.'
 };

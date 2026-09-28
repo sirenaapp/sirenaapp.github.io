@@ -358,5 +358,13 @@ window.SIRENA_LANG.eu = {
   aiLink: 'elkarrekin sortuz, MIAEren 4. mailan',
   aiAfter: ': egileak erabaki ditu diseinua eta funtzioak, eta programa askotan probatu du, egoera desberdinetan, akatsak eta hobetu beharrekoak aurkitzeko.',
   helpClose: 'Itxi',
-  restoreWarning: 'Estekak irakurri ezin izan den diagrama bat dauka.'
+  restoreWarning: 'Estekak irakurri ezin izan den diagrama bat dauka.',
+  exeInsert: 'Txertatu',
+  exeMaxWidth: 'Gehienezko zabalera (aukerakoa)',
+  exeMaxHeight: 'Gehienezko altuera (aukerakoa)',
+  exeSizeHint: 'adib. 800px, 50%, 40em, 30rem',
+  exeWidthError: 'Gehienezko zabalerak 0 baino handiagoa izan behar du eta px, em, rem edo % erabili (adib. 800px, 50%, 40em, 30rem).',
+  exeHeightError: 'Gehienezko altuerak 0 baino handiagoa izan behar du eta px, em, rem edo % erabili (adib. 600px, 70%, 30em, 20rem).',
+  exeSizeHelp: 'Diagramak orrian duen tamaina mugatzen du. Hutsik utziz gero, diagramak zabalera erabilgarri osoa hartzen du.',
+  exeEmpty: 'Ez dago ezer txertatzeko: kodea hutsik dago.'
 };

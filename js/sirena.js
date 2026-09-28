@@ -151,6 +151,10 @@ const el = {
   helpModal: $('help-modal'),
   creditosModal: $('creditos-modal'),
   viewerLink: $('viewer-link'),
+  barraExe: $('barra-exe'),
+  exeAncho: $('exe-ancho'),
+  exeAlto: $('exe-alto'),
+  exeError: $('exe-error'),
   gutter: $('gutter'),
   a11yModal: $('a11y-modal'),
   linkModal: $('link-modal'),
@@ -260,6 +264,28 @@ let currentSvg = '';
 let mermaidConFormulas = false;
 let viewer = false;
 let errorLine = 0;
+
+// Dentro de eXeLearning, Sirena se abre en una ventana de su editor de texto
+// (TinyMCE) y devuelve el diagrama a la caja que se está editando, como hace
+// EdiCuaTeX con las fórmulas. Solo se detecta cuando la página de fuera es la
+// de eXe y comparte origen con esta; en cualquier otro caso (la web, o el modo
+// visor incrustado en un material) el acceso falla y Sirena funciona como
+// siempre.
+function anfitrionExe() {
+  try {
+    const padre = window.parent;
+    if (padre && padre !== window && !/(^|[#&])v=1(&|$)/.test(location.hash)
+        && typeof padre.eXeLearning === 'object' && padre.tinymce && padre.tinymce.activeEditor) {
+      return padre;
+    }
+  } catch (_) {
+    // Página de otro origen: no es eXe.
+  }
+  return null;
+}
+const exe = anfitrionExe();
+// El bloque del diagrama que se está editando, si se abrió desde uno.
+let bloqueExe = null;
 const coloresTocados = new Set();
 const view = { scale: 1, x: 0, y: 0 };
 
@@ -326,6 +352,8 @@ function nombreSugerido(codigo) {
 // Si el diagrama abierto está vacío se reaprovecha, para no dejar fichas
 // vacías en la lista cada vez que se carga un ejemplo o un archivo.
 function crearDoc(codigo, nombre) {
+  // En eXe el diagrama vive en el material, no en la biblioteca del navegador.
+  if (exe) return null;
   const docs = leerDocs();
   const actual = docs.find((d) => d.id === docActivo);
   if (actual && !actual.codigo.trim() && codigo.trim()) {
@@ -379,6 +407,7 @@ function soltarDocActivo() {
 
 // Cada cambio se guarda solo en el diagrama abierto, sin botón de guardar.
 function guardarDocActivo() {
+  if (exe) return;
   clearTimeout(guardadoTimer);
   guardadoTimer = setTimeout(() => {
     const docs = leerDocs();
@@ -612,7 +641,24 @@ async function importarBiblioteca(file) {
 
 /* --- Idioma --- */
 
+// Idioma en que trabaja eXe (es, ca, va, fr...), o '' si no se sabe.
+function idiomaExe() {
+  try {
+    return String(exe.eXeLearning.app.locale.lang || '').toLowerCase();
+  } catch (_) {
+    return '';
+  }
+}
+
 function detectLang() {
+  if (exe) {
+    // Sirena sigue el idioma de eXe. Sus textos los traduce eXe (véase t());
+    // de aquí solo sale la lengua de los ejemplos, que es una de las de
+    // Sirena: el valenciano toma los del catalán y el resto, los del inglés.
+    const base = idiomaExe().split(/[-_]/)[0];
+    const propio = base === 'va' ? 'ca' : base;
+    return window.SIRENA_LANG[propio] ? propio : 'en';
+  }
   const saved = localStorage.getItem(STORE.lang);
   if (saved && window.SIRENA_LANG[saved]) return saved;
   for (const nav of navigator.languages || [navigator.language || 'es']) {
@@ -623,14 +669,31 @@ function detectLang() {
 }
 
 function t(key) {
+  if (exe) return traducirConExe(key);
   return (strings && strings[key]) || window.SIRENA_LANG.es[key] || key;
+}
+
+// En eXe, cada texto se pide a su catálogo por la frase inglesa, que es lo que
+// eXe recoge de lang/en.js. Si eXe aún no la ha traducido, se usa la traducción
+// de Sirena, y si Sirena tampoco la tiene, la frase inglesa.
+function traducirConExe(key) {
+  const ingles = window.SIRENA_LANG.en[key];
+  if (ingles) {
+    try {
+      const traducida = exe._(ingles);
+      if (typeof traducida === 'string' && traducida && traducida !== ingles) return traducida;
+    } catch (_) {
+      // Sin traducción de eXe: se sigue con la de Sirena.
+    }
+  }
+  return (strings && strings[key]) || ingles || window.SIRENA_LANG.es[key] || key;
 }
 
 function applyLang(code) {
   lang = window.SIRENA_LANG[code] ? code : 'es';
   strings = window.SIRENA_LANG[lang];
-  localStorage.setItem(STORE.lang, lang);
-  document.documentElement.lang = lang;
+  if (!exe) localStorage.setItem(STORE.lang, lang);
+  document.documentElement.lang = (exe && idiomaExe()) || lang;
   // El nivel de uso de IA se enlaza en la web del MIAE en el idioma de la página.
   $('ai-link').href = 'https://jjdeharo.github.io/miae/' + lang + '/?nivel=4';
 
@@ -1325,7 +1388,7 @@ async function renderOnce() {
   // las fórmulas o el ajuste del modo oscuro, que no debe pasar a otros temas.
   if (hayFormulas(code) !== mermaidConFormulas || (sigueAlModo() && isDark()) !== mermaidOscuroPropio) initMermaid();
   codigoPrevio = el.editor.value;
-  localStorage.setItem(STORE.code, el.editor.value);
+  if (!exe) localStorage.setItem(STORE.code, el.editor.value);
   guardarDocActivo();
   updateStatus();
   renderGutter();
@@ -4638,8 +4701,23 @@ function insertarFormula(latex) {
   insertSnippet(formula);
 }
 
+// Dentro de eXe se usa la copia de Edicuatex que lleva el propio eXe, la misma
+// que abre su editor de texto: así funciona también sin conexión.
+function direccionEdicuatex() {
+  if (exe) {
+    try {
+      const propia = exe.tinymce.activeEditor.settings.edicuatex_url;
+      if (typeof propia === 'string' && propia) return new URL(propia, exe.location.href).href;
+    } catch (_) {
+      // Sin la dirección de eXe: se usa la pública.
+    }
+  }
+  return EDICUATEX;
+}
+
 function abrirEditorFormulas() {
-  const direccion = EDICUATEX + '?pm=1&origin=' + encodeURIComponent(location.origin);
+  const destino = direccionEdicuatex();
+  const direccion = destino + (destino.includes('?') ? '&' : '?') + 'pm=1&origin=' + encodeURIComponent(location.origin);
   if (ventanaFormulas && !ventanaFormulas.closed) {
     ventanaFormulas.focus();
     return;
@@ -4660,7 +4738,7 @@ function cerrarEditorFormulas() {
 
 function setupFormulas() {
   window.addEventListener('message', (event) => {
-    if (event.origin !== new URL(EDICUATEX).origin) return;
+    if (event.origin !== new URL(direccionEdicuatex()).origin) return;
     const datos = event.data;
     if (!datos || datos.type !== 'edicuatex:result') return;
     insertarFormula(datos.latex);
@@ -6155,6 +6233,113 @@ function enableViewer(params) {
   el.viewerLink.hidden = false;
 }
 
+/* --- Dentro de eXeLearning --- */
+
+// El tamaño máximo del diagrama sigue las reglas del cuadro de Mermaid de eXe:
+// un número mayor que 0 en px, em, rem o %, o nada. Si eXe ofrece su propio
+// comprobador se usa ese, para que las dos reglas no se separen nunca.
+function medidaValida(valor) {
+  try {
+    const reglas = exe.eXeLearning.mermaidMaxSize;
+    if (reglas && typeof reglas.isValidDimension === 'function') return reglas.isValidDimension(valor);
+  } catch (_) {
+    // Sin comprobador de eXe: se aplican las mismas reglas aquí.
+  }
+  if (valor === '') return true;
+  const partes = /^(\d+(?:\.\d+)?)(px|em|rem|%)$/i.exec(valor);
+  return Boolean(partes) && Number(partes[1]) > 0;
+}
+
+// Código con el que se abre Sirena: el del diagrama donde está el cursor, lo
+// seleccionado (como hace el cuadro de Mermaid de eXe) o el diagrama de
+// muestra, si se empieza uno nuevo.
+function codigoDesdeExe() {
+  const editor = exe.tinymce.activeEditor;
+  let nodo = null;
+  try {
+    nodo = editor.selection.getNode();
+  } catch (_) {
+    nodo = null;
+  }
+  const cuerpo = editor.getBody();
+  while (nodo && nodo !== cuerpo && nodo.nodeName !== 'PRE') nodo = nodo.parentNode;
+  if (nodo && nodo.nodeName === 'PRE' && nodo.classList.contains('mermaid')) {
+    bloqueExe = nodo;
+    el.exeAncho.value = nodo.style.maxWidth || '';
+    el.exeAlto.value = nodo.style.maxHeight || '';
+    // Se lee con un analizador inerte: los saltos escritos como <br> vuelven a
+    // ser saltos y las entidades (&lt;, &amp;) vuelven a ser caracteres.
+    const html = nodo.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+    return new DOMParser().parseFromString(html, 'text/html').body.textContent;
+  }
+  let seleccion = '';
+  try {
+    seleccion = editor.selection.getContent({ format: 'text' }).trim();
+  } catch (_) {
+    seleccion = '';
+  }
+  return seleccion || DEFAULT_CODE[lang] || DEFAULT_CODE.en;
+}
+
+function avisoMedidas(texto) {
+  el.exeError.textContent = texto;
+  el.exeError.hidden = !texto;
+}
+
+// Escribe el diagrama en la caja de eXe con el mismo formato que su cuadro de
+// Mermaid, <pre class="mermaid">, para que eXe lo dibuje y lo exporte igual y
+// cualquiera de los dos pueda volver a abrirlo.
+function insertarEnExe() {
+  const codigo = el.editor.value.trim();
+  if (!codigo) {
+    toast(t('exeEmpty'));
+    el.editor.focus();
+    return;
+  }
+  const ancho = el.exeAncho.value.trim();
+  const alto = el.exeAlto.value.trim();
+  const anchoMal = !medidaValida(ancho);
+  const altoMal = !medidaValida(alto);
+  el.exeAncho.setAttribute('aria-invalid', String(anchoMal));
+  el.exeAlto.setAttribute('aria-invalid', String(altoMal));
+  if (anchoMal || altoMal) {
+    avisoMedidas([anchoMal && t('exeWidthError'), altoMal && t('exeHeightError')].filter(Boolean).join(' '));
+    (anchoMal ? el.exeAncho : el.exeAlto).focus();
+    return;
+  }
+  avisoMedidas('');
+  const editor = exe.tinymce.activeEditor;
+  const html = codigo.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  editor.undoManager.transact(() => {
+    if (bloqueExe && editor.getBody().contains(bloqueExe)) {
+      editor.dom.setHTML(bloqueExe, html);
+      editor.dom.setStyle(bloqueExe, 'max-width', ancho || null);
+      editor.dom.setStyle(bloqueExe, 'max-height', alto || null);
+    } else {
+      const estilo = [ancho && 'max-width:' + ancho, alto && 'max-height:' + alto].filter(Boolean).join(';');
+      editor.insertContent('<pre class="mermaid"' + (estilo ? ' style="' + estilo + '"' : '') + '>' + html + '</pre>');
+    }
+  });
+  editor.windowManager.close();
+}
+
+function prepararExe() {
+  document.body.classList.add('exe');
+  el.barraExe.hidden = false;
+  el.editor.value = codigoDesdeExe();
+  $('exe-insertar').addEventListener('click', insertarEnExe);
+  $('exe-cancelar').addEventListener('click', () => exe.tinymce.activeEditor.windowManager.close());
+  $('exe-ayuda').addEventListener('click', () => toast(t('exeSizeHelp')));
+  [el.exeAncho, el.exeAlto].forEach((campo) => {
+    campo.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        insertarEnExe();
+      }
+    });
+  });
+}
+
 /* --- Divisor de paneles --- */
 
 // El separador dice a los lectores de pantalla qué parte del ancho ocupa el
@@ -6626,8 +6811,10 @@ async function start() {
   focoEnVentanas();
   setupPan();
 
-  const fromLink = await loadFromHash();
-  if (fromLink) {
+  const fromLink = !exe && await loadFromHash();
+  if (exe) {
+    prepararExe();
+  } else if (fromLink) {
     // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
     // toca: así abrirlo no ensucia lo que la persona tenga guardado.
     docActivo = null;

@@ -138,6 +138,22 @@ opcional: sirve para que el marco se ajuste solo al alto del diagrama. Ese mismo
 parámetro lo lleva el enlace a pantalla completa, que se copia desde el botón de
 compartir y se envía tal cual a quien solo tiene que ver el diagrama.
 
+## Dentro de eXeLearning
+
+Sirena puede hacer de editor de diagramas del editor de texto de eXeLearning,
+igual que Edicuatex lo hace con las fórmulas. Copiada dentro de eXe y abierta
+en una ventana de su editor, detecta sola que está allí: carga el diagrama
+donde está el cursor, cambia el pie por una barra con el ancho y el alto
+máximos y el botón «Insertar», y escribe el resultado en la caja como
+`<pre class="mermaid">`, el mismo formato que usa eXe. En ese modo no toca la
+biblioteca del navegador, sigue el idioma de eXe y usa sus traducciones. Fuera
+de eXe, nada de esto se activa. Los detalles están en el
+[ADR 29](docs/adr/0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md).
+
+Por eso los textos de `lang/en.js` van dentro de `_('…')`: eXe recoge esas
+llamadas para su catálogo de traducciones. Todo texto nuevo de la interfaz se
+escribe así.
+
 ## Cómo funciona por dentro
 
 Es una página estática. Mermaid se sirve desde el propio repositorio
