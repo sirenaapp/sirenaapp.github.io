@@ -13,7 +13,10 @@ comprobar, con un script de pasos, estas tres cosas:
 
 1. Que todos los ejemplos se dibujan sin error en Chromium y en Firefox, en los
    cinco idiomas: cada idioma tiene su propio código, y un texto sin comillas
-   puede fallar en uno y no en otro.
+   puede fallar en uno y no en otro. No basta con que no den error: un tipo que
+   no entiende una línea puede dibujarla como texto (el kanban dibujaba
+   `accTitle` como una columna), así que conviene buscar en el texto del dibujo
+   `accTitle`, `accDescr` y `%%`.
 2. Que cada ejemplo se exporta a PNG. Algunos tipos de diagrama (el recorrido de
    usuario, por ejemplo) colocan los rótulos en `<foreignObject>`; al exportar se
    sustituyen por texto SVG, porque si no el navegador impide convertir el

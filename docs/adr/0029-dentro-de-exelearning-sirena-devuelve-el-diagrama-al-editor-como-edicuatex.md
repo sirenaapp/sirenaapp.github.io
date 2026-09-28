@@ -77,15 +77,17 @@ lo que sale en el material:
 - Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
   el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
   Las herramientas que actúan sobre el dibujo aceptan las dos formas.
-- **Solo se ofrece lo que el Mermaid de eXe sabe dibujar** (versión 1.0.7).
-  Al abrirse, Sirena pregunta al Mermaid de eXe (`parse` con
+- **Solo se ofrece lo que el Mermaid de eXe sabe dibujar** (versiones 1.0.7 y
+  1.0.8). Al abrirse, Sirena pregunta al Mermaid de eXe (`parse` con
   `suppressErrors`, sin dibujar) si entiende cada ejemplo en el idioma de la
-  interfaz. Si no lo entiende, prueba sin las líneas de accesibilidad
-  (`accTitle`, `accDescr`); si así sí, el ejemplo se carga sin ellas, y si
-  tampoco, ni el ejemplo ni su tipo aparecen en la lista de ejemplos ni en el
-  menú de tipos. Con Mermaid 11 quedan fuera carriles, Ishikawa, árbol y Venn,
-  que no existen en esa versión, y el mapa de árbol se carga sin las líneas de
-  accesibilidad, que su Mermaid 11 no admite. Como se pregunta al propio Mermaid
+  interfaz. Si no lo entiende, prueba con las líneas de accesibilidad
+  (`accTitle`, `accDescr`) como comentario, igual que Sirena hace siempre en
+  los tipos que no las admiten (`ACC_COMENTARIO`); si así sí, el ejemplo se
+  carga de ese modo y el cuadro de accesibilidad las escribe también como
+  comentario en ese tipo. Si tampoco, ni el ejemplo ni su tipo aparecen en la
+  lista de ejemplos ni en el menú de tipos. Con Mermaid 11 quedan fuera
+  carriles, Ishikawa, árbol y Venn, que no existen en esa versión, y el mapa
+  de árbol lleva las líneas de accesibilidad como comentario. Como se pregunta al propio Mermaid
   de eXe, al actualizarlo los ejemplos vuelven solos.
 
 **Idiomas.** Se sigue el modelo de Edicuatex. Cada texto de `lang/en.js` va
@@ -189,9 +191,15 @@ gráfico de ejes en gallego (también en la web, por los ordinales sin comillas)
 y la arquitectura en inglés (en eXe, por el guion de un rótulo). Tras corregir
 esos tres ejemplos y añadir la comprobación, con Mermaid 12 se dibujan los 135;
 con Mermaid 11, todos menos los cuatro tipos que no tiene, y el mapa de árbol
-sin las líneas de accesibilidad. Dentro de la versión estática de eXe, en
-Chromium y Firefox, Sirena ofrece 23 ejemplos y 20 tipos, y los 23 se dibujan
-sin error.
+con las líneas de accesibilidad como comentario. Dentro de la versión estática
+de eXe, en Chromium y Firefox, Sirena ofrece 23 ejemplos y 20 tipos, y los 23
+se dibujan sin error.
+
+28-09-2026, versión 1.0.8: el kanban no admite `accTitle` ni `accDescr` en
+ninguna versión de Mermaid, que los dibujaba como dos columnas más sin dar
+error. Su ejemplo los lleva ahora como comentario, como ya hacía el cuadro de
+accesibilidad en ese tipo. La comprobación de los 135 códigos busca también
+esas palabras, o `%%`, en el texto del dibujo: ya no aparecen en ninguno.
 
 28-09-2026, con la rama de eXe que abre Sirena desde su botón de Mermaid: sus
 cuatro pruebas E2E de ese botón (insertar y dibujar, editar un diagrama, el

@@ -1870,8 +1870,8 @@ Resit,Repeat year,3`
         label: { es: 'Tablero kanban', ca: 'Tauler kanban', gl: 'Taboleiro kanban', eu: 'Kanban taula', en: 'Kanban board' },
         code: {
           es: `kanban
-  accTitle: Tablero kanban
-  accDescr: Tareas repartidas entre pendiente, en curso y terminado.
+  %% accTitle: Tablero kanban
+  %% accDescr: Tareas repartidas entre pendiente, en curso y terminado.
   Pendiente
     tarea1[Preparar la rúbrica]
     tarea2[Reservar el aula de informática]
@@ -1880,8 +1880,8 @@ Resit,Repeat year,3`
   Terminado
     tarea4[Publicar el guion del proyecto]`,
           ca: `kanban
-  accTitle: Tauler kanban
-  accDescr: Tasques repartides entre pendent, en curs i acabat.
+  %% accTitle: Tauler kanban
+  %% accDescr: Tasques repartides entre pendent, en curs i acabat.
   Pendent
     tasca1[Preparar la rúbrica]
     tasca2[Reservar l'aula d'informàtica]
@@ -1890,8 +1890,8 @@ Resit,Repeat year,3`
   Acabat
     tasca4[Publicar el guió del projecte]`,
           gl: `kanban
-  accTitle: Taboleiro kanban
-  accDescr: Tarefas repartidas entre pendente, en curso e rematado.
+  %% accTitle: Taboleiro kanban
+  %% accDescr: Tarefas repartidas entre pendente, en curso e rematado.
   Pendente
     tarefa1[Preparar a rúbrica]
     tarefa2[Reservar a aula de informática]
@@ -1900,8 +1900,8 @@ Resit,Repeat year,3`
   Rematado
     tarefa4[Publicar o guión do proxecto]`,
           eu: `kanban
-  accTitle: Kanban taula
-  accDescr: Zereginak zain, egiten eta amaituta artean banatuta.
+  %% accTitle: Kanban taula
+  %% accDescr: Zereginak zain, egiten eta amaituta artean banatuta.
   Zain
     zeregina1[Errubrika prestatu]
     zeregina2[Informatika gela erreserbatu]
@@ -1910,8 +1910,8 @@ Resit,Repeat year,3`
   Amaituta
     zeregina4[Proiektuaren gidoia argitaratu]`,
           en: `kanban
-  accTitle: Kanban board
-  accDescr: Tasks split between to do, in progress and done.
+  %% accTitle: Kanban board
+  %% accDescr: Tasks split between to do, in progress and done.
   To do
     task1[Draft the rubric]
     task2[Book the computer room]

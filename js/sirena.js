@@ -336,8 +336,9 @@ async function cargarMermaidExe() {
 // Los ejemplos que el Mermaid de eXe no dibuja tal cual. Los tipos nuevos de
 // Mermaid 12 (carriles, Ishikawa, árbol, Venn) no existen en la 11, y el mapa
 // de árbol de la 11 no admite las líneas de accesibilidad. Para cada ejemplo
-// que falla se anota 'sinAccesibilidad' si lo entiende sin esas líneas, o null
-// si tampoco: entonces ni el ejemplo ni su tipo se ofrecen. Se pregunta al propio
+// que falla se anota 'accComentario' si lo entiende con esas líneas como
+// comentario (como en los tipos de ACC_COMENTARIO), o null si tampoco: entonces
+// ni el ejemplo ni su tipo se ofrecen. Se pregunta al propio
 // Mermaid de eXe, así que al actualizarlo los ejemplos aparecen solos.
 const ejemplosExe = new Map();
 
@@ -355,16 +356,16 @@ async function comprobarEjemplosExe() {
     for (const item of grupo.items) {
       const codigo = item.code[lang] || item.code.es;
       if (await entiende(codigo)) continue;
-      const sinAcc = sinAccesibilidad(codigo);
-      ejemplosExe.set(item.id, sinAcc !== codigo && await entiende(sinAcc) ? 'sinAccesibilidad' : null);
+      const comentado = accComoComentario(codigo);
+      ejemplosExe.set(item.id, comentado !== codigo && await entiende(comentado) ? 'accComentario' : null);
     }
   }
   buildExampleSelect();
   buildTypeMenu();
 }
 
-function sinAccesibilidad(codigo) {
-  return codigo.split('\n').filter((linea) => !/^\s*acc(Title|Descr)\s*:/.test(linea)).join('\n');
+function accComoComentario(codigo) {
+  return codigo.replace(/^([ \t]*)(acc(Title|Descr)[ \t]*:)/gm, '$1%% $2');
 }
 
 // Si el ejemplo (y su tipo) se puede ofrecer: fuera de eXe, siempre.
@@ -1078,7 +1079,7 @@ function findExample(id) {
 
 function exampleCode(item) {
   const codigo = item.code[lang] || item.code.es;
-  return ejemplosExe.get(item.id) === 'sinAccesibilidad' ? sinAccesibilidad(codigo) : codigo;
+  return ejemplosExe.get(item.id) === 'accComentario' ? accComoComentario(codigo) : codigo;
 }
 
 // Si en el editor está un ejemplo tal cual, al cambiar de idioma se sustituye
@@ -5980,8 +5981,11 @@ function setupContextual() {
 // palabras, para que viajen con el código aunque no lleguen al SVG.
 const ACC_COMENTARIO = ['mindmap', 'kanban', 'timeline', 'block', 'sankey', 'venn', 'ishikawa'];
 
+// Dentro de eXe se añaden los tipos cuyo ejemplo solo entiende el Mermaid de
+// eXe con esas líneas como comentario.
 function accEsComentario() {
-  return ACC_COMENTARIO.includes(editorType());
+  const tipo = editorType();
+  return ACC_COMENTARIO.includes(tipo) || ejemplosExe.get(tipo) === 'accComentario';
 }
 
 function abrirAccesibilidad() {
