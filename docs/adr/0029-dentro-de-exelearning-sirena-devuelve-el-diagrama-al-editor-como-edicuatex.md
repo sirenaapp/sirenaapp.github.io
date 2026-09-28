@@ -34,7 +34,12 @@ entra en este modo.
 
 - Al abrirse, carga el diagrama donde está el cursor (`pre.mermaid`), con su
   ancho y alto máximos; si no lo hay, lo seleccionado, como el cuadro de eXe;
-  y si tampoco, el diagrama de muestra.
+  y si tampoco, el diagrama de muestra. Mientras la ventana se carga, el editor
+  de eXe pierde la selección, así que el botón de Mermaid de eXe la anota al
+  pulsarse (el diagrama, el texto seleccionado y una marca de la posición del
+  cursor) y la ofrece con `editor.plugins.exemermaid.getContext()`. Sirena usa
+  ese contexto si existe y, si no, la selección del momento. Un diagrama nuevo
+  se inserta en la posición anotada.
 - El pie se sustituye por una barra con el ancho y el alto máximos (opcionales),
   «Cancelar» e «Insertar». Las medidas siguen las reglas de eXe (número mayor
   que 0 en px, em, rem o %): si eXe ofrece su comprobador
@@ -113,7 +118,15 @@ barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
 
 ## Validación
 
-28-09-2026, en Chromium y Firefox:
+28-09-2026, con la rama de eXe que abre Sirena desde su botón de Mermaid: sus
+cuatro pruebas E2E de ese botón (insertar y dibujar, editar un diagrama, el
+prerrenderizado al previsualizar y conservar otros estilos al cambiar el ancho)
+pasan en Chromium y en Firefox. Esas pruebas mostraron que, en los dos
+navegadores, cuando Sirena termina de cargar el editor ya ha perdido la
+selección (se leía `P` en vez de `PRE`): de ahí el contexto que anota el botón,
+añadido en la versión 1.0.1.
+
+Antes, en Chromium y Firefox:
 
 - Con una página que carga el TinyMCE y el comprobador de medidas de eXe:
   insertar un diagrama nuevo con `<`, `&` y `$$…$$` (se escapa y vuelve

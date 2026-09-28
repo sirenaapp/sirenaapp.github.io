@@ -287,6 +287,8 @@ function anfitrionExe() {
 const exe = anfitrionExe();
 // El bloque del diagrama que se está editando, si se abrió desde uno.
 let bloqueExe = null;
+// Lo que mostraba el editor de eXe al abrir Sirena (véase contextoExe()).
+let contextoAbierto = null;
 const coloresTocados = new Set();
 const view = { scale: 1, x: 0, y: 0 };
 
@@ -6249,20 +6251,43 @@ function medidaValida(valor) {
   return Boolean(partes) && Number(partes[1]) > 0;
 }
 
-// Código con el que se abre Sirena: el del diagrama donde está el cursor, lo
-// seleccionado (como hace el cuadro de Mermaid de eXe) o el diagrama de
-// muestra, si se empieza uno nuevo.
-function codigoDesdeExe() {
+// Lo que mostraba el editor de eXe al pulsar el botón: el diagrama donde estaba
+// el cursor, el texto seleccionado y la posición donde irá un diagrama nuevo.
+// Mientras la ventana se carga, el editor pierde la selección, así que el botón
+// de Mermaid de eXe la anota al pulsarse y la ofrece con getContext(). Con un
+// botón que no lo haga, se lee la selección del momento, como antes.
+function contextoExe() {
   const editor = exe.tinymce.activeEditor;
+  try {
+    const plugin = editor.plugins && editor.plugins.exemermaid;
+    if (plugin && typeof plugin.getContext === 'function') {
+      const anotado = plugin.getContext() || {};
+      return { bloque: anotado.block || null, seleccion: anotado.selectedText || '', marca: anotado.bookmark || null };
+    }
+  } catch (_) {
+    // Sin el contexto del botón: se lee la selección.
+  }
   let nodo = null;
+  let seleccion = '';
   try {
     nodo = editor.selection.getNode();
+    seleccion = editor.selection.getContent({ format: 'text' });
   } catch (_) {
     nodo = null;
   }
   const cuerpo = editor.getBody();
   while (nodo && nodo !== cuerpo && nodo.nodeName !== 'PRE') nodo = nodo.parentNode;
-  if (nodo && nodo.nodeName === 'PRE' && nodo.classList.contains('mermaid')) {
+  const bloque = nodo && nodo.nodeName === 'PRE' && nodo.classList.contains('mermaid') ? nodo : null;
+  return { bloque, seleccion: bloque ? '' : seleccion, marca: null };
+}
+
+// Código con el que se abre Sirena: el del diagrama donde está el cursor, lo
+// seleccionado (como hace el cuadro de Mermaid de eXe) o el diagrama de
+// muestra, si se empieza uno nuevo.
+function codigoDesdeExe() {
+  contextoAbierto = contextoExe();
+  const nodo = contextoAbierto.bloque;
+  if (nodo) {
     bloqueExe = nodo;
     el.exeAncho.value = nodo.style.maxWidth || '';
     el.exeAlto.value = nodo.style.maxHeight || '';
@@ -6271,13 +6296,7 @@ function codigoDesdeExe() {
     const html = nodo.innerHTML.replace(/<br\s*\/?>/gi, '\n');
     return new DOMParser().parseFromString(html, 'text/html').body.textContent;
   }
-  let seleccion = '';
-  try {
-    seleccion = editor.selection.getContent({ format: 'text' }).trim();
-  } catch (_) {
-    seleccion = '';
-  }
-  return seleccion || DEFAULT_CODE[lang] || DEFAULT_CODE.en;
+  return contextoAbierto.seleccion.trim() || DEFAULT_CODE[lang] || DEFAULT_CODE.en;
 }
 
 function avisoMedidas(texto) {
@@ -6316,6 +6335,14 @@ function insertarEnExe() {
       editor.dom.setStyle(bloqueExe, 'max-height', alto || null);
     } else {
       const estilo = [ancho && 'max-width:' + ancho, alto && 'max-height:' + alto].filter(Boolean).join(';');
+      // El diagrama nuevo va donde estaba el cursor al pulsar el botón.
+      if (contextoAbierto && contextoAbierto.marca) {
+        try {
+          editor.selection.moveToBookmark(contextoAbierto.marca);
+        } catch (_) {
+          // Si la marca ya no vale, se inserta donde esté la selección.
+        }
+      }
       editor.insertContent('<pre class="mermaid"' + (estilo ? ' style="' + estilo + '"' : '') + '>' + html + '</pre>');
     }
   });
