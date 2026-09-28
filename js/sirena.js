@@ -1088,6 +1088,7 @@ function hayFormulas(codigo) {
 // Cuando un rótulo lleva fórmula, Mermaid lo rehace como una fila y se come
 // los <br>. Se cambian por una marca que sobrevive al viaje (es texto normal)
 // y, ya dibujado, se vuelven a poner como saltos de verdad.
+// Parche a un fallo de Mermaid (#7194): ver docs/parches-mermaid.md.
 // Un separador invisible: si algo fallara y no se restaurase, no se vería.
 const MARCA_SALTO = '\u2063\u2063\u2063';
 
@@ -1101,6 +1102,7 @@ function marcarSaltos(codigo) {
 // Cuando el rótulo lleva una fórmula, Mermaid lo arma como una fila que no
 // deja saltar de línea: se pasa a bloque para que el texto se reparta y la
 // fórmula quede como una palabra más.
+// Parche a un fallo de Mermaid (#8340, #6690): ver docs/parches-mermaid.md.
 function soltarFilas(dentro) {
   dentro.querySelectorAll('div').forEach((caja) => {
     if (getComputedStyle(caja).display !== 'flex') return;
@@ -1332,6 +1334,7 @@ function ajustarRotulosHtml() {
     if (!dentro) return;
     restaurarSaltos(dentro);
     soltarFilas(dentro);
+    // Parche a un fallo de Mermaid (#5543): ver docs/parches-mermaid.md.
     // Mermaid pinta el fondo del rótulo en su <p>, y al que lleva una fórmula
     // no le pone <p>: la línea lo atraviesa. Se le da el mismo fondo.
     if (dentro.querySelector('.katex') && !dentro.querySelector('p') && !hueco.previousElementSibling) {
@@ -1400,6 +1403,7 @@ function ajustarRotulosHtml() {
     }
     // Si aun así no cabe (una fórmula no se parte), se encoge un poco la
     // letra antes que cortar el texto.
+    // Parte del parche a un fallo de Mermaid (#8340): ver docs/parches-mermaid.md.
     const ancho2 = anchoDelRotulo(dentro);
     if (ancho2 - disponible > 1) {
       // Lo que no se puede partir (una fórmula larga) se encoge antes que
@@ -1431,6 +1435,7 @@ function ajustarRotulosHtml() {
 // rótulo donde estaba, a unos píxeles de la línea (ver ADR 26). Se lleva cada
 // rótulo al punto más cercano de su línea. Ese desplazamiento no pasa nunca de
 // 16 px, así que un rótulo más alejado no se toca.
+// Parche a un fallo de Mermaid (#8292): ver docs/parches-mermaid.md.
 function rotulosSobreSuLinea() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;

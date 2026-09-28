@@ -11,7 +11,7 @@ probar-web http://localhost:8931/index.html -n chromium,firefox -d escritorio,mo
 Antes de publicar un cambio que toque el dibujo o la exportación conviene
 comprobar, con un script de pasos, estas tres cosas:
 
-1. Que los 18 ejemplos se dibujan sin error en Chromium y en Firefox.
+1. Que todos los ejemplos se dibujan sin error en Chromium y en Firefox.
 2. Que cada ejemplo se exporta a PNG. Algunos tipos de diagrama (el recorrido de
    usuario, por ejemplo) colocan los rótulos en `<foreignObject>`; al exportar se
    sustituyen por texto SVG, porque si no el navegador impide convertir el
@@ -53,3 +53,18 @@ aplicación de escritorio (`resources/app.asar`, carpeta `dist/static`), con
 Sirena copiada en `app/common/sirena`. En una caja de texto hay dos editores
 (texto y retroalimentación): antes de abrir Sirena a mano hay que enfocar el
 visible, porque el diagrama va al editor activo.
+
+## Parches a fallos de Mermaid
+
+Los fallos de Mermaid que Sirena corrige por su cuenta están en
+[docs/parches-mermaid.md](parches-mermaid.md). Para saber si siguen en una
+versión de Mermaid:
+
+```bash
+npm i --no-save playwright@1.63.0      # si no está; con npx playwright install chromium
+node scripts/comprobar-parches.mjs                        # la copia de vendor/mermaid
+node scripts/comprobar-parches.mjs --mermaid <carpeta>    # otra versión (package/dist)
+```
+
+El aviso semanal de versión nueva lo hace solo y pone el resultado en su
+incidencia.

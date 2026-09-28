@@ -31,7 +31,8 @@ corrección se hace sobre el dibujo, llega también a las descargas.
 
 El fallo se ha comunicado a Mermaid en la incidencia
 [#8292](https://github.com/mermaid-js/mermaid/issues/8292). Cuando lo
-corrija, la función se quita.
+corrija, la función se quita. Si ya lo ha corregido lo dice la comprobación del aviso
+semanal de versión nueva ([ADR 31](0031-los-parches-a-mermaid-se-comprueban-con-cada-version-nueva.md)).
 
 Comprobado el 22-09-2026 en Chromium y Firefox con todos los ejemplos: solo se
 mueve el rótulo «Sí» (o «Yes») del diagrama de flujo, y todos los rótulos

@@ -38,7 +38,8 @@ jobs:
             echo "hay_novedad=sí" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Abrir la incidencia si no existe ya
+      - name: Ver si la incidencia ya estaba abierta
+        id: incidencia
         if: steps.versiones.outputs.hay_novedad == 'sí'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,10 +47,46 @@ jobs:
           ULTIMA: ${{ steps.versiones.outputs.ultima }}
         run: |
           titulo="Mermaid $ULTIMA disponible (Sirena lleva $INSTALADA)"
+          echo "titulo=$titulo" >> "$GITHUB_OUTPUT"
           if gh issue list --state open --search "$titulo in:title" --json title \
              | grep -qF "$titulo"; then
             echo "La incidencia ya estaba abierta."
-            exit 0
+            echo "abierta=sí" >> "$GITHUB_OUTPUT"
+          else
+            echo "abierta=no" >> "$GITHUB_OUTPUT"
           fi
-          cuerpo="$(INSTALADA="$INSTALADA" ULTIMA="$ULTIMA" envsubst '$INSTALADA $ULTIMA' < .github/aviso-mermaid.md)"
-          gh issue create --title "$titulo" --label mermaid --body "$cuerpo"
+
+      # Dibuja con la versión nueva los ejemplos de los fallos que Sirena parchea
+      # (scripts/parches-mermaid.json) y dice cuáles ya están corregidos, para
+      # quitar esos parches al actualizar. Ver docs/parches-mermaid.md.
+      - uses: actions/setup-node@v4
+        if: steps.incidencia.outputs.abierta == 'no'
+        with:
+          node-version: 22
+      - name: Comprobar los parches de Sirena con la versión nueva
+        if: steps.incidencia.outputs.abierta == 'no'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ULTIMA: ${{ steps.versiones.outputs.ultima }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/mermaid"
+          # Con una versión simulada que no existe en npm se comprueba la última.
+          ( cd "$RUNNER_TEMP/mermaid" && { npm pack "mermaid@$ULTIMA" >/dev/null 2>&1 || npm pack mermaid@latest >/dev/null; } && tar xzf mermaid-*.tgz )
+          npm i --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+          if ! node scripts/comprobar-parches.mjs --mermaid "$RUNNER_TEMP/mermaid/package/dist" > parches.md; then
+            echo "No se pudo hacer la comprobación automática: hay que revisar los parches a mano (docs/parches-mermaid.md)." > parches.md
+          fi
+          cat parches.md
+
+      - name: Abrir la incidencia
+        if: steps.incidencia.outputs.abierta == 'no'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INSTALADA: ${{ steps.versiones.outputs.instalada }}
+          ULTIMA: ${{ steps.versiones.outputs.ultima }}
+          TITULO: ${{ steps.incidencia.outputs.titulo }}
+        run: |
+          export PARCHES="$(cat parches.md)"
+          cuerpo="$(INSTALADA="$INSTALADA" ULTIMA="$ULTIMA" envsubst '$INSTALADA $ULTIMA $PARCHES' < .github/aviso-mermaid.md)"
+          gh issue create --title "$TITULO" --label mermaid --body "$cuerpo"

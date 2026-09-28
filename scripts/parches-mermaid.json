@@ -1,0 +1,67 @@
+{
+  "_descripcion": "Parches de Sirena a fallos de Mermaid. Cada uno con su incidencia, la función que lo aplica y un ejemplo mínimo que reproduce el fallo con Mermaid solo. scripts/comprobar-parches.mjs dibuja cada ejemplo con una versión de Mermaid y dice si el fallo sigue. Ver docs/parches-mermaid.md. «control» es el mismo caso sin la causa del fallo (sin fórmula, o con dagre en vez de ELK): tiene que salir siempre bien; si no, la medición no sirve para esa versión.",
+  "parches": [
+    {
+      "clave": "rotulo-fuera-de-linea",
+      "fallo": "Con ELK, un rótulo de flecha queda al lado de su línea en vez de sobre ella",
+      "incidencias": [
+        8292
+      ],
+      "funciones": [
+        "rotulosSobreSuLinea"
+      ],
+      "adr": "0026",
+      "comprobacion": "rotuloFueraDeLinea",
+      "codigo": "flowchart TD\n    A --> B{Decision}\n    B -- Yes --> C[Done]\n    B -- No --> D[Step 1]\n    D --> E{Again?}\n    E -- Yes --> C\n    E -- No --> F[Stop]",
+      "control": "%%{init: {\"layout\":\"dagre\"}}%%\nflowchart TD\n    A --> B{Decision}\n    B -- Yes --> C[Done]\n    B -- No --> D[Step 1]\n    D --> E{Again?}\n    E -- Yes --> C\n    E -- No --> F[Stop]"
+    },
+    {
+      "clave": "formula-sin-partir",
+      "fallo": "Un rótulo con fórmula no se reparte en varias líneas y el texto pierde el espacio junto a la fórmula",
+      "incidencias": [
+        8340,
+        6690
+      ],
+      "funciones": [
+        "soltarFilas"
+      ],
+      "adr": "0022",
+      "comprobacion": "formulaSinPartir",
+      "codigo": "flowchart LR\n  A[\"This is a long sentence that Mermaid wraps onto several lines\"]\n  B[\"This is a long sentence that Mermaid wraps onto several lines $$x^2$$\"]",
+      "nota": "y la reducción de la letra de una fórmula que no cabe, en ajustarRotulosHtml",
+      "control": "flowchart LR\n  A[\"This is a long sentence that Mermaid wraps onto several lines\"]\n  B[\"This is a long sentence that Mermaid wraps onto several lines x2\"]"
+    },
+    {
+      "clave": "salto-con-formula",
+      "fallo": "En un rótulo con fórmula desaparecen los saltos de línea (`<br>`)",
+      "incidencias": [
+        7194,
+        5941,
+        7873
+      ],
+      "funciones": [
+        "marcarSaltos",
+        "restaurarSaltos"
+      ],
+      "adr": "0022",
+      "comprobacion": "saltoConFormula",
+      "codigo": "flowchart LR\n  A[\"First line<br>Second line $$x^2$$\"]\n  B[\"First line\"]",
+      "control": "flowchart LR\n  A[\"First line<br>Second line x2\"]\n  B[\"First line\"]"
+    },
+    {
+      "clave": "fondo-rotulo-formula",
+      "fallo": "El rótulo de flecha con fórmula no tiene fondo opaco y la línea lo atraviesa",
+      "incidencias": [
+        5543
+      ],
+      "funciones": [
+        "ajustarRotulosHtml"
+      ],
+      "adr": "0022",
+      "comprobacion": "fondoRotuloFormula",
+      "codigo": "flowchart LR\n  A --- |\"Ratio $$\\dfrac{a}{b}$$\"| B",
+      "nota": "solo el fondo que pone al rótulo; el resto de la función son ajustes propios de Sirena",
+      "control": "flowchart LR\n  A --- |\"Ratio a/b\"| B"
+    }
+  ]
+}
