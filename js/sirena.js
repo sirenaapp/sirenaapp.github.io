@@ -285,6 +285,48 @@ function anfitrionExe() {
   return null;
 }
 const exe = anfitrionExe();
+// Dentro de eXe, Sirena dibuja con el Mermaid de eXe, el mismo que dibujará
+// el diagrama en el material: así lo que se ve al editar es lo que sale, sea
+// cual sea la versión de Mermaid que lleve eXe. Si no llegara a cargarse, se
+// usa el de Sirena configurado como el de eXe.
+let mermaidExe = null;
+
+async function cargarMermaidExe() {
+  try {
+    const cargador = exe.$exe && exe.$exe.mermaid;
+    if (!exe.mermaid && cargador && typeof cargador.loadMermaid === 'function') cargador.loadMermaid();
+    // eXe lo inicializa en cuanto termina de descargarlo.
+    for (let i = 0; i < 100 && !(exe.mermaid && (!cargador || cargador.initialized)); i += 1) {
+      await new Promise((listo) => setTimeout(listo, 100));
+    }
+    if (exe.mermaid && typeof exe.mermaid.render === 'function') mermaidExe = exe.mermaid;
+  } catch (_) {
+    mermaidExe = null;
+  }
+}
+
+// El Mermaid con que se dibuja.
+function mermaidDeDibujo() {
+  return mermaidExe || mermaid;
+}
+
+// Motor que usa por defecto el Mermaid de eXe: dagre en la versión 11, que no
+// trae ELK; elk desde la 12.
+function motorExe() {
+  try {
+    const api = mermaidExe && (mermaidExe.mermaidAPI || mermaidExe);
+    const motor = api && api.getConfig ? api.getConfig().layout : '';
+    return motor || 'dagre';
+  } catch (_) {
+    return 'dagre';
+  }
+}
+
+// Motor que se usa cuando el código no lo dice: el de Mermaid 12 en la web y el
+// de eXe dentro de eXe.
+function motorPorDefecto() {
+  return exe ? motorExe() : 'elk';
+}
 // El bloque del diagrama que se está editando, si se abrió desde uno.
 let bloqueExe = null;
 // Lo que mostraba el editor de eXe al abrir Sirena (véase contextoExe()).
@@ -858,7 +900,7 @@ function buildAppearanceSelects() {
   fillSelect(el.lookSelect, LOOKS, localStorage.getItem(STORE.look));
   fillSelect(el.sizeSelect, SIZES, localStorage.getItem(STORE.size), '16');
   fillSelect(el.colorSelect, COLORS.map(([v, k]) => [v, k]), localStorage.getItem(STORE.color));
-  fillSelect(el.engineSelect, ENGINES.map(([v, k]) => [v, k]), localStorage.getItem(STORE.layout), 'elk');
+  fillSelect(el.engineSelect, ENGINES.map(([v, k]) => [v, k]), exe ? '' : localStorage.getItem(STORE.layout), motorPorDefecto());
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'basis');
   fillSelect(el.mergeSelect, YESNO, null, 'no');
   fillSelect(el.arrowWidthSelect, ARROW_WIDTHS, null, '');
@@ -920,9 +962,11 @@ function updateAppearanceVisibility() {
   const tipo = diagramKind();
   const esFlujo = tipo === 'flowchart';
   const conMotor = CON_MOTOR.includes(tipo);
-  const motor = el.engineSelect.value || 'elk';
+  const motor = el.engineSelect.value || motorPorDefecto();
   const visibles = {
-    engine: conMotor,
+    // Dentro de eXe, los motores ELK solo están si el Mermaid de eXe los trae
+    // (desde la versión 12); con la 11 solo hay dagre y no hay nada que elegir.
+    engine: conMotor && (!exe || motorExe() !== 'dagre'),
     lines: esFlujo,
     // En estados no hay formas que elegir, pero sí el ancho de las cajas.
     shape: esFlujo || tipo === 'state',
@@ -1104,7 +1148,38 @@ function sigueAlModo() {
 
 let mermaidOscuroPropio = false;
 
+// Dentro de eXe, Sirena dibuja como dibuja eXe: con la configuración de Mermaid
+// que usa eXe (su letra, rótulos en HTML y el tema claro de serie) y con el
+// motor que usa su Mermaid, dagre, para que lo que se ve al editar sea lo que
+// sale en el material. Solo se aparta en useMaxWidth, que no cambia el dibujo
+// sino cómo se muestra, porque el tamaño lo gobierna el zoom de Sirena.
+function initMermaidComoExe() {
+  mermaidConFormulas = hayFormulas();
+  mermaidOscuroPropio = false;
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    theme: 'default',
+    layout: motorExe(),
+    flowchart: { useMaxWidth: false },
+    sequence: { useMaxWidth: false },
+    gantt: { useMaxWidth: false },
+    er: { useMaxWidth: false },
+    journey: { useMaxWidth: false },
+    class: { useMaxWidth: false },
+    state: { useMaxWidth: false },
+    pie: { useMaxWidth: false },
+    mindmap: { useMaxWidth: false }
+  });
+}
+
 function initMermaid() {
+  if (exe) {
+    // Con el Mermaid de eXe manda su propia configuración, la de eXe.
+    if (!mermaidExe) initMermaidComoExe();
+    mermaidConFormulas = hayFormulas();
+    return;
+  }
   const conFormulas = hayFormulas();
   mermaidConFormulas = conFormulas;
   mermaidOscuroPropio = sigueAlModo() && isDark();
@@ -1417,18 +1492,23 @@ async function renderOnce() {
   const token = ++renderToken;
   try {
     const id = 'sirena-diagram-' + token;
-    const { svg } = await mermaid.render(id, mermaidConFormulas ? marcarSaltos(code) : code);
+    // Dentro de eXe el dibujo queda tal como lo hace Mermaid, sin los retoques
+    // de Sirena: eXe no los hace, y el diagrama se tiene que ver igual allí.
+    const retocar = !exe;
+    const { svg } = await mermaidDeDibujo().render(id, retocar && mermaidConFormulas ? marcarSaltos(code) : code);
     if (token !== renderToken) return;
-    currentSvg = opaqueEdgeLabels(svg, id);
+    currentSvg = retocar ? opaqueEdgeLabels(svg, id) : svg;
     el.canvas.innerHTML = currentSvg;
-    // El arreglo del rótulo se hace ya, forzando la composición: si se
-    // dejara para el siguiente fotograma no llegaría a hacerse en una pestaña
-    // que el navegador considere oculta, donde no dibuja fotogramas.
-    if (currentSvg.includes('<foreignObject')) {
-      ajustarRotulosHtml();
+    if (retocar) {
+      // El arreglo del rótulo se hace ya, forzando la composición: si se
+      // dejara para el siguiente fotograma no llegaría a hacerse en una
+      // pestaña que el navegador considere oculta, donde no dibuja fotogramas.
+      if (currentSvg.includes('<foreignObject')) {
+        ajustarRotulosHtml();
+      }
+      rotulosSobreSuLinea();
+      colorTitulosBloques();
     }
-    rotulosSobreSuLinea();
-    colorTitulosBloques();
     prepararEnlaces();
     ocultarAnclas();
     hideEmpty();
@@ -1744,7 +1824,7 @@ function appearanceConfig() {
   const tipo = diagramKind();
   const esFlujo = tipo === 'flowchart';
   if (CON_MOTOR.includes(tipo)) {
-    const motor = el.engineSelect.value || 'elk';
+    const motor = el.engineSelect.value || motorPorDefecto();
     config.layout = motor;
     if (esFlujo && motor === 'dagre') {
       if (curva !== 'basis') flowchart.curve = curva;
@@ -1962,7 +2042,7 @@ function colorTitulosBloques() {
     const propio = propsDe(lineas, 'style ' + b.id);
     const color = (Object.keys(propio).length ? propio : comun).color;
     if (!color) return;
-    const cluster = el.canvas.querySelector('g.cluster[id$="-' + b.id + '"], g.cluster[id="' + b.id + '"]');
+    const cluster = el.canvas.querySelector(selectorBloque(b.id));
     if (!cluster) return;
     cluster.querySelectorAll('.cluster-label text, .cluster-label tspan').forEach((n) => n.style.setProperty('fill', color, 'important'));
     cluster.querySelectorAll('.cluster-label span, .cluster-label p').forEach((n) => n.style.setProperty('color', color, 'important'));
@@ -2182,7 +2262,7 @@ function editarBloqueCuandoAparezca(id) {
   let intentos = 0;
   const probar = () => {
     const svg = el.canvas.querySelector('svg');
-    const cluster = svg && svg.querySelector('g.cluster[id$="-' + id + '"]');
+    const cluster = svg && svg.querySelector(selectorBloque(id));
     const etiqueta = cluster && cluster.querySelector('.cluster-label');
     if (etiqueta) { editarEnElSitio({ tipo: 'bloque', id }, etiqueta.getBoundingClientRect()); return; }
     if (intentos++ < 20) setTimeout(probar, 100);
@@ -2427,7 +2507,7 @@ function readAppearance() {
   el.themeSelect.value = MERMAID_THEMES.includes(config.theme) ? config.theme : 'default';
   el.lookSelect.value = config.look || 'classic';
   const flujo = config.flowchart || {};
-  const motor = config.layout || 'elk';
+  const motor = config.layout || motorPorDefecto();
   el.engineSelect.value = ENGINES.some(([v]) => v === motor) ? motor : (motor === 'elk.layered' ? 'elk' : 'elk');
   el.curveSelect.value = CURVES.some(([v]) => v === flujo.curve) ? flujo.curve : 'basis';
   el.mergeSelect.value = config.elk && config.elk.mergeEdges ? 'yes' : 'no';
@@ -2514,7 +2594,7 @@ function hexDeCSS(valor) {
 // Variables del tema que Mermaid está usando ahora.
 function variablesDelTema() {
   try {
-    const api = mermaid.mermaidAPI || mermaid;
+    const api = mermaidDeDibujo().mermaidAPI || mermaidDeDibujo();
     const config = api.getConfig ? api.getConfig() : null;
     return (config && config.themeVariables) || {};
   } catch (_) {
@@ -5006,6 +5086,19 @@ function flechaCercana(flechas, x, y, radio) {
 
 // Identifica qué hay bajo el ratón: una caja, una flecha (o su rótulo, que
 // se resuelve por cercanía) o el fondo.
+// El id que Mermaid da a un elemento del dibujo, sin el del dibujo delante. La
+// versión 12 lo antepone (sirena-diagram-1-flowchart-A-0); la 11, con la que
+// dibuja eXe, no (flowchart-A-0).
+function idSinPrefijo(elemento, svg) {
+  const id = (elemento && elemento.id) || '';
+  return svg && svg.id && id.startsWith(svg.id + '-') ? id.slice(svg.id.length + 1) : id;
+}
+
+// Los bloques (subgraph) llevan su id tal cual o con el del dibujo delante.
+function selectorBloque(id) {
+  return 'g.cluster[id$="-' + id + '"], g.cluster[id="' + id + '"]';
+}
+
 function objetoDelDiagrama(event) {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return { tipo: 'fondo' };
@@ -5021,7 +5114,7 @@ function objetoDelDiagrama(event) {
   // número detrás (flowchart-A-0, state-A-1, classId-A-0) o solo (bloques).
   const nodo = objetivo.closest && objetivo.closest('g.node');
   if (nodo && COLORABLE.includes(diagramKind())) {
-    const resto = (nodo.id || '').slice(svg.id.length + 1);
+    const resto = idSinPrefijo(nodo, svg);
     const m = /^(?:flowchart|state|classId)-(.+)-\d+$/.exec(resto);
     const id = m ? m[1] : resto;
     const escrito = new RegExp('(^|[^\\w-])' + escapaRe(id) + '(?![\\w-])', 'm').test(el.editor.value.replace(INIT_RE, ''));
@@ -5052,7 +5145,7 @@ function objetoDelDiagrama(event) {
   // Un bloque (subgraph): su id va detrás del id del dibujo.
   const cluster = objetivo.closest && objetivo.closest('g.cluster');
   if (cluster && !(objetivo.closest && objetivo.closest('.edgeLabel'))) {
-    const id = (cluster.id || '').slice(svg.id.length + 1);
+    const id = idSinPrefijo(cluster, svg);
     if (bloquesDelCodigo().some((b) => b.id === id)) return { tipo: 'bloque', id };
   }
 
@@ -5523,7 +5616,7 @@ function construirContextual(objeto) {
       // Aspecto | contenido | estructura | borrar, como en los demás objetos.
       menu.appendChild(document.createElement('hr'));
       accionContextual(menu, t('ctxEditText'), 'i-pencil', () => {
-        const nodo = el.canvas.querySelector('[id$="-flowchart-' + objeto.id + '-' + '"], [id*="-flowchart-' + objeto.id + '-"]');
+        const nodo = el.canvas.querySelector('[id*="-flowchart-' + objeto.id + '-"], [id^="flowchart-' + objeto.id + '-"]');
         editarEnElSitio(objeto, nodo && nodo.getBoundingClientRect());
       });
       accionContextual(menu, t(enlaceDeCaja(objeto.id) ? 'ctxLinkEdit' : 'ctxLink'), 'i-link', () => abrirEnlace(objeto.id));
@@ -5590,7 +5683,7 @@ function construirContextual(objeto) {
     formatoBloqueEn(menu, objeto.id);
     menu.appendChild(document.createElement('hr'));
     accionContextual(menu, t('blockTitle'), 'i-pencil', () => {
-      const cluster = el.canvas.querySelector('g.cluster[id$="-' + objeto.id + '"]');
+      const cluster = el.canvas.querySelector(selectorBloque(objeto.id));
       const etiqueta = cluster && cluster.querySelector('.cluster-label');
       editarEnElSitio(objeto, etiqueta && etiqueta.getBoundingClientRect());
     });
@@ -6319,8 +6412,20 @@ function avisoMedidas(texto) {
 // Escribe el diagrama en la caja de eXe con el mismo formato que su cuadro de
 // Mermaid, <pre class="mermaid">, para que eXe lo dibuje y lo exporte igual y
 // cualquiera de los dos pueda volver a abrirlo.
+// Escribe el motor en la cabecera si el diagrama lo admite y el código no lo
+// dice, como hace Sirena con los diagramas de flujo (ADR 12): así se sigue
+// viendo igual cuando eXe cambie de versión de Mermaid y, con ella, de motor
+// por defecto.
+function fijarMotorExe() {
+  const codigo = el.editor.value;
+  if (!CON_MOTOR.includes(diagramKind())) return;
+  if (/"layout"\s*:|^\s*layout\s*:/m.test(codigo)) return;
+  el.engineSelect.value = motorExe();
+  writeAppearance();
+}
+
 function insertarEnExe() {
-  const codigo = el.editor.value.trim();
+  let codigo = el.editor.value.trim();
   if (!codigo) {
     toast(t('exeEmpty'));
     el.editor.focus();
@@ -6338,6 +6443,8 @@ function insertarEnExe() {
     return;
   }
   avisoMedidas('');
+  fijarMotorExe();
+  codigo = el.editor.value.trim();
   const editor = exe.tinymce.activeEditor;
   const html = codigo.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   editor.undoManager.transact(() => {
@@ -6852,6 +6959,7 @@ async function start() {
   const fromLink = !exe && await loadFromHash();
   if (exe) {
     prepararExe();
+    await cargarMermaidExe();
   } else if (fromLink) {
     // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
     // toca: así abrirlo no ensucia lo que la persona tenga guardado.

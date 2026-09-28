@@ -58,6 +58,26 @@ entra en este modo.
 - El botón de fórmula abre la copia de Edicuatex que lleva eXe (la dirección
   `edicuatex_url` de su editor), no la pública: así funciona sin conexión.
 
+**Dibuja como eXe (versión 1.0.5).** Dentro de eXe, lo que se ve al editar es
+lo que sale en el material:
+
+- Sirena dibuja con el **Mermaid de eXe** (`window.mermaid` de la página de
+  eXe, que el botón precarga), con la configuración de eXe. Si no llegara a
+  cargarse en 10 segundos, usa el suyo configurado como el de eXe: su letra,
+  rótulos en HTML y el tema claro de serie.
+- No aplica sus retoques después de dibujar (fondo opaco de los rótulos,
+  ajuste de los rótulos con fórmula, recolocación de los rótulos de flecha,
+  color de los títulos de bloque), porque eXe no los hace. Fuera de eXe, todo
+  sigue como siempre.
+- El motor por defecto es el del Mermaid de eXe (`getConfig().layout`: dagre
+  en la versión 11, elk desde la 12). Al insertar un diagrama que admite motor
+  y no lo dice, se escribe en la cabecera (como en el ADR 12), para que se siga
+  viendo igual cuando eXe cambie de versión. El botón de motores solo aparece
+  si el Mermaid de eXe trae ELK.
+- Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
+  el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
+  Las herramientas que actúan sobre el dibujo aceptan las dos formas.
+
 **Idiomas.** Se sigue el modelo de Edicuatex. Cada texto de `lang/en.js` va
 dentro de `_('…')`; en ese archivo `_` es una función que devuelve el texto tal
 cual, así que fuera de eXe no cambia nada. En eXe, cada texto se pide a su
@@ -90,10 +110,13 @@ barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
 - Todo texto nuevo de la interfaz se escribe en `lang/en.js` dentro de `_()`.
 - La parte de eXe (dependencia de npm, script que copia Sirena, botón que la
   abre, pruebas) se prepara aparte, en una rama del fork de eXe.
-- Mientras eXe use Mermaid 11 y Sirena la 12, lo que se ve en Sirena puede no
-  coincidir con lo que dibuja eXe (tipos en beta como Venn o Ishikawa, motor
-  elk). Se resolverá cuando eXe pase a Mermaid 12 o cuando Sirena use, dentro
-  de eXe, el Mermaid de eXe.
+- Dentro de eXe, lo que no dibuja el Mermaid de eXe tampoco se ve en Sirena:
+  con Mermaid 11, los tipos en beta de los ejemplos (Venn, Ishikawa) dan error
+  y no hay motores ELK. Es lo correcto, porque tampoco saldrían en el material;
+  llegarán solos cuando eXe pase a Mermaid 12.
+- Los arreglos de Sirena a fallos de Mermaid (ADR 26 y los de las fórmulas) no
+  llegan a eXe: se han notificado a Mermaid (#8292, #8340, y un comentario con
+  la corrección en #5543) para que lleguen con sus versiones.
 
 ## Evidencia
 
@@ -132,6 +155,16 @@ barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width
   entra en este modo.
 
 ## Validación
+
+28-09-2026, versión 1.0.5, en la versión estática de eXe con Mermaid 11: siete
+diagramas (flujo de muestra, con saltos de línea, con fórmulas, secuencia,
+clases, estados y sectores) salen idénticos en Sirena y en eXe, en Chromium y
+Firefox: mismas medidas del dibujo y mismas cajas en la misma posición, con la
+misma letra. Antes, con el Mermaid 12 de Sirena, solo coincidía el de clases.
+Con el dibujo de eXe siguen funcionando el menú del botón derecho de cada
+caja, la edición con doble clic, el cambio de tema y la descarga en PNG. La
+web no cambia: letra del sistema, rótulos como texto SVG, elk por defecto, los
+27 ejemplos sin error y `probar-web` en las 18 combinaciones.
 
 28-09-2026, con la rama de eXe que abre Sirena desde su botón de Mermaid: sus
 cuatro pruebas E2E de ese botón (insertar y dibujar, editar un diagrama, el
