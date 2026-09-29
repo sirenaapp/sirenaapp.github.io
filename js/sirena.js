@@ -5105,7 +5105,7 @@ function editarCajaCuandoAparezca(id) {
   const intentar = (queda) => {
     const svg = el.canvas.querySelector('svg');
     const nodo = svg && [...svg.querySelectorAll('g.node')].find((n) => {
-      const m = /-flowchart-(.+)-\d+$/.exec(n.id || '');
+      const m = ID_CAJA.exec(n.id || '');
       return m && m[1] === id;
     });
     if (nodo) {
@@ -5118,11 +5118,16 @@ function editarCajaCuandoAparezca(id) {
 }
 
 // Caja del diagrama sobre la que está el puntero.
+// Id de la caja en el id que Mermaid da a su grupo: la 12 antepone el del
+// dibujo (sirena-diagram-1-flowchart-A-0) y la 11, la de eXe, no
+// (flowchart-A-0).
+const ID_CAJA = /(?:^|-)flowchart-(.+)-\d+$/;
+
 function cajaBajoPuntero(x, y) {
   const bajo = document.elementFromPoint(x, y);
   const nodo = bajo && bajo.closest && bajo.closest('g.node');
   if (!nodo) return null;
-  const m = /-flowchart-(.+)-\d+$/.exec(nodo.id || '');
+  const m = ID_CAJA.exec(nodo.id || '');
   const id = m && m[1];
   return id && allNodes().includes(id) ? { id, nodo } : null;
 }

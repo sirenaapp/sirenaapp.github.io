@@ -86,7 +86,11 @@ lo que sale en el material:
   si el Mermaid de eXe trae ELK.
 - Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
   el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
-  Las herramientas que actúan sobre el dibujo aceptan las dos formas.
+  Las herramientas que actúan sobre el dibujo aceptan las dos formas. Los
+  puntos para añadir cajas y la edición del texto de la caja recién creada
+  solo aceptaban la de la 12, y dentro de eXe no salían; se corrigió en la
+  versión 2.1.2 (29-09-2026, lo vio Juanjo en eXe) con un solo patrón,
+  `ID_CAJA`.
 - **Solo se ofrece lo que el Mermaid de eXe sabe dibujar** (versiones 1.0.7 y
   1.0.8). Al abrirse, Sirena pregunta al Mermaid de eXe (`parse` con
   `suppressErrors`, sin dibujar) si entiende cada ejemplo en el idioma de la
