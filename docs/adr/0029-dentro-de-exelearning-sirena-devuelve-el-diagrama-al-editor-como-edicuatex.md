@@ -52,7 +52,13 @@ entra en este modo.
 - No usa la biblioteca del navegador ni guarda el código en `localStorage`: el
   diagrama vive en el material.
 - Se ocultan la biblioteca, compartir, imprimir y el idioma, que no tienen
-  sentido dentro de un material. La marca se oculta a la vista porque el título
+  sentido dentro de un material, y desde la versión 2.1.0 también crear, abrir
+  y descargar archivos y copiar el dibujo como imagen, que confundían dentro de
+  un iDevice (revisión de Ernesto Serrano al PR #2482 de eXe, 29-09-2026);
+  `Ctrl+S` no descarga nada.
+- `Esc` cierra la ventana, como el antiguo cuadro de eXe, si en Sirena no hay
+  nada abierto; si hay un menú, una ventana o un texto en edición, cierra eso
+  primero (versión 2.1.0). La marca se oculta a la vista porque el título
   lo pone la ventana de eXe, pero el título de la página sigue ahí para los
   lectores de pantalla.
 - El botón de fórmula abre la copia de Edicuatex que lleva eXe (la dirección
@@ -70,9 +76,13 @@ lo que sale en el material:
   color de los títulos de bloque), porque eXe no los hace. Fuera de eXe, todo
   sigue como siempre.
 - El motor por defecto es el del Mermaid de eXe (`getConfig().layout`: dagre
-  en la versión 11, elk desde la 12). Al insertar un diagrama que admite motor
-  y no lo dice, se escribe en la cabecera (como en el ADR 12), para que se siga
-  viendo igual cuando eXe cambie de versión. El botón de motores solo aparece
+  en la versión 11, elk desde la 12). En un diagrama que admite motor y no lo
+  dice, se escribe en la cabecera (como en el ADR 12), para que se siga viendo
+  igual cuando eXe cambie de versión. Desde la versión 2.1.0 se escribe en
+  cuanto el código entra en el editor (al abrir la ventana o elegir un
+  ejemplo), para que se vea antes de insertar y no sea un cambio escondido;
+  «Cancelar» deja el diagrama como estaba. Si el código se teclea desde cero,
+  se escribe al insertar, porque mientras se teclea movería el cursor. El botón de motores solo aparece
   si el Mermaid de eXe trae ELK.
 - Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
   el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
@@ -97,9 +107,13 @@ catálogo por la frase inglesa; si eXe aún no la tiene traducida, se usa la
 traducción de Sirena, y si Sirena tampoco la tiene, la inglesa. El catálogo de
 eXe guarda cada frase tal como está escrita en `lang/en.js`, sin interpretar los
 escapes (un apóstrofo entre comillas simples queda como `\'` y un salto de
-línea como `\n`), así que, si la frase no aparece tal cual, Sirena la pide
-también en esa forma escrita y convierte los `\n` de la respuesta en saltos de
-línea (versión 1.0.2). La lengua de
+línea como `\n`), y la frase con escapes no coincidiría con la que recibe
+`_()`. Por eso, desde la versión 2.1.0, las frases inglesas no llevan
+apóstrofos escapados ni saltos escritos: «Do not show again», y la pista de
+formato en tres frases que Sirena une con saltos de línea. Entre la 1.0.2 y la
+2.0.0 Sirena pedía además la frase en su forma escrita, lo que dependía de ese
+comportamiento del extractor; la revisión de Ernesto Serrano lo señaló y se
+quitó. La lengua de
 los ejemplos y del diagrama de muestra es la de eXe si Sirena la tiene; el
 valenciano toma la del catalán y el resto, la del inglés. Los textos de la
 barra nueva repiten las frases del cuadro de Mermaid de eXe («Max. width

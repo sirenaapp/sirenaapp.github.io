@@ -1280,9 +1280,16 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 
 /* --- Dentro de eXeLearning: la barra de insertar ocupa el sitio del pie --- */
 
-/* Lo que no tiene sentido dentro de un material: la biblioteca del navegador,
-   compartir por enlace, imprimir y el idioma, que es el de eXe. La marca ya la
-   pone el título de la ventana de eXe. */
+/* Lo que no tiene sentido dentro de un material: crear, abrir y descargar
+   archivos o copiar el dibujo como imagen (el diagrama vuelve al material con
+   «Insertar»), la biblioteca del navegador, compartir por enlace, imprimir y el
+   idioma, que es el de eXe. La marca ya la pone el título de la ventana de
+   eXe. */
+body.exe #btn-new,
+body.exe #btn-open,
+body.exe #btn-download,
+body.exe #download-menu,
+body.exe #btn-copy-image,
 body.exe #btn-library,
 body.exe #btn-print,
 body.exe #btn-share,

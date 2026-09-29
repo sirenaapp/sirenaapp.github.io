@@ -798,29 +798,19 @@ function t(key) {
   return (strings && strings[key]) || window.SIRENA_LANG.es[key] || key;
 }
 
-// El catálogo de eXe guarda cada frase tal como está escrita en lang/en.js,
-// sin interpretar los escapes: un apóstrofo entre comillas simples queda como
-// \' y un salto de línea como \n. Esta es esa forma escrita de una frase.
-function formaEscrita(frase) {
-  return frase.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
-}
-
 // En eXe, cada texto se pide a su catálogo por la frase inglesa, que es lo que
-// eXe recoge de lang/en.js: primero tal cual y, si no está, en su forma
-// escrita. Si eXe aún no la ha traducido, se usa la traducción de Sirena, y si
-// Sirena tampoco la tiene, la frase inglesa.
+// eXe recoge de lang/en.js. Si eXe aún no la ha traducido, se usa la traducción
+// de Sirena, y si Sirena tampoco la tiene, la frase inglesa. Las frases inglesas
+// no llevan apóstrofos escapados ni saltos de línea escritos: el catálogo de eXe
+// las guarda tal como están escritas y no coincidirían.
 function traducirConExe(key) {
   const ingles = window.SIRENA_LANG.en[key];
   if (ingles) {
-    for (const forma of [ingles, formaEscrita(ingles)]) {
-      try {
-        const traducida = exe._(forma);
-        if (typeof traducida === 'string' && traducida && traducida !== forma) {
-          return traducida.replace(/\\n/g, '\n').replace(/\\'/g, "'");
-        }
-      } catch (_) {
-        // Sin traducción de eXe: se sigue con la de Sirena.
-      }
+    try {
+      const traducida = exe._(ingles);
+      if (typeof traducida === 'string' && traducida && traducida !== ingles) return traducida;
+    } catch (_) {
+      // Sin traducción de eXe: se sigue con la de Sirena.
     }
   }
   return (strings && strings[key]) || ingles || window.SIRENA_LANG.es[key] || key;
@@ -850,7 +840,7 @@ function applyLang(code) {
   buildExportSelects();
   buildLangMenu();
   if (el.pistaFormato && !el.pistaFormato.hidden) {
-    $('pista-formato-texto').textContent = t(window.matchMedia('(hover: none)').matches ? 'hintTouch' : 'hintMouse');
+    $('pista-formato-texto').textContent = textoPistaFormato(window.matchMedia('(hover: none)').matches);
   }
   buildTypeMenu();
   updateEditorTools();
@@ -5259,7 +5249,10 @@ function setupCrear() {
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && trazando) cancelar();
+    if (event.key === 'Escape' && trazando) {
+      event.preventDefault();
+      cancelar();
+    }
   });
 
   // Las anclas siguen al ratón de caja en caja.
@@ -6066,6 +6059,12 @@ function pistaDesactivada() {
   try { return localStorage.getItem(PISTA_NUNCA) === '1'; } catch (_) { return false; }
 }
 
+// La pista va en tres frases, una por línea, y la primera en negrita (CSS).
+// Cada frase es un texto aparte: así se traduce entera y sin saltos escritos.
+function textoPistaFormato(tactil) {
+  return [t('hintIntro'), t(tactil ? 'hintTouchFormat' : 'hintMouseFormat'), t(tactil ? 'hintTouchEdit' : 'hintMouseEdit')].join('\n');
+}
+
 function mostrarPista() {
   if (viewer || pistaDescartada || pistaDesactivada()) return;
   if (diagramKind() !== 'flowchart') { ocultarPista(false); return; }
@@ -6074,7 +6073,7 @@ function mostrarPista() {
   localStorage.removeItem('sirena.pistaFormato');
   // En pantalla táctil no hay botón derecho: ahí es la pulsación larga.
   const tactil = window.matchMedia('(hover: none)').matches;
-  $('pista-formato-texto').textContent = t(tactil ? 'hintTouch' : 'hintMouse');
+  $('pista-formato-texto').textContent = textoPistaFormato(tactil);
   el.pistaFormato.hidden = false;
   pistaTempo = setTimeout(() => ocultarPista(true), 20000);
 }
@@ -6640,7 +6639,10 @@ function avisoMedidas(texto) {
 // Escribe el motor en la cabecera si el diagrama lo admite y el código no lo
 // dice, como hace Sirena con los diagramas de flujo (ADR 12): así se sigue
 // viendo igual cuando eXe cambie de versión de Mermaid y, con ella, de motor
-// por defecto.
+// por defecto. Se escribe en cuanto el código entra en el editor (al abrir la
+// ventana o elegir un ejemplo), para que se vea antes de insertar; al insertar
+// solo queda por escribir en el código tecleado desde cero, porque mientras se
+// teclea movería el cursor.
 function fijarMotorExe() {
   const codigo = el.editor.value;
   if (!CON_MOTOR.includes(diagramKind())) return;
@@ -7002,6 +7004,7 @@ function setupToolbar() {
     el.editor.value = exampleCode(found);
     crearDoc(el.editor.value, found.label[lang] || found.label.es);
     readAppearance();
+    if (exe) fijarMotorExe();
     renderGutter();
     render();
   });
@@ -7132,11 +7135,22 @@ function setupToolbar() {
   });
 
   document.addEventListener('keydown', (event) => {
+    // Guardar como archivo; dentro de eXe no se descargan archivos.
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
-      downloadAs('mmd');
+      if (!exe) downloadAs('mmd');
     }
     if (event.key === 'Escape') {
+      // Dentro de eXe, Esc cierra la ventana, como el antiguo cuadro de eXe,
+      // si en Sirena no hay nada abierto; si lo hay, cierra eso primero. Lo que
+      // atiende Esc por su cuenta (la edición de un texto, el trazado de una
+      // flecha) lo marca con preventDefault.
+      const nadaAbierto = !algoAbiertoEnSirena();
+      if (exe && nadaAbierto) {
+        setTimeout(() => {
+          if (!event.defaultPrevented) exe.tinymce.activeEditor.windowManager.close();
+        }, 0);
+      }
       el.creditosModal.hidden = true;
       // El foco vuelve al botón del menú que estaba abierto.
       const abierto = MENUS_EDITOR.map((clave) => el[clave]).concat([el.langMenu, el.downloadMenu])
@@ -7155,6 +7169,13 @@ function setupToolbar() {
       el.libraryModal.hidden = true;
     }
   });
+}
+
+// Si hay abierto algún menú o ventana de Sirena, o se está editando un texto.
+function algoAbiertoEnSirena() {
+  const ventanas = [el.creditosModal, el.helpModal, el.a11yModal, el.linkModal, el.langMenu, el.downloadMenu,
+    el.libraryModal, el.shapeModal, el.contextMenu, el.editorSitio].concat(MENUS_EDITOR.map((clave) => el[clave]));
+  return ventanas.some((v) => v && !v.hidden);
 }
 
 /* --- Arranque --- */
@@ -7242,6 +7263,7 @@ async function start() {
 
   renderGutter();
   readAppearance();
+  if (exe) fijarMotorExe();
   await render();
   // Al final, cuando ya se sabe si la página va en modo visor.
   mostrarPista();
