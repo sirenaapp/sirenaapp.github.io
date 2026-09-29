@@ -58,7 +58,11 @@ entra en este modo.
   `Ctrl+S` no descarga nada.
 - `Esc` cierra la ventana, como el antiguo cuadro de eXe, si en Sirena no hay
   nada abierto; si hay un menú, una ventana o un texto en edición, cierra eso
-  primero (versión 2.1.0). La marca se oculta a la vista porque el título
+  primero (versión 2.1.0). Para que llegue a Sirena, el foco tiene que estar
+  dentro: al abrir la ventana se lleva al código, y pulsar sobre el dibujo lo
+  trae si estaba en eXe, porque ese clic anula el comportamiento normal para
+  poder arrastrar el diagrama (versión 2.1.3; con la 2.1.0 solo funcionaba tras
+  pulsar en el código, lo vio Juanjo el 29-09-2026). La marca se oculta a la vista porque el título
   lo pone la ventana de eXe, pero el título de la página sigue ahí para los
   lectores de pantalla.
 - El botón de fórmula abre la copia de Edicuatex que lleva eXe (la dirección

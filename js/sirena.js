@@ -1778,6 +1778,9 @@ function setupPan() {
   el.viewport.addEventListener('pointerdown', (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     event.preventDefault();
+    // preventDefault impide que el clic lleve el foco a la página: dentro de
+    // la ventana de eXe, las teclas (Esc incluida) seguirían yendo a eXe.
+    if (!document.hasFocus()) window.focus();
     pulsacion = { id: event.pointerId, x: event.clientX, y: event.clientY };
     punteros.set(event.pointerId, { x: event.clientX, y: event.clientY });
     el.viewport.setPointerCapture(event.pointerId);
@@ -7176,6 +7179,23 @@ function setupToolbar() {
   });
 }
 
+// Dentro de eXe, el foco se queda en eXe al abrir la ventana: se lleva al
+// código, para que se pueda escribir y Esc cierre sin pulsar antes dentro. Se
+// repite un momento después por si eXe lo recupera al terminar de abrirla.
+function enfocarEnExe() {
+  const enfocar = () => {
+    if (document.hasFocus() && document.activeElement !== document.body) return;
+    try {
+      window.focus();
+      el.editor.focus({ preventScroll: true });
+    } catch (_) {
+      // Si el navegador no deja mover el foco, basta con pulsar dentro.
+    }
+  };
+  enfocar();
+  setTimeout(enfocar, 400);
+}
+
 // Si hay abierto algún menú o ventana de Sirena, o se está editando un texto.
 function algoAbiertoEnSirena() {
   const ventanas = [el.creditosModal, el.helpModal, el.a11yModal, el.linkModal, el.langMenu, el.downloadMenu,
@@ -7270,6 +7290,7 @@ async function start() {
   readAppearance();
   if (exe) fijarMotorExe();
   await render();
+  if (exe) enfocarEnExe();
   // Al final, cuando ya se sabe si la página va en modo visor.
   mostrarPista();
 }
