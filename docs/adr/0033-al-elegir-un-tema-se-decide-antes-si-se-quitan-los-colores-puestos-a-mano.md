@@ -40,7 +40,9 @@ Con la casilla marcada, al elegir un tema:
   los del tema y deja dos pasos.
 
 El fondo de los rótulos que se ve con «Color propio» es parte de esa paleta: no
-cuenta como puesto a mano y no pasa al tema siguiente.
+cuenta como puesto a mano y no pasa al tema siguiente. Tampoco cuenta el que
+escribe un color de la lista, que va a juego con su relleno
+([ADR 34](0034-los-colores-de-la-lista-escriben-a-juego-los-fondos-que-mermaid-sacaria-girando-el-tono.md)).
 
 Al leer un diagrama, el fondo de los rótulos se toma de lo que diga la
 cabecera. Antes solo se leía con «Color propio», así que con otro tema se perdía

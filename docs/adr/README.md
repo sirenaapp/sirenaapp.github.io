@@ -39,6 +39,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [31](0031-los-parches-a-mermaid-se-comprueban-con-cada-version-nueva.md) | Los parches a fallos de Mermaid se comprueban con cada versión nueva | aceptado |
 | [32](0032-el-tema-blanco-y-negro-es-un-tema-de-todo-el-diagrama.md) | El tema blanco y negro es un tema de todo el diagrama | aceptado |
 | [33](0033-al-elegir-un-tema-se-decide-antes-si-se-quitan-los-colores-puestos-a-mano.md) | Al elegir un tema se decide antes si se quitan los colores puestos a mano | aceptado |
+| [34](0034-los-colores-de-la-lista-escriben-a-juego-los-fondos-que-mermaid-sacaria-girando-el-tono.md) | Los colores de la lista escriben a juego los fondos que Mermaid sacaría girando el tono | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

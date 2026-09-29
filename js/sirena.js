@@ -1844,21 +1844,60 @@ function placeMenu(menu, boton) {
 const INIT_RE = /^\s*%%\{\s*init\s*:\s*(\{[\s\S]*\})\s*\}%%[ \t]*\n?/;
 
 function colorVariables(valor) {
+  let propios = null;
   if (valor === 'custom') {
-    return {
+    propios = {
       primaryColor: el.colorFill.value,
       primaryBorderColor: el.colorBorder.value,
       lineColor: el.colorLine.value,
       primaryTextColor: el.colorText.value
     };
+  } else {
+    const encontrado = COLORS.find(([nombre]) => nombre === valor);
+    if (!encontrado || !encontrado[2]) return null;
+    propios = encontrado[2];
   }
-  const encontrado = COLORS.find(([nombre]) => nombre === valor);
-  if (!encontrado || !encontrado[2]) return null;
-  // Los colores de los sectores y de la gráfica XY solo se escriben en el
-  // diagrama que los usa, para no cargar la cabecera de los demás.
+  // Lo que el color trae escrito (el blanco y negro, por ejemplo) manda; los
+  // fondos a juego van detrás, para que la cabecera empiece por el relleno.
+  const vars = { ...propios };
+  Object.entries(fondosAJuego(propios)).forEach(([clave, valor]) => { if (!(clave in vars)) vars[clave] = valor; });
+  // Los colores de los sectores, de la gráfica XY, de las secciones del
+  // Gantt, de las etiquetas de commit y de las activaciones solo se escriben
+  // en el diagrama que los usa, para no cargar la cabecera de los demás.
   const tipo = diagramKind();
-  return Object.fromEntries(Object.entries(encontrado[2]).filter(([clave]) =>
-    (!/^pie/.test(clave) || tipo === 'pie') && (clave !== 'xyChart' || tipo === 'xychart')));
+  const git = /^\s*gitGraph\b/m.test(el.editor.value.replace(INIT_RE, ''));
+  return Object.fromEntries(Object.entries(vars).filter(([clave]) =>
+    (!/^pie/.test(clave) || tipo === 'pie') && (clave !== 'xyChart' || tipo === 'xychart')
+    && (clave !== 'sectionBkgColor' || tipo === 'gantt') && (clave !== 'commitLabelBackground' || git)
+    && (!/^activation/.test(clave) || tipo === 'sequence')));
+}
+
+// El tema base de Mermaid saca varios fondos girando el tono del relleno: el
+// de los rótulos de flecha, de las etiquetas de commit y de las activaciones
+// de la secuencia, 120°; el de los grupos y las secciones del Gantt, 180°. El
+// borde de las cajas es un degradado que acaba en otro color girado. Con el morado salían verdes y
+// amarillos. Se escriben a juego con el relleno: el mismo color para los
+// rótulos, y más claro para los grupos, con el borde de las cajas. Con «Color
+// propio» el fondo de los rótulos va aparte, porque se puede elegir.
+function fondosAJuego(vars) {
+  const claro = aclarar(vars.primaryColor, 0.5);
+  return {
+    edgeLabelBackground: vars.primaryColor,
+    clusterBkg: claro,
+    clusterBorder: vars.primaryBorderColor,
+    gradientStop: vars.primaryBorderColor,
+    sectionBkgColor: claro,
+    commitLabelBackground: vars.primaryColor,
+    activationBkgColor: claro,
+    activationBorderColor: vars.primaryBorderColor
+  };
+}
+
+// Mezcla un color con el blanco: 0 lo deja igual y 1 lo vuelve blanco.
+function aclarar(hex, factor) {
+  const n = parseInt(hex.slice(1), 16);
+  const canal = (desplazamiento) => Math.round(((n >> desplazamiento) & 255) + (255 - ((n >> desplazamiento) & 255)) * factor);
+  return '#' + [canal(16), canal(8), canal(0)].map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
 // Oscurece un color para el borde y las líneas, a partir del color de relleno.
@@ -1883,10 +1922,9 @@ function appearanceConfig() {
     config.theme = el.themeSelect.value;
   }
   // El fondo de los rótulos de flecha vale con cualquier tema, así que se
-  // escribe aparte y solo si se ha elegido; si no, sigue el gris del tema.
-  // Con color propio se escribe siempre (el del relleno mientras no se toque):
-  // el tema base lo sacaría girando el tono del relleno, y un verde daría un
-  // rótulo rojo que no se ha pedido.
+  // escribe aparte si se ha elegido; si no, sigue el del tema (con los
+  // colores de la lista, el del relleno: ver fondosAJuego). Con color propio
+  // se escribe siempre, el del relleno mientras no se toque.
   if (coloresTocados.has('labelbg') || el.colorSelect.value === 'custom') variables.edgeLabelBackground = el.colorLabelBg.value;
   if (diagramKind() === 'pie') {
     Object.entries(coloresSectores).forEach(([i, valor]) => { if (valor) variables['pie' + i] = valor; });
@@ -2634,8 +2672,10 @@ function readAppearance() {
     el.colorSelect.value = '';
   }
   // El fondo de los rótulos vale con cualquier tema: se sigue lo que diga el
-  // código, para no perderlo ni arrastrar el de otro diagrama.
-  if (variables.edgeLabelBackground) {
+  // código, para no perderlo ni arrastrar el de otro diagrama. El que trae el
+  // propio color de la lista no cuenta como elegido.
+  const delColor = conocido && colorVariables(conocido[0]).edgeLabelBackground;
+  if (variables.edgeLabelBackground && variables.edgeLabelBackground !== delColor) {
     el.colorLabelBg.value = variables.edgeLabelBackground;
     coloresTocados.add('labelbg');
   } else {
