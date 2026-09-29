@@ -80,10 +80,17 @@ también fuera de Sirena, así que vienen de Mermaid 12:
   la fórmula queda como una palabra más. Lo que sobresale se mide sobre los
   elementos de dentro, no solo sobre el rótulo, porque lo que desborda de una
   fila no cuenta en la medida del padre.
-- Decide si el texto se parte o no (`white-space`) con una medida previa que
-  hace en un elemento fuera de pantalla, y en el Chrome del autor esa medida
-  le decía que cabía en una línea cuando no cabía: el rótulo salía en `nowrap`
-  y cortado. Se parte siempre. Y el arreglo se hace en el momento, forzando la
+- Decide si el texto se parte o no (`white-space`) con una medida previa: solo
+  lo parte si mide exactamente el ancho máximo (`bbox.width === width`). En
+  Chrome y Edge, con algunas escalas de pantalla o de zoom, esa medida sale unas
+  milésimas distinta (200,00003 px con la escala 0,984 del Chrome del autor) y
+  el rótulo queda en `nowrap` y cortado. Se parte siempre. Es el fallo
+  [#7794](https://github.com/mermaid-js/mermaid/issues/7794) de Mermaid, con una
+  corrección propuesta en el PR
+  [#8233](https://github.com/mermaid-js/mermaid/pull/8233) (29-09-2026: sin
+  aceptar). Con Chromium a escala forzada fallan 0,9, 0,984 y 1,75 en Mermaid
+  11.12.0 y 12.0.0, y 1,2 y 1,333 en algunos diagramas; salen bien 1, 1,1,
+  1,25, 1,5 y 2, y Firefox con todas. Y el arreglo se hace en el momento, forzando la
   composición, no en el siguiente fotograma: en una pestaña que el navegador
   considera oculta no dibuja fotogramas y el arreglo no llegaba a hacerse
   (así se destapó, 22-09-2026, con la pestaña de la extensión del navegador).

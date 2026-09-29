@@ -1,5 +1,5 @@
 {
-  "_descripcion": "Parches de Sirena a fallos de Mermaid. Cada uno con su incidencia, la función que lo aplica y un ejemplo mínimo que reproduce el fallo con Mermaid solo. scripts/comprobar-parches.mjs dibuja cada ejemplo con una versión de Mermaid y dice si el fallo sigue. Ver docs/parches-mermaid.md. «control» es el mismo caso sin la causa del fallo (sin fórmula, o con dagre en vez de ELK): tiene que salir siempre bien; si no, la medición no sirve para esa versión.",
+  "_descripcion": "Parches de Sirena a fallos de Mermaid. Cada uno con su incidencia, la función que lo aplica y un ejemplo mínimo que reproduce el fallo con Mermaid solo. scripts/comprobar-parches.mjs dibuja cada ejemplo con una versión de Mermaid y dice si el fallo sigue. Ver docs/parches-mermaid.md. «control» es el mismo caso sin la causa del fallo (sin fórmula, con dagre en vez de ELK, o a escala 1 si el parche lleva «escala»): tiene que salir siempre bien; si no, la medición no sirve para esa versión.",
   "parches": [
     {
       "clave": "rotulo-fuera-de-linea",
@@ -62,6 +62,22 @@
       "codigo": "flowchart LR\n  A --- |\"Ratio $$\\dfrac{a}{b}$$\"| B",
       "nota": "solo el fondo que pone al rótulo; el resto de la función son ajustes propios de Sirena",
       "control": "flowchart LR\n  A --- |\"Ratio a/b\"| B"
+    },
+    {
+      "clave": "rotulo-sin-partir",
+      "fallo": "En Chrome y Edge, con algunas escalas de pantalla o de zoom, el texto de una caja que no cabe en una línea queda en una sola y cortado",
+      "incidencias": [
+        7794
+      ],
+      "funciones": [
+        "ajustarRotulosHtml"
+      ],
+      "adr": "0022",
+      "comprobacion": "rotuloSinPartir",
+      "escala": 1.75,
+      "codigo": "flowchart TD\n  A[A deliberately long node label that is wider than the wrapping width]",
+      "nota": "solo el white-space: normal que pone al rótulo",
+      "control": "flowchart TD\n  A[A deliberately long node label that is wider than the wrapping width]"
     }
   ]
 }

@@ -1459,8 +1459,11 @@ function ajustarRotulosHtml() {
     restaurarSaltos(dentro);
     soltarFilas(dentro);
     dentro.style.display = 'block';
-    // Mermaid deja el rótulo sin partir (nowrap) cuando su medida previa le
-    // dice que cabe, y esa medida falla en una pestaña oculta: se parte siempre.
+    // Mermaid solo parte el rótulo si su medida previa es exactamente el ancho
+    // máximo, y en Chrome y Edge, con algunas escalas de pantalla o de zoom,
+    // sale unas milésimas distinta: el rótulo queda en una línea y cortado. Se
+    // parte siempre. Parche a un fallo de Mermaid (#7794): ver
+    // docs/parches-mermaid.md.
     dentro.style.whiteSpace = 'normal';
     dentro.style.width = disponible + 'px';
     dentro.style.maxWidth = disponible + 'px';

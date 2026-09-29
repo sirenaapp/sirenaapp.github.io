@@ -12,6 +12,10 @@
 // tiene que llevar mermaid.esm.min.mjs y chunks/mermaid.esm.min/. Hace falta
 // Playwright con Chromium (npm i --no-save playwright; npx playwright install chromium).
 // Termina con código 0 aunque algún fallo siga: el resultado es la tabla.
+//
+// Un parche con «escala» se dibuja con Chromium a esa escala de pantalla
+// (--force-device-scale-factor), porque su fallo solo sale así; su control es
+// el mismo ejemplo a escala 1.
 
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -117,6 +121,15 @@ const MEDICIONES = {
     }
     return { sigue: !opaco, detalle: opaco ? 'el texto tiene fondo opaco' : 'ningún fondo opaco bajo el texto' };
   }`,
+  // El texto de la caja, más ancho que el ancho máximo, tiene que partirse en
+  // varias líneas en vez de quedar en una sola y cortado.
+  rotuloSinPartir: `(svg) => {
+    const fo = svg.querySelector('g.node foreignObject');
+    const div = fo && fo.querySelector('div');
+    if (!div) return { sigue: true, detalle: 'no se encontró el rótulo' };
+    const cortado = getComputedStyle(div).whiteSpace === 'nowrap' && div.scrollWidth > parseFloat(fo.getAttribute('width')) + 1;
+    return { sigue: cortado, detalle: cortado ? 'el texto queda en una línea y cortado (' + div.scrollWidth + ' px en un hueco de ' + Math.round(parseFloat(fo.getAttribute('width'))) + ')' : 'el texto se reparte en varias líneas' };
+  }`,
 };
 
 const TIPOS = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript' };
@@ -159,23 +172,31 @@ async function estadoIncidencia(numero) {
 }
 
 const { chromium } = await import('playwright');
-const navegador = await chromium.launch();
+// Un navegador por escala de pantalla, abierto la primera vez que hace falta.
+const navegadores = new Map();
+async function paginaA(escala) {
+  if (!navegadores.has(escala)) {
+    const navegador = await chromium.launch(escala === 1 ? {} : { args: [`--force-device-scale-factor=${escala}`] });
+    const pagina = await navegador.newPage({ viewport: { width: 1200, height: 900 } });
+    await pagina.goto(base + '/');
+    await pagina.evaluate(async () => {
+      const { default: mermaid } = await import('/mermaid/mermaid.esm.min.mjs');
+      mermaid.initialize({ startOnLoad: false });
+      window.dibujar = async (id, codigo) => {
+        document.body.innerHTML = '';
+        const { svg } = await mermaid.render(id, codigo);
+        document.body.innerHTML = svg;
+        return document.body.querySelector('svg');
+      };
+    });
+    navegadores.set(escala, { navegador, pagina });
+  }
+  return navegadores.get(escala).pagina;
+}
 const filas = [];
 try {
-  const pagina = await navegador.newPage({ viewport: { width: 1200, height: 900 } });
-  await pagina.goto(base + '/');
-  await pagina.evaluate(async () => {
-    const { default: mermaid } = await import('/mermaid/mermaid.esm.min.mjs');
-    mermaid.initialize({ startOnLoad: false });
-    window.dibujar = async (id, codigo) => {
-      document.body.innerHTML = '';
-      const { svg } = await mermaid.render(id, codigo);
-      document.body.innerHTML = svg;
-      return document.body.querySelector('svg');
-    };
-  });
   for (const parche of parches) {
-    const medir = (id, codigo) => pagina.evaluate(async ({ id, codigo, medir }) => {
+    const medir = async (id, codigo, escala) => (await paginaA(escala)).evaluate(async ({ id, codigo, medir }) => {
       const svg = await window.dibujar(id, codigo);
       // eslint-disable-next-line no-eval
       return (0, eval)(medir)(svg);
@@ -184,10 +205,10 @@ try {
     try {
       // El control es el mismo caso sin la causa del fallo: si también da
       // fallo, la medición no vale para esta versión y no se puede fiar.
-      const control = await medir('c-' + parche.clave, parche.control);
+      const control = await medir('c-' + parche.clave, parche.control, 1);
       resultado = control.sigue
         ? { sigue: null, detalle: 'la medición no vale para esta versión: el ejemplo de control también da fallo (' + control.detalle + ')' }
-        : await medir('p-' + parche.clave, parche.codigo);
+        : await medir('p-' + parche.clave, parche.codigo, parche.escala || 1);
     } catch (error) {
       resultado = { sigue: null, detalle: 'no se pudo medir: ' + String(error.message || error).split('\n')[0] };
     }
@@ -196,7 +217,7 @@ try {
     filas.push({ parche, resultado, incidencias });
   }
 } finally {
-  await navegador.close();
+  for (const { navegador } of navegadores.values()) await navegador.close();
   servidor.close();
 }
 
