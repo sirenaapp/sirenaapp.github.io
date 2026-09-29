@@ -80,14 +80,22 @@ lo que sale en el material:
   color de los títulos de bloque), porque eXe no los hace. Fuera de eXe, todo
   sigue como siempre.
 - El motor por defecto es el del Mermaid de eXe (`getConfig().layout`: dagre
-  en la versión 11, elk desde la 12). En un diagrama que admite motor y no lo
-  dice, se escribe en la cabecera (como en el ADR 12), para que se siga viendo
-  igual cuando eXe cambie de versión. Desde la versión 2.1.0 se escribe en
-  cuanto el código entra en el editor (al abrir la ventana o elegir un
-  ejemplo), para que se vea antes de insertar y no sea un cambio escondido;
-  «Cancelar» deja el diagrama como estaba. Si el código se teclea desde cero,
-  se escribe al insertar, porque mientras se teclea movería el cursor. El botón de motores solo aparece
-  si el Mermaid de eXe trae ELK.
+  en la versión 11, elk desde la 12). **Dentro de eXe, Sirena no escribe el
+  motor en la cabecera** (desde la versión 2.2.0): solo lo escribe si se elige
+  otro distinto del de eXe, y lo conserva si el código ya lo traía. El botón de
+  motores solo aparece si el Mermaid de eXe trae ELK.
+
+  Hasta la 2.1.3 lo escribía en todo diagrama que lo admitía, como en la web
+  (ADR 12), para que siguiera viéndose igual cuando eXe pasara a Mermaid 12,
+  cuyo motor por defecto es ELK; en la 2.1.0 se pasó a escribirlo al abrir, para
+  que se viera antes de insertar. Ernesto Serrano lo señaló como un cambio del
+  código escondido (revisión del PR #2482 de eXe, 29-09-2026) y, en su revisión
+  del PR #2449 de eXe (Mermaid 12), propuso fijar en la configuración de eXe
+  `layout: 'dagre'` y `look: 'classic'` para que todos los diagramas conserven
+  su aspecto. Esa vía cubre también los diagramas que nunca se abren en Sirena,
+  y la decisión sobre el aspecto de los diagramas de eXe es de eXe, así que
+  Sirena deja de escribirlo. Si eXe fija dagre, Sirena lo sigue sola, porque
+  toma el motor de la configuración del Mermaid de eXe.
 - Los ids de los elementos cambian entre versiones de Mermaid (la 12 antepone
   el del dibujo, `sirena-diagram-1-flowchart-A-0`; la 11 no, `flowchart-A-0`).
   Las herramientas que actúan sobre el dibujo aceptan las dos formas. Los

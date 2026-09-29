@@ -66,5 +66,9 @@ versión de Mermaid con que se abra.
 En Mermaid 11, que no trae `elk`, esa cabecera no da error: el diagrama se
 dibuja con `dagre`.
 
+Dentro de eXeLearning no se aplica: allí el motor lo decide la configuración de
+Mermaid de eXe, y Sirena solo lo escribe si se elige otro (ADR 29, desde la
+versión 2.2.0).
+
 Al actualizar Mermaid conviene repetir la tabla, por si `elk` empieza a atender
 a la forma de las líneas o cambia otra vez el motor por defecto.

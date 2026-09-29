@@ -1953,7 +1953,11 @@ function appearanceConfig() {
   const esFlujo = tipo === 'flowchart';
   if (CON_MOTOR.includes(tipo)) {
     const motor = el.engineSelect.value || motorPorDefecto();
-    config.layout = motor;
+    // En la web el motor se escribe siempre (ADR 12). Dentro de eXe lo decide
+    // la configuración de Mermaid de eXe, para todos sus diagramas: solo se
+    // escribe si se elige otro o si el código ya lo traía (ADR 29).
+    const yaLoDice = /"layout"\s*:|^\s*layout\s*:/m.test(el.editor.value);
+    if (!exe || motor !== motorExe() || yaLoDice) config.layout = motor;
     if (esFlujo && motor === 'dagre') {
       if (curva !== 'basis') flowchart.curve = curva;
       if (separacion !== '50') {
@@ -6644,23 +6648,9 @@ function avisoMedidas(texto) {
 // Escribe el diagrama en la caja de eXe con el mismo formato que su cuadro de
 // Mermaid, <pre class="mermaid">, para que eXe lo dibuje y lo exporte igual y
 // cualquiera de los dos pueda volver a abrirlo.
-// Escribe el motor en la cabecera si el diagrama lo admite y el código no lo
-// dice, como hace Sirena con los diagramas de flujo (ADR 12): así se sigue
-// viendo igual cuando eXe cambie de versión de Mermaid y, con ella, de motor
-// por defecto. Se escribe en cuanto el código entra en el editor (al abrir la
-// ventana o elegir un ejemplo), para que se vea antes de insertar; al insertar
-// solo queda por escribir en el código tecleado desde cero, porque mientras se
-// teclea movería el cursor.
-function fijarMotorExe() {
-  const codigo = el.editor.value;
-  if (!CON_MOTOR.includes(diagramKind())) return;
-  if (/"layout"\s*:|^\s*layout\s*:/m.test(codigo)) return;
-  el.engineSelect.value = motorExe();
-  writeAppearance();
-}
 
 function insertarEnExe() {
-  let codigo = el.editor.value.trim();
+  const codigo = el.editor.value.trim();
   if (!codigo) {
     toast(t('exeEmpty'));
     el.editor.focus();
@@ -6678,8 +6668,6 @@ function insertarEnExe() {
     return;
   }
   avisoMedidas('');
-  fijarMotorExe();
-  codigo = el.editor.value.trim();
   const editor = exe.tinymce.activeEditor;
   const html = codigo.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   editor.undoManager.transact(() => {
@@ -7012,7 +7000,6 @@ function setupToolbar() {
     el.editor.value = exampleCode(found);
     crearDoc(el.editor.value, found.label[lang] || found.label.es);
     readAppearance();
-    if (exe) fijarMotorExe();
     renderGutter();
     render();
   });
@@ -7288,7 +7275,6 @@ async function start() {
 
   renderGutter();
   readAppearance();
-  if (exe) fijarMotorExe();
   await render();
   if (exe) enfocarEnExe();
   // Al final, cuando ya se sabe si la página va en modo visor.
