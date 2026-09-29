@@ -1284,18 +1284,17 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
    archivos o copiar el dibujo como imagen (el diagrama vuelve al material con
    «Insertar»), la biblioteca del navegador, compartir por enlace, imprimir y el
    idioma, que es el de eXe. La marca ya la pone el título de la ventana de
-   eXe. */
+   eXe. Se oculta la caja entera de cada botón con menú, y la raya que quedaba
+   al principio, para que no dejen huecos en la barra. */
 body.exe #btn-new,
 body.exe #btn-open,
-body.exe #btn-download,
-body.exe #download-menu,
+body.exe .menu-wrap:has(> #btn-download),
+body.exe .menu-wrap:has(> #btn-share),
+body.exe .menu-wrap:has(> #btn-lang),
+body.exe .toolbar > .tb-sep,
 body.exe #btn-copy-image,
 body.exe #btn-library,
 body.exe #btn-print,
-body.exe #btn-share,
-body.exe #share-menu,
-body.exe #btn-lang,
-body.exe #lang-menu,
 body.exe #doc-name,
 body.exe .footer { display: none !important; }
 
