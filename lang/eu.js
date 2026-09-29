@@ -86,6 +86,8 @@ window.SIRENA_LANG.eu = {
   colorMenu: 'Elementuaren eta etiketen hondoaren koloreak',
   themeMenu: 'Gaia',
   themeMenuTip: 'Gaia: diagrama osoaren koloreak',
+  themeClearManual: 'Eskuz jarritako koloreak kendu',
+  themeClearManualHelp: 'Diagramak kutxei, geziei, etiketei edo sektoreei emandako koloreak ditu, eta gaiaren gainetik ikusten dira. Lauki hau markatzen bada, gai bat aukeratzean kentzen dira; bestela, mantendu egiten dira.',
   colorAll: 'Diagrama osoa',
   nodeColorAll: 'Kutxa osoa',
   nodeColorText: 'Testua bakarrik',

@@ -86,6 +86,8 @@ window.SIRENA_LANG.gl = {
   colorMenu: 'Cores do elemento e do fondo dos rótulos',
   themeMenu: 'Tema',
   themeMenuTip: 'Tema: as cores de todo o diagrama',
+  themeClearManual: 'Quitar as cores postas a man',
+  themeClearManualHelp: 'O diagrama ten cores dadas a caixas, frechas, rótulos ou sectores, que se ven por riba do tema. Se se marca esta caixa, quítanse ao escoller un tema; se non, consérvanse.',
   colorAll: 'Todo o diagrama',
   nodeColorAll: 'Toda a caixa',
   nodeColorText: 'Só o texto',

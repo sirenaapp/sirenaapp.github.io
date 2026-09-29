@@ -18,7 +18,8 @@ propia dirección.
   árbol entre ellos); un
   desplegable con las cuatro orientaciones, en los diagramas que la admiten;
   el tema, con los temas de Mermaid y los colores de Sirena dibujados en una
-  sola lista; el menú de colores, con el fondo de los rótulos de flecha y el color
+  sola lista y, si el diagrama tiene colores puestos a mano, una casilla para
+  quitarlos al elegir el tema; el menú de colores, con el fondo de los rótulos de flecha y el color
   del elemento donde está el cursor (o de los seleccionados), de toda la caja,
   solo del texto, solo del borde o de la flecha de esa línea, escrito en el
   código como línea `style`, clase `classDef` o `linkStyle`; el trazo, solo en los tipos donde cambia algo; la tipografía, con el tamaño

@@ -2630,12 +2630,16 @@ function readAppearance() {
     if (variables.primaryBorderColor) el.colorBorder.value = variables.primaryBorderColor;
     if (variables.lineColor) el.colorLine.value = variables.lineColor;
     if (variables.primaryTextColor) el.colorText.value = variables.primaryTextColor;
-    if (variables.edgeLabelBackground) {
-      el.colorLabelBg.value = variables.edgeLabelBackground;
-      coloresTocados.add('labelbg');
-    }
   } else {
     el.colorSelect.value = '';
+  }
+  // El fondo de los rótulos vale con cualquier tema: se sigue lo que diga el
+  // código, para no perderlo ni arrastrar el de otro diagrama.
+  if (variables.edgeLabelBackground) {
+    el.colorLabelBg.value = variables.edgeLabelBackground;
+    coloresTocados.add('labelbg');
+  } else {
+    coloresTocados.delete('labelbg');
   }
   updateColorInput();
 }
@@ -4070,6 +4074,8 @@ function dibujoDeTema([relleno, borde, linea]) {
 function buildThemeMenu() {
   const lista = $('lista-temas');
   lista.innerHTML = '';
+  $('quitar-colores').hidden = !hayColoresAMano();
+  $('quitar-colores-marca').checked = false;
   const color = el.colorSelect.value;
   const tema = el.themeSelect.value || 'default';
   const opcion = (dibujo, texto, actual, alElegir) => {
@@ -4099,6 +4105,24 @@ function buildThemeMenu() {
 }
 
 function elegirTema(tema, color) {
+  const quitar = !$('quitar-colores').hidden && $('quitar-colores-marca').checked;
+  // El fondo de los rótulos que se ve con «Color propio» es parte de esa
+  // paleta (está entre sus colores) y no pasa al tema siguiente.
+  if (el.colorSelect.value === 'custom' && color !== 'custom') coloresTocados.delete('labelbg');
+  if (quitar) {
+    quitarColoresAMano();
+    // «Color propio» parte de los colores que se ven en el dibujo: antes
+    // tiene que dibujarse sin los que se acaban de quitar.
+    if (color === 'custom') {
+      writeAppearance();
+      renderChain.then(() => elegirTemaSinPreguntar(tema, color));
+      return;
+    }
+  }
+  elegirTemaSinPreguntar(tema, color);
+}
+
+function elegirTemaSinPreguntar(tema, color) {
   el.themeSelect.value = tema;
   if (color) {
     el.colorSelect.value = color;
@@ -4195,6 +4219,60 @@ function limpiarFormato() {
   aplicarCodigo(codigoSinFormato(el.editor.value).replace(/\n$/, '').split('\n'));
   coloresTocados.clear();
   readAppearance();
+}
+
+/* --- Colores puestos a mano --- */
+
+// Los colores dados a una caja, una flecha, un bloque o una clase (líneas
+// style, classDef y linkStyle), el fondo de los rótulos y los de los sectores
+// se ven por encima del tema. Al elegir un tema se conservan, salvo que se
+// marque quitarlos en su menú. Solo se quitan las propiedades de color: el
+// grosor o el trazo de una línea se quedan.
+const PROPS_COLOR = new Set(['fill', 'stroke', 'color', 'background', 'background-color']);
+
+function codigoSinColores(codigo) {
+  const asigna = diagramKind() === 'class' ? 'cssClass' : 'class';
+  const ASIGNACION = new RegExp(`^\\s*${asigna}\\s+("?)[^"\\s]+\\1\\s+([\\w-]+)\\s*$`);
+  const vacias = new Set();
+  let lineas = codigo.split('\n').map((l) => {
+    const m = /^(\s*)((style|classDef|linkStyle)\s+(\S+))\s+(.*)$/.exec(l);
+    if (!m) return l;
+    // Las comas de rgb(…) no separan propiedades.
+    const props = m[5].split(/,(?![^(]*\))/);
+    const quedan = props.filter((x) => !PROPS_COLOR.has(x.split(':')[0].trim().toLowerCase()));
+    if (quedan.length === props.length) return l;
+    if (quedan.length) return `${m[1]}${m[2]} ${quedan.map((x) => x.trim()).join(',')}`;
+    if (m[3] === 'classDef') vacias.add(m[4]);
+    return null;
+  }).filter((l) => l !== null);
+  // Una clase que se queda sin nada tampoco se asigna.
+  if (vacias.size) {
+    lineas = lineas.filter((l) => {
+      const m = ASIGNACION.exec(l);
+      return !(m && vacias.has(m[2]));
+    }).map((l) => (/^\s*%%/.test(l) ? l : l.replace(/:::([\w-]+)/g, (x, nombre) => (vacias.has(nombre) ? '' : x))));
+  }
+  return lineas.join('\n');
+}
+
+function hayColoresAMano() {
+  return codigoSinColores(el.editor.value) !== el.editor.value
+    || (coloresTocados.has('labelbg') && el.colorSelect.value !== 'custom')
+    || Object.values(coloresSectores).some(Boolean);
+}
+
+// Deja el código sin esos colores; el tema que se elige a continuación
+// escribe la cabecera y dibuja el resultado.
+function quitarColoresAMano() {
+  const limpio = codigoSinColores(el.editor.value);
+  if (limpio !== el.editor.value) {
+    el.editor.value = limpio;
+    codigoPrevio = limpio;
+    updateStatus();
+    renderGutter();
+  }
+  coloresTocados.delete('labelbg');
+  Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
 }
 
 const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'themeMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
@@ -4540,6 +4618,7 @@ function setupEditorTools() {
   MENUS_EDITOR.forEach((clave) => {
     el[clave].addEventListener('click', (event) => event.stopPropagation());
   });
+  $('quitar-colores-ayuda').addEventListener('click', () => toast(t('themeClearManualHelp')));
 
   el.colorPartes.querySelectorAll('button').forEach((boton) => {
     boton.addEventListener('click', () => {

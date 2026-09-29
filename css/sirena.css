@@ -1234,6 +1234,12 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
 .menu .lista-temas button[aria-current="true"] { background: var(--accent-soft); }
 .muestra-tema { flex: none; width: 38px; height: 20px; }
 .menu-temas .colores-propios { margin-top: 8px; }
+/* Solo aparece si el diagrama tiene colores puestos a mano: se decide antes
+   de elegir el tema si se quitan o se conservan. */
+.quitar-colores { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; padding: 2px 8px 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.quitar-colores label { display: flex; flex: 1; align-items: center; gap: 8px; cursor: pointer; }
+.quitar-colores input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.menu .quitar-colores .ayuda-exe { flex: none; width: 22px; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-2); color: var(--text-soft); font: 600 12px/1 system-ui, sans-serif; text-align: center; cursor: help; }
 
 /* Menú de colores: el elemento del cursor y, debajo, el fondo de los rótulos.
    La raya solo separa los dos apartados cuando se ven los dos. */

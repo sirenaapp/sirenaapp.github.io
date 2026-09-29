@@ -86,6 +86,8 @@ window.SIRENA_LANG.ca = {
   colorMenu: "Colors de l'element i del fons dels rètols",
   themeMenu: 'Tema',
   themeMenuTip: 'Tema: els colors de tot el diagrama',
+  themeClearManual: 'Treure els colors posats a mà',
+  themeClearManualHelp: 'El diagrama té colors donats a caixes, fletxes, rètols o sectors, que es veuen per sobre del tema. Si es marca aquesta casella, es treuen en triar un tema; si no, es conserven.',
   colorAll: 'Tot el diagrama',
   nodeColorAll: 'Tota la caixa',
   nodeColorText: 'Només el text',

@@ -86,6 +86,8 @@ window.SIRENA_LANG.es = {
   colorMenu: 'Colores del elemento y del fondo de los rótulos',
   themeMenu: 'Tema',
   themeMenuTip: 'Tema: los colores de todo el diagrama',
+  themeClearManual: 'Quitar los colores puestos a mano',
+  themeClearManualHelp: 'El diagrama tiene colores dados a cajas, flechas, rótulos o sectores, que se ven por encima del tema. Si se marca esta casilla, se quitan al elegir un tema; si no, se conservan.',
   colorAll: 'Todo el diagrama',
   nodeColorAll: 'Toda la caja',
   nodeColorText: 'Solo el texto',

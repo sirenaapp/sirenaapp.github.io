@@ -88,6 +88,8 @@ window.SIRENA_LANG.en = (function (_) { return {
   colorMenu: _('Colours of the element and of the label background'),
   themeMenu: _('Theme'),
   themeMenuTip: _('Theme: the colours of the whole diagram'),
+  themeClearManual: _('Remove colours set by hand'),
+  themeClearManualHelp: _('The diagram has colours given to boxes, arrows, labels or slices, which show on top of the theme. If this box is ticked, they are removed when a theme is chosen; otherwise, they are kept.'),
   colorAll: _('Whole diagram'),
   nodeColorAll: _('Whole box'),
   nodeColorText: _('Text only'),
