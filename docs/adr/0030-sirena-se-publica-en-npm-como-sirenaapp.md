@@ -15,11 +15,18 @@ número de versión.
 Sirena se publica en npm con el nombre `sirenaapp`, el mismo de la organización
 de GitHub. El nombre `sirena` está ocupado por un paquete ajeno.
 
-- **Contenido.** El paquete es la web tal como se sirve, sin construir nada:
-  `index.html`, `favicon.svg`, `css`, `js`, `lang`, `vendor` (Mermaid y los
-  iconos), las dos licencias y el README. Quedan fuera `docs`, `scripts` y
-  `.github`, que solo sirven al repositorio. La lista está en `files` de
+- **Contenido.** El paquete es la web tal como se sirve, sin construir nada y
+  sin Mermaid: `index.html`, `favicon.svg`, `css`, `js`, `lang`,
+  `vendor/lucide` (los iconos), las dos licencias y el README. Quedan fuera
+  `vendor/mermaid`, `docs`, `scripts` y `.github`. La lista está en `files` de
   `package.json`.
+- **Sin Mermaid (desde la 2.0.0).** El paquete es para programas que ya tienen
+  su Mermaid, como eXe, que quiere una sola versión para editar, previsualizar y
+  exportar (revisión de Ernesto Serrano al PR #2482 de eXe, 29-09-2026). Sirena
+  carga su Mermaid solo si hace falta: en la web, siempre; dentro de eXe, solo
+  si no está el de eXe, y en el paquete no lo encuentra y avisa en el recuadro
+  de error. Hasta la 1.0.10 el paquete lo llevaba y `sirena.js` lo cargaba
+  siempre al empezar, también dentro de eXe, aunque dibujara con el de eXe.
 - **Licencia.** `AGPL-3.0-or-later`, como el resto de proyectos del autor. Cada
   archivo de código lo indica en su primera línea con
   `SPDX-License-Identifier`, y los contenidos (textos, ejemplos y
@@ -36,6 +43,8 @@ de GitHub. El nombre `sirena` está ocupado por un paquete ajeno.
 
 ## Alternativas descartadas
 
+- **Dos paquetes, con Mermaid y sin él.** Su único usuario es eXe, que no lo
+  necesita, y habría que publicar y mantener los dos a la vez.
 - **Nombres como `sirena-mermaid` o `@sirenaapp/sirena`.** `sirenaapp` coincide
   con la organización y con la web, y no obliga a crear un ámbito en npm.
 - **Que eXe copie Sirena desde GitHub.** eXe ya resuelve sus dependencias con
@@ -47,9 +56,10 @@ de GitHub. El nombre `sirena` está ocupado por un paquete ajeno.
 
 - Una versión publicada en npm no se puede sustituir: cada cambio que tenga que
   llegar a eXe necesita una versión nueva y su etiqueta.
-- El paquete pesa 1,8 MB comprimido y 6,1 MB descomprimido, casi todo Mermaid.
-  Si eXe usa su propio Mermaid, su script puede dejar fuera `vendor/mermaid`.
-- La web no cambia: `package.json`, el flujo y la segunda licencia no afectan a
+- El paquete pesa 687 KB descomprimido (19 archivos); con Mermaid eran 6,1 MB
+  (127 archivos). Solo, sin un Mermaid del programa que lo lleva, no dibuja.
+- La web no cambia: se sirve desde el repositorio, que sí lleva
+  `vendor/mermaid`; `package.json`, el flujo y la segunda licencia no afectan a
   lo que se sirve.
 
 ## Evidencia

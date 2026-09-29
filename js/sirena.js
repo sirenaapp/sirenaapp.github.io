@@ -2,7 +2,18 @@
 // Sirena — editor de diagramas Mermaid.
 // Todo el trabajo se hace en el navegador: no hay servidor ni envío de datos.
 
-import mermaid from '../vendor/mermaid/mermaid.esm.min.mjs';
+// El Mermaid propio se carga solo si hace falta: en la web, siempre; dentro de
+// eXe, solo si no está el de eXe. El paquete de npm no lo lleva, porque lo usa
+// eXe, que dibuja con el suyo (ADR 30).
+let mermaid = null;
+
+async function cargarMermaidPropio() {
+  try {
+    mermaid = (await import('../vendor/mermaid/mermaid.esm.min.mjs')).default;
+  } catch (_) {
+    mermaid = null;
+  }
+}
 
 const STORE = {
   code: 'sirena.code',
@@ -316,7 +327,8 @@ const exe = anfitrionExe();
 // Dentro de eXe, Sirena dibuja con el Mermaid de eXe, el mismo que dibujará
 // el diagrama en el material: así lo que se ve al editar es lo que sale, sea
 // cual sea la versión de Mermaid que lleve eXe. Si no llegara a cargarse, se
-// usa el de Sirena configurado como el de eXe.
+// usa el de Sirena configurado como el de eXe, si lo hay (el paquete de npm no
+// lo lleva).
 let mermaidExe = null;
 
 async function cargarMermaidExe() {
@@ -1227,6 +1239,7 @@ let mermaidOscuroPropio = false;
 function initMermaidComoExe() {
   mermaidConFormulas = hayFormulas();
   mermaidOscuroPropio = false;
+  if (!mermaid) return;
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
@@ -1254,6 +1267,7 @@ function initMermaid() {
   const conFormulas = hayFormulas();
   mermaidConFormulas = conFormulas;
   mermaidOscuroPropio = sigueAlModo() && isDark();
+  if (!mermaid) return;
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
@@ -1572,6 +1586,7 @@ async function renderOnce() {
     // Dentro de eXe el dibujo queda tal como lo hace Mermaid, sin los retoques
     // de Sirena: eXe no los hace, y el diagrama se tiene que ver igual allí.
     const retocar = !exe;
+    if (!mermaidDeDibujo()) throw new Error('Mermaid could not be loaded');
     const { svg } = await mermaidDeDibujo().render(id, retocar && mermaidConFormulas ? marcarSaltos(code) : code);
     if (token !== renderToken) return;
     currentSvg = retocar ? opaqueEdgeLabels(svg, id) : svg;
@@ -7191,6 +7206,7 @@ async function start() {
   }
   updateDocName();
 
+  if (!mermaidExe) await cargarMermaidPropio();
   initMermaid();
   el.editor.addEventListener('input', () => {
     historial.pendiente = 'tecleo';

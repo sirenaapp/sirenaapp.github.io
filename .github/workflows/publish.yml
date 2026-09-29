@@ -37,9 +37,10 @@ jobs:
         if: github.event_name == 'push'
         run: test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
 
-      # Nothing is built: the package is the site as it is served. What has to
-      # be checked is that the page, its code and Mermaid are inside, and that
-      # the repository-only folders (docs, scripts, workflows) are not.
+      # Nothing is built: the package is the site as it is served, without
+      # Mermaid. What has to be checked is that the page and its code are
+      # inside, and that Mermaid and the repository-only folders (docs,
+      # scripts, workflows) are not.
       - name: Check the tarball
         run: |
           npm pack --pack-destination .
@@ -47,7 +48,10 @@ jobs:
           tar -tzf sirenaapp-*.tgz | grep -q "^package/index.html$"
           tar -tzf sirenaapp-*.tgz | grep -q "^package/js/sirena.js$"
           tar -tzf sirenaapp-*.tgz | grep -q "^package/lang/en.js$"
-          tar -tzf sirenaapp-*.tgz | grep -q "^package/vendor/mermaid/mermaid.esm.min.mjs$"
+          # Mermaid stays out: the package is for hosts that bring their own
+          # (eXeLearning); the website serves it from the repository.
+          ! tar -tzf sirenaapp-*.tgz | grep -q "^package/vendor/mermaid/"
+          tar -tzf sirenaapp-*.tgz | grep -q "^package/vendor/lucide/"
           tar -tzf sirenaapp-*.tgz | grep -q "^package/LICENSE-CONTENIDOS$"
           ! tar -tzf sirenaapp-*.tgz | grep -qE "^package/(docs|scripts|\.github)/"
 

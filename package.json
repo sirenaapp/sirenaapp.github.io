@@ -1,6 +1,6 @@
 {
   "name": "sirenaapp",
-  "version": "1.0.10",
+  "version": "2.0.0",
   "description": "Free Mermaid diagram editor that runs entirely in the browser, for eXeLearning and any web page",
   "keywords": [
     "mermaid",
@@ -28,6 +28,6 @@
     "css",
     "js",
     "lang",
-    "vendor"
+    "vendor/lucide"
   ]
 }
