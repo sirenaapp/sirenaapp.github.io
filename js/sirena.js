@@ -1552,7 +1552,7 @@ function ajustarRotulosHtml() {
 // redondeada y hexágono). En los diagramas de flujo no pasa porque su hoja de
 // estilo sí lo centra. Se centra aquí el texto de esos rótulos, en el propio
 // dibujo, para que llegue también a las descargas. Ver ADR 35.
-// Parche a un fallo de Mermaid: ver docs/parches-mermaid.md.
+// Parche a un fallo de Mermaid (#8387): ver docs/parches-mermaid.md.
 function centrarTextoMapaMental() {
   const svg = el.canvas.querySelector('svg');
   if (!svg) return;

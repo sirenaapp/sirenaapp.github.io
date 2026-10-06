@@ -68,7 +68,9 @@
     {
       "clave": "texto-mapa-mental",
       "fallo": "En un mapa mental con los rótulos como texto SVG, el texto de las cajas (círculo, cuadrado, caja redondeada, hexágono) empieza en el centro de la forma y se sale por la derecha",
-      "incidencias": [],
+      "incidencias": [
+        8387
+      ],
       "funciones": [
         "centrarTextoMapaMental"
       ],

@@ -31,7 +31,8 @@ de otra forma, no se tocan. Como la corrección queda en el dibujo, llega tambi�
 a las descargas. Dentro de eXeLearning no se aplica, como los demás parches
 ([ADR 29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md)).
 
-El fallo se comunica a Mermaid. Cuando lo corrija, la función se quita: lo dice
+El fallo se ha comunicado a Mermaid en la incidencia
+[#8387](https://github.com/mermaid-js/mermaid/issues/8387). Cuando lo corrija, la función se quita: lo dice
 la comprobación del aviso de versión nueva
 ([ADR 31](0031-los-parches-a-mermaid-se-comprueban-con-cada-version-nueva.md)),
 que lleva su ejemplo y su control en `scripts/parches-mermaid.json`.
