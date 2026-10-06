@@ -412,6 +412,26 @@ async function comprobarEjemplosExe() {
   buildTypeMenu();
 }
 
+// Las formas de caja del diagrama de flujo que el Mermaid de eXe no conoce
+// (las de navegador, consola, carpeta, cubo y persona no existen en la 11.12):
+// elegirlas rompería el diagrama, así que dentro de eXe no se ofrecen. Se
+// pregunta al propio Mermaid de eXe, y al actualizarlo vuelven solas. Ver ADR 29.
+const formasNoExe = new Set();
+
+async function comprobarFormasExe() {
+  if (!mermaidExe || typeof mermaidExe.parse !== 'function') return;
+  formasNoExe.clear();
+  for (const item of (window.SIRENA_SHAPES || []).flatMap((grupo) => grupo.items)) {
+    let entiende;
+    try {
+      entiende = (await mermaidExe.parse('flowchart LR\n  A@{ shape: ' + item.id + ' }', { suppressErrors: true })) !== false;
+    } catch (_) {
+      entiende = false;
+    }
+    if (!entiende) formasNoExe.add(item.id);
+  }
+}
+
 function accComoComentario(codigo) {
   return codigo.replace(/^([ \t]*)(acc(Title|Descr)[ \t]*:)/gm, '$1%% $2');
 }
@@ -3658,6 +3678,8 @@ function buildShapeMenu(destino) {
   caja.appendChild(titulo);
   const actual = formaAlcance === 'todas' ? formaGeneral() : currentShape(ids[0]);
   (window.SIRENA_SHAPES || []).forEach((grupo) => {
+    const items = grupo.items.filter((item) => !formasNoExe.has(item.id));
+    if (!items.length) return;
     const cabecera = document.createElement('p');
     cabecera.className = 'menu-grupo';
     cabecera.textContent = grupo.group[lang] || grupo.group.es;
@@ -3665,7 +3687,7 @@ function buildShapeMenu(destino) {
     const rejilla = document.createElement('div');
     rejilla.className = 'formas-rejilla';
     caja.appendChild(rejilla);
-    grupo.items.forEach((item) => {
+    items.forEach((item) => {
       const boton = document.createElement('button');
       boton.type = 'button';
       boton.setAttribute('aria-current', item.id === actual ? 'true' : 'false');
@@ -7756,6 +7778,7 @@ async function start() {
     prepararExe();
     await cargarMermaidExe();
     await comprobarEjemplosExe();
+    await comprobarFormasExe();
   } else if (fromLink) {
     // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
     // toca: así abrirlo no ensucia lo que la persona tenga guardado.

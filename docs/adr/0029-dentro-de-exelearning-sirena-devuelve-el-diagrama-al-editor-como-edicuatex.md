@@ -115,6 +115,12 @@ lo que sale en el material:
   carriles, Ishikawa, árbol y Venn, que no existen en esa versión, y el mapa
   de árbol lleva las líneas de accesibilidad como comentario. Como se pregunta al propio Mermaid
   de eXe, al actualizarlo los ejemplos vuelven solos.
+  Lo mismo con las formas de caja del diagrama de flujo (versión 2.4.1,
+  06-10-2026): se pregunta por cada una (`A@{ shape: … }`) y las que no entiende
+  no aparecen en el selector de formas. Con Mermaid 11.12.0 son cinco de 52
+  (navegador, consola, carpeta, cubo y persona), que llegaron después; antes
+  se ofrecían y, al elegirlas, el diagrama daba error. Las siete formas del
+  mapa mental existen en las dos versiones (ADR 37).
 
 **Idiomas.** Se sigue el modelo de Edicuatex. Cada texto de `lang/en.js` va
 dentro de `_('…')`; en ese archivo `_` es una función que devuelve el texto tal
