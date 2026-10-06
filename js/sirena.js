@@ -5372,7 +5372,12 @@ function objetoDelDiagrama(event) {
     if (id && (allNodes().includes(id) || escrito)) return { tipo: 'nodo', id };
   }
 
-  const flecha = objetivo.closest && objetivo.closest('.edgePaths path, path.flowchart-link');
+  // Una flecha solo se reconoce en los diagramas de flujo: lo que ofrece su
+  // menú se escribe con linkStyle, que los demás tipos no atienden (en el de
+  // estados se ignora) o no admiten y dejan de dibujarse (mapa mental, clases,
+  // entidad-relación, bloques). Ahí la línea abre el menú de todo el diagrama.
+  const conFlechas = diagramKind() === 'flowchart';
+  const flecha = conFlechas && objetivo.closest && objetivo.closest('.edgePaths path, path.flowchart-link');
   if (flecha) {
     const indice = flechasSvg.indexOf(flecha);
     if (indice >= 0) return { tipo: 'flecha', indice };
@@ -5406,7 +5411,7 @@ function objetoDelDiagrama(event) {
   const caja = rotulo && rotulo.getBoundingClientRect();
   const x = caja ? caja.left + caja.width / 2 : event.clientX;
   const y = caja ? caja.top + caja.height / 2 : event.clientY;
-  const indice = flechaCercana(flechasSvg, x, y, caja ? Infinity : 12);
+  const indice = conFlechas ? flechaCercana(flechasSvg, x, y, caja ? Infinity : 12) : -1;
   if (indice >= 0) return { tipo: rotulo ? 'rotulo' : 'flecha', indice };
   return { tipo: 'fondo' };
 }

@@ -87,6 +87,16 @@ una flecha no dice a cuál pertenece, y acertar un trazo de dos píxeles con el
 ratón es difícil, así que en ambos casos se toma la flecha que pase más cerca
 (hasta doce píxeles del puntero).
 
+Las flechas solo se reconocen en los diagramas de flujo, porque todo lo que
+ofrece su menú se escribe con `linkStyle`, y Mermaid solo atiende esa
+instrucción ahí: en el de estados la acepta sin aplicarla, y en el mapa mental,
+el de clases, el entidad-relación y el de bloques el diagrama deja de dibujarse
+(comprobado con Mermaid 12.1.0 el 06-10-2026). En esos tipos, el botón derecho
+sobre una línea abre el menú de todo el diagrama; en el mapa mental, ahí está el
+grosor de las ramas ([ADR 36](0036-el-grosor-de-las-ramas-del-mapa-mental-se-escribe-en-la-cabecera.md)).
+Hasta ese día se ofrecía en cualquiera, y en un mapa mental escribía
+`linkStyle` y lo rompía.
+
 Con Mayús pulsada no se intercepta, de modo que sigue disponible el menú del
 navegador para guardar o copiar la imagen. En pantalla táctil lo abre la
 pulsación larga. En el modo visor ([ADR 5](0005-modo-visor-para-incrustar.md))
