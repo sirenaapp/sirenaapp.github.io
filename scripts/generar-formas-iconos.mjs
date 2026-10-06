@@ -83,12 +83,8 @@ const iconos = await pagina.evaluate(async () => {
   };
   const salida = {};
   let n = 0;
-  for (const forma of formas) {
-    const { svg } = await m.render('icono' + (n++), `flowchart LR\n    A@{ shape: ${forma}, label: "ab" }`);
-    const caja = document.createElement('div');
-    caja.innerHTML = svg;
-    document.body.appendChild(caja);
-    const nodo = caja.querySelector('g.node');
+  // Miniatura de la caja «nodo» del dibujo que hay en «caja», guardada como «clave».
+  const miniatura = (caja, nodo, forma, clave) => {
     // Se quitan los rótulos y se copian solo las figuras, sin colores.
     nodo.querySelectorAll('.label, foreignObject, text').forEach((e) => e.remove());
     const figuras = [...nodo.querySelectorAll('rect, path, polygon, circle, ellipse, line, polyline')];
@@ -107,7 +103,25 @@ const iconos = await pagina.evaluate(async () => {
     // El nodo puede llevar las figuras dentro de un subgrupo con su propio transform.
     const subgrupo = interior.find((c) => c.tagName === 'g' && c.getAttribute('transform'));
     const t2 = subgrupo ? subgrupo.getAttribute('transform') : '';
-    salida[forma] = `<svg viewBox="${(bbox.x - margen).toFixed(1)} ${(bbox.y - margen).toFixed(1)} ${(bbox.width + 2 * margen).toFixed(1)} ${(bbox.height + 2 * margen).toFixed(1)}" aria-hidden="true"><g transform="${t2}">${partes.join('')}</g></svg>`;
+    salida[clave] = `<svg viewBox="${(bbox.x - margen).toFixed(1)} ${(bbox.y - margen).toFixed(1)} ${(bbox.width + 2 * margen).toFixed(1)} ${(bbox.height + 2 * margen).toFixed(1)}" aria-hidden="true"><g transform="${t2}">${partes.join('')}</g></svg>`;
+  };
+  for (const forma of formas) {
+    const { svg } = await m.render('icono' + (n++), `flowchart LR\n    A@{ shape: ${forma}, label: "ab" }`);
+    const caja = document.createElement('div');
+    caja.innerHTML = svg;
+    document.body.appendChild(caja);
+    miniatura(caja, caja.querySelector('g.node'), forma, forma);
+    caja.remove();
+  }
+  // Las formas del mapa mental, dibujadas en un mapa mental: su nube y su
+  // explosión no son las del diagrama de flujo. Se guardan como «mapa-…».
+  for (const item of window.SIRENA_MINDMAP_SHAPES) {
+    const caja2 = item.open ? `a${item.open}ab${item.close}` : 'ab';
+    const { svg } = await m.render('icono' + (n++), `mindmap\n  root((R))\n    ${caja2}`);
+    const caja = document.createElement('div');
+    caja.innerHTML = svg;
+    document.body.appendChild(caja);
+    miniatura(caja, caja.querySelector('g.mindmap-node[id$="node_1"]'), item.id, 'mapa-' + item.id);
     caja.remove();
   }
   return salida;

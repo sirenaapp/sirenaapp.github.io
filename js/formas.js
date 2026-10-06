@@ -77,3 +77,16 @@ window.SIRENA_SHAPES = [
     ]
   }
 ];
+
+// Formas de las cajas de un mapa mental: las siete que admite su sintaxis en
+// Mermaid 12 (no tiene la forma nueva @{ shape: … }). «open» y «close» rodean el
+// texto; la forma por defecto no lleva marcas. Ver ADR 37.
+window.SIRENA_MINDMAP_SHAPES = [
+  { id: 'default', open: '', close: '', label: { es: 'Por defecto', ca: 'Per defecte', gl: 'Predeterminada', eu: 'Lehenetsia', en: 'Default' } },
+  { id: 'rect', open: '[', close: ']', label: { es: 'Cuadrado', ca: 'Quadrat', gl: 'Cadrado', eu: 'Karratua', en: 'Square' } },
+  { id: 'rounded', open: '(', close: ')', label: { es: 'Redondeado', ca: 'Arrodonit', gl: 'Redondeado', eu: 'Biribildua', en: 'Rounded' } },
+  { id: 'circle', open: '((', close: '))', label: { es: 'Círculo', ca: 'Cercle', gl: 'Círculo', eu: 'Zirkulua', en: 'Circle' } },
+  { id: 'hex', open: '{{', close: '}}', label: { es: 'Hexágono', ca: 'Hexàgon', gl: 'Hexágono', eu: 'Hexagonoa', en: 'Hexagon' } },
+  { id: 'cloud', open: ')', close: '(', label: { es: 'Nube', ca: 'Núvol', gl: 'Nube', eu: 'Hodeia', en: 'Cloud' } },
+  { id: 'bang', open: '))', close: '((', label: { es: 'Explosión', ca: 'Explosió', gl: 'Explosión', eu: 'Leherketa', en: 'Bang' } }
+];

@@ -425,6 +425,8 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 /* Las formas van en rejilla: icono encima del nombre, cuatro por fila. */
 .formas-rejilla button:hover { background: var(--accent-soft); }
 .formas-rejilla button[aria-current="true"] { color: var(--accent); font-weight: 600; }
+/* Las siete formas del mapa mental, en el desplegable del botón de forma. */
+.menu-formas-mapa { width: 370px; max-width: calc(100vw - 32px); }
 .formas-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 4px 4px; }
 .formas-rejilla button {
   border: 0;

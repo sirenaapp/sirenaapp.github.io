@@ -203,6 +203,15 @@ suyos. Lo elegido sigue elegido, para poder volver a pulsar. «Limpiar
 formato» no los quita (ADR 27): son énfasis del texto, no aspecto del
 diagrama, y su rótulo emergente lo dice.
 
+Desde el 06-10-2026, para saber dónde empieza y acaba el texto de una caja,
+Sirena reconoce todas las marcas de forma, también las dobles (`((…))`,
+`([…])`, `[[…]]`, `[(…)]`, `{{…}}`, `(((…)))`) y las del mapa mental (`))…((`
+la explosión, `)…(` la nube). Antes tomaba el primer paréntesis o corchete: en
+`root((Célula))` envolvía `(Célula` y la caja cambiaba de forma. En la forma
+por defecto del mapa mental, que no tiene marcas, los asteriscos van tal cual
+(`**Membrana**`), porque Mermaid ya los lee ahí y entre comillas no la admite.
+Comprobado con todas las formas de los dos tipos, en Chromium y Firefox.
+
 ## Consecuencias
 
 Empezar un diagrama, orientarlo y colorearlo se hace sin conocer la sintaxis,

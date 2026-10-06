@@ -138,6 +138,8 @@ const WEEKDAYS = [['sunday', 'weekSunday'], ['monday', 'weekMonday']];
 const DONUTS = [['0', 'donutNone'], ['0.3', 'donutThin'], ['0.5', 'donutMedium'], ['0.7', 'donutThick']];
 const LEGENDS = [['right', 'legendRight'], ['left', 'legendLeft'], ['top', 'legendTop'], ['bottom', 'legendBottom']];
 const coloresSectores = {};
+// Color de cada rama de un mapa mental, por su sección (-1 es el centro). Ver ADR 37.
+const coloresRamas = {};
 // Gráfica XY: la orientación va en el cuerpo (xychart-beta horizontal).
 const ORIENTATIONS = [['vertical', 'chartVertical'], ['horizontal', 'chartHorizontal']];
 // Máximo de diagramas en la biblioteca. Al llegar se borran los más antiguos.
@@ -237,6 +239,7 @@ const el = {
   arrowWidthCustom: $('arrow-width-custom'),
   borderWidthCustom: $('border-width-custom'),
   linesMenu: $('lines-menu'),
+  formaMapaMenu: $('forma-mapa-menu'),
   sizeMenu: $('size-menu'),
   shapeMenu: $('shape-menu'),
   widthMenu: $('width-menu'),
@@ -1060,7 +1063,7 @@ function updateAppearanceVisibility() {
     // En los mapas mentales, solo el grosor de las ramas (ADR 36).
     lines: esFlujo || tipo === 'mindmap',
     // En estados no hay formas que elegir, pero sí el ancho de las cajas.
-    shape: esFlujo || tipo === 'state',
+    shape: esFlujo || tipo === 'state' || tipo === 'mindmap',
     spacing: esFlujo && motor === 'dagre',
     padding: esFlujo,
     merge: conMotor && motor === 'elk',
@@ -1076,7 +1079,7 @@ function updateAppearanceVisibility() {
   // (comprobado con Mermaid 12.0.0): el botón sobra.
   $('wrap-stroke').hidden = SIN_TRAZO.includes(editorType());
   const btnShape = $('btn-shape');
-  btnShape.title = t(esFlujo ? 'shapeBtn' : 'boxWidth');
+  btnShape.title = t(esFlujo || tipo === 'mindmap' ? 'shapeBtn' : 'boxWidth');
   btnShape.setAttribute('aria-label', btnShape.title);
   updateMergeButton();
   $('ajuste-curve').hidden = motor !== 'dagre';
@@ -1945,6 +1948,20 @@ function appearanceConfig() {
     if (el.legendSelect.value && el.legendSelect.value !== 'right') pie.legendPosition = el.legendSelect.value;
     if (Object.keys(pie).length) config.pie = pie;
   }
+  // Cada rama coloreada lleva también el color de su texto, negro o blanco,
+  // porque Mermaid no lo ajusta solo (ADR 37).
+  if (diagramKind() === 'mindmap') {
+    Object.entries(coloresRamas).forEach(([seccion, color]) => {
+      if (!color) return;
+      if (Number(seccion) === -1) {
+        variables.git0 = color;
+        variables.gitBranchLabel0 = textoSobre(color);
+      } else {
+        variables['cScale' + (Number(seccion) + 1)] = color;
+        variables['cScaleLabel' + (Number(seccion) + 1)] = textoSobre(color);
+      }
+    });
+  }
   if (Object.keys(variables).length) config.themeVariables = variables;
   const flowchart = {};
   const curva = el.curveSelect.value;
@@ -2675,6 +2692,13 @@ function readAppearance() {
     .every((clave) => vars[clave] === variables[clave]));
   // Los sectores que trae el propio tema no cuentan como colores elegidos a mano.
   Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
+  // Colores de rama del mapa mental: cScale1 es la primera rama (sección 0) y
+  // git0 el centro (sección -1).
+  Object.keys(coloresRamas).forEach((i) => { delete coloresRamas[i]; });
+  if (variables.git0) coloresRamas[-1] = variables.git0;
+  for (let i = 1; i <= 11; i += 1) {
+    if (variables['cScale' + i]) coloresRamas[i - 1] = variables['cScale' + i];
+  }
   for (let i = 1; i <= 12; i += 1) {
     const valor = variables['pie' + i];
     if (valor && !(conocido && conocido[2]['pie' + i] === valor)) coloresSectores[i] = valor;
@@ -2964,8 +2988,10 @@ function updateEditorTools() {
   const conDireccion = CON_MOTOR.includes(kind) && !ENGINES_SIN_DIRECCION.includes(el.engineSelect.value);
   el.dirGroup.hidden = !conDireccion;
   if (conDireccion) readDirection();
-  el.nodeColorBox.hidden = !COLORABLE.includes(kind);
-  $('wrap-color').hidden = !CON_ROTULOS.includes(kind);
+  el.nodeColorBox.hidden = !COLORABLE.includes(kind) && kind !== 'mindmap';
+  $('wrap-color').hidden = !CON_ROTULOS.includes(kind) && kind !== 'mindmap';
+  // El mapa mental no tiene rótulos de flecha.
+  $('fondo-rotulos-box').hidden = kind === 'mindmap';
   $('btn-salto').hidden = !CON_SALTO.includes(tipo);
   $('btn-formula').hidden = !CON_FORMULA.includes(tipo);
   const conFormato = CON_SALTO.includes(tipo);
@@ -3577,6 +3603,11 @@ function cerrarFormas() {
 
 function buildShapeMenu(destino) {
   const caja = destino || el.shapeGrid;
+  if (diagramKind() === 'mindmap') {
+    caja.innerHTML = '';
+    construirFormasMapa(caja);
+    return;
+  }
   const enCursor = targetNodes();
   const ids = formaAlcance === 'todas' ? nodosConFormaGeneral() : enCursor;
   caja.innerHTML = '';
@@ -3640,6 +3671,217 @@ function buildShapeMenu(destino) {
       rejilla.appendChild(boton);
     });
   });
+}
+
+/* --- Mapa mental: forma de las cajas y color de las ramas (ADR 37) --- */
+
+// Partes de una caja de mapa mental escrita en una línea: identificador,
+// forma, texto (lo que va entre las marcas, con sus comillas si las lleva) y
+// lo que siga a la forma.
+function formaDeCajaMapa(contenido) {
+  for (let i = 1; i < contenido.length; i += 1) {
+    const apertura = APERTURAS_MAPA.find(([a]) => contenido.startsWith(a, i));
+    if (!apertura) continue;
+    const [abre, [[cierre, forma]]] = apertura;
+    const resto = contenido.slice(i + abre.length);
+    let fin = -1;
+    if (resto.startsWith('"')) {
+      const comilla = resto.indexOf('"', 1);
+      if (comilla !== -1) fin = resto.indexOf(cierre, comilla + 1);
+    } else {
+      fin = resto.indexOf(cierre);
+    }
+    if (fin === -1) break;
+    return { id: contenido.slice(0, i), forma, texto: resto.slice(0, fin), cola: resto.slice(fin + cierre.length) };
+  }
+  return { id: '', forma: 'default', texto: contenido, cola: '' };
+}
+
+// Las cajas del mapa mental en el orden del código, que es el que sigue
+// Mermaid al numerarlas (node_0 es el centro). La cabecera, los comentarios,
+// los iconos (::icon) y las clases (:::) no son cajas.
+function nodosDelMapa() {
+  const nodos = [];
+  let dentro = false;
+  el.editor.value.split('\n').forEach((linea, i) => {
+    if (!dentro) { dentro = /^\s*mindmap\b/.test(linea); return; }
+    const m = /^(\s*)(\S.*?)\s*$/.exec(linea);
+    if (!m || /^(%%|::)/.test(m[2])) return;
+    nodos.push({ linea: i, sangria: m[1], ...formaDeCajaMapa(m[2]) });
+  });
+  return nodos;
+}
+
+function nodoMapaEnCursor() {
+  const fila = el.editor.value.slice(0, el.editor.selectionStart).split('\n').length - 1;
+  return nodosDelMapa().findIndex((n) => n.linea === fila);
+}
+
+// El texto de la caja sin comillas ni acentos graves, tal como se lee.
+function textoPlanoMapa(nodo) {
+  let texto = nodo.texto;
+  if (/^".*"$/.test(texto)) texto = texto.slice(1, -1);
+  if (/^`[\s\S]*`$/.test(texto)) texto = texto.slice(1, -1);
+  return texto;
+}
+
+// La forma por defecto no tiene marcas que encierren el texto: Mermaid tomaría
+// un paréntesis, un corchete o una llave por el principio de otra forma, y con
+// los rótulos como texto SVG no traduce sus códigos (#40;).
+function admiteFormaDefecto(nodo) {
+  const texto = textoPlanoMapa(nodo);
+  return Boolean(texto.trim()) && !/[()[\]{}]/.test(texto);
+}
+
+// El texto, escrito como lo pide la forma de destino: sin marcas, la caja por
+// defecto lleva el Markdown tal cual (**negrita**); con ellas, entre comillas
+// y acentos graves ("`**negrita**`"), y entre comillas si lleva paréntesis.
+function textoParaFormaMapa(nodo, forma) {
+  if (forma === 'default') return textoPlanoMapa(nodo);
+  if (/^".*"$/.test(nodo.texto) || nodo.forma !== 'default') return nodo.texto;
+  if (/\*/.test(nodo.texto)) return '"`' + nodo.texto + '`"';
+  if (/[()[\]{}]/.test(nodo.texto)) return '"' + nodo.texto + '"';
+  return nodo.texto;
+}
+
+function aplicarFormaMapa(indices, forma) {
+  const datos = (window.SIRENA_MINDMAP_SHAPES || []).find((f) => f.id === forma);
+  if (!datos) return;
+  const lineas = el.editor.value.replace(/\s+$/, '').split('\n');
+  const nodos = nodosDelMapa();
+  const usados = new Set(nodos.map((n) => n.id).filter(Boolean));
+  indices.forEach((k) => {
+    const nodo = nodos[k];
+    if (!nodo || nodo.forma === forma) return;
+    if (forma === 'default' && !admiteFormaDefecto(nodo)) return;
+    const texto = textoParaFormaMapa(nodo, forma);
+    // Una forma con marcas pide un identificador delante: si la caja no lo
+    // tenía, se le da uno libre (n1, n2…).
+    let id = nodo.id;
+    if (forma !== 'default' && !id) {
+      let j = 1;
+      while (usados.has('n' + j)) j += 1;
+      id = 'n' + j;
+      usados.add(id);
+    }
+    lineas[nodo.linea] = nodo.sangria + (forma === 'default' ? texto : id + datos.open + texto + datos.close) + nodo.cola;
+  });
+  aplicarCodigo(lineas);
+}
+
+function construirFormasMapa(caja) {
+  const nodos = nodosDelMapa();
+  const enCursor = nodoMapaEnCursor();
+  const indices = formaAlcance === 'todas' ? nodos.map((n, k) => k) : (enCursor >= 0 ? [enCursor] : []);
+  if (!formaAlcanceFijado) {
+    const alcance = document.createElement('div');
+    alcance.className = 'segmentos segmentos-menu';
+    [['esta', 'shapeThis'], ['todas', 'shapeAll']].forEach(([valor, clave]) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.textContent = t(clave);
+      boton.setAttribute('aria-current', valor === formaAlcance ? 'true' : 'false');
+      boton.addEventListener('click', () => { formaAlcance = valor; buildShapeMenu(caja); });
+      alcance.appendChild(boton);
+    });
+    caja.appendChild(alcance);
+  }
+  const titulo = document.createElement('p');
+  titulo.className = 'menu-titulo';
+  caja.appendChild(titulo);
+  if (!indices.length) {
+    titulo.textContent = t(formaAlcance === 'todas' ? 'shapeNoneAll' : 'shapeNone');
+    return;
+  }
+  if (formaAlcance === 'todas') {
+    titulo.textContent = t('shapeTargetAll').replace('{n}', indices.length).replace('{m}', nodos.length);
+  } else {
+    titulo.textContent = t('shapeTarget') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = textoPlanoMapa(nodos[indices[0]]);
+    titulo.appendChild(codigo);
+  }
+  const formas = new Set(indices.map((k) => nodos[k].forma));
+  const actual = formas.size === 1 ? [...formas][0] : null;
+  const sinDefecto = indices.some((k) => !admiteFormaDefecto(nodos[k]));
+  const rejilla = document.createElement('div');
+  rejilla.className = 'formas-rejilla';
+  caja.appendChild(rejilla);
+  (window.SIRENA_MINDMAP_SHAPES || []).forEach((item) => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.setAttribute('aria-current', item.id === actual ? 'true' : 'false');
+    // La miniatura es la forma tal como la dibuja Mermaid en un mapa mental.
+    const icono = document.createElement('span');
+    icono.className = 'forma-icono';
+    icono.innerHTML = (window.SIRENA_SHAPE_ICONS || {})['mapa-' + item.id] || '';
+    const nombre = document.createElement('span');
+    nombre.className = 'forma-nombre';
+    nombre.textContent = item.label[lang] || item.label.es;
+    boton.title = (item.label[lang] || item.label.es) + ' · ' + (item.open ? 'id' + item.open + 'Texto' + item.close : 'Texto');
+    if (item.id === 'default' && sinDefecto) {
+      // Toda la caja hay que tenerla en la misma forma: si una no admite la
+      // forma por defecto, la opción no se ofrece y se dice por qué.
+      boton.disabled = true;
+      boton.title = t('shapeDefaultNo');
+    }
+    boton.append(icono, nombre);
+    boton.addEventListener('click', () => {
+      cerrarFormas();
+      cerrarMenusEditor();
+      cerrarContextual();
+      aplicarFormaMapa(indices, item.id);
+    });
+    rejilla.appendChild(boton);
+  });
+}
+
+// Sección de una caja del mapa mental, tal como la ha dibujado Mermaid: el
+// centro es la -1 y cada rama que sale de él, con todo lo que cuelga, una
+// sección. Mermaid tiene once colores de rama: la duodécima repite la primera.
+function seccionDeCajaMapa(k) {
+  const svg = el.canvas.querySelector('svg');
+  const nodo = svg && svg.querySelector('g.mindmap-node[id$="-node_' + k + '"]');
+  const m = nodo && /section-(-?\d+)/.exec(nodo.getAttribute('class') || '');
+  return m ? Number(m[1]) : null;
+}
+
+// Color del texto que se lee mejor sobre un fondo: negro o blanco.
+function textoSobre(fondo) {
+  const hex = hexDeCSS(fondo) || '#ffffff';
+  const canal = (i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const luz = 0.2126 * canal(1) + 0.7152 * canal(3) + 0.0722 * canal(5);
+  return (luz + 0.05) / 0.05 >= 1.05 / (luz + 0.05) ? '#000000' : '#ffffff';
+}
+
+// Color de la rama tal como se ve ahora, para empezar el selector propio.
+function colorDibujadoDeSeccion(seccion) {
+  const svg = el.canvas.querySelector('svg');
+  const forma = svg && svg.querySelector('g.mindmap-node.section-' + seccion + ' > :is(rect, path, circle, polygon)');
+  return forma ? getComputedStyle(forma).fill : '';
+}
+
+function colorDeRama(seccion, color) {
+  if (seccion === null) return;
+  if (color) coloresRamas[seccion] = color;
+  else delete coloresRamas[seccion];
+  writeAppearance();
+}
+
+// Colores de rama, paleta, color propio y quitar, para el menú contextual y
+// para el menú de color de la barra.
+function seccionDeColorRama(contenedor, seccion, alTerminar) {
+  const grupo = document.createElement('p');
+  grupo.className = 'menu-grupo';
+  grupo.textContent = t(seccion === -1 ? 'centerColor' : 'branchColor');
+  contenedor.appendChild(grupo);
+  const elegir = (color) => { if (alTerminar) alTerminar(); colorDeRama(seccion, color); };
+  muestrasDeColor(contenedor, false, (color) => elegir(color));
+  otroColor(contenedor, coloresRamas[seccion] || colorDibujadoDeSeccion(seccion), (color) => elegir(color));
+  accionContextual(contenedor, t('nodeColorClear'), 'i-trash', () => elegir(null));
 }
 
 /* --- Grosor de las líneas --- */
@@ -4036,6 +4278,35 @@ function clearNodeColor(ids) {
 }
 
 function buildNodeColorSection() {
+  const mapa = diagramKind() === 'mindmap';
+  el.colorPartes.hidden = mapa;
+  el.swatches.hidden = mapa;
+  el.nodeColorCustom.closest('label').hidden = mapa;
+  $('node-color-clear').hidden = mapa;
+  let ramaBarra = $('color-rama-barra');
+  if (!ramaBarra) {
+    ramaBarra = document.createElement('div');
+    ramaBarra.id = 'color-rama-barra';
+    el.nodeColorBox.appendChild(ramaBarra);
+  }
+  ramaBarra.innerHTML = '';
+  ramaBarra.hidden = !mapa;
+  if (mapa) {
+    // La rama de la caja donde está el cursor.
+    const k = nodoMapaEnCursor();
+    const nodo = nodosDelMapa()[k];
+    el.nodeColorTarget.innerHTML = '';
+    if (!nodo) {
+      el.nodeColorTarget.textContent = t('nodeColorNone');
+      return;
+    }
+    el.nodeColorTarget.textContent = t('ctxBox') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = textoPlanoMapa(nodo);
+    el.nodeColorTarget.appendChild(codigo);
+    seccionDeColorRama(ramaBarra, seccionDeCajaMapa(k), () => { el.colorMenu.hidden = true; });
+    return;
+  }
   const ids = targetNodes();
   const flechas = targetLinks();
   const caja = el.nodeColorBox;
@@ -4321,7 +4592,8 @@ function codigoSinColores(codigo) {
 function hayColoresAMano() {
   return codigoSinColores(el.editor.value) !== el.editor.value
     || (coloresTocados.has('labelbg') && el.colorSelect.value !== 'custom')
-    || Object.values(coloresSectores).some(Boolean);
+    || Object.values(coloresSectores).some(Boolean)
+    || Object.values(coloresRamas).some(Boolean);
 }
 
 // Deja el código sin esos colores; el tema que se elige a continuación
@@ -4336,9 +4608,10 @@ function quitarColoresAMano() {
   }
   coloresTocados.delete('labelbg');
   Object.keys(coloresSectores).forEach((i) => { delete coloresSectores[i]; });
+  Object.keys(coloresRamas).forEach((i) => { delete coloresRamas[i]; });
 }
 
-const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'themeMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
+const MENUS_EDITOR = ['typeMenu', 'dirMenu', 'themeMenu', 'colorMenu', 'strokeMenu', 'engineMenu', 'linesMenu', 'sizeMenu', 'shapeMenu', 'formaMapaMenu', 'widthMenu', 'calendarMenu', 'pieMenu', 'sequenceMenu', 'xychartMenu'];
 
 function cerrarMenusEditor() {
   MENUS_EDITOR.forEach((clave) => { el[clave].hidden = true; });
@@ -4620,8 +4893,15 @@ function setupEditorTools() {
   // El botón de cajas abre un menú con lo suyo: la forma y el ancho.
   $('btn-shape').addEventListener('click', (event) => {
     event.stopPropagation();
-    // Fuera del flujo solo hay ancho: se abre directamente.
-    if (diagramKind() !== 'flowchart') alternarMenuEditor(el.widthMenu, $('btn-shape'), buildWidthMenu);
+    // En el mapa mental solo hay forma, y fuera del flujo solo ancho: se abren directamente.
+    if (diagramKind() === 'mindmap') {
+      alternarMenuEditor(el.formaMapaMenu, $('btn-shape'), () => {
+        formaAlcanceFijado = false;
+        el.formaMapaMenu.innerHTML = '';
+        construirFormasMapa(el.formaMapaMenu);
+      });
+    }
+    else if (diagramKind() !== 'flowchart') alternarMenuEditor(el.widthMenu, $('btn-shape'), buildWidthMenu);
     else alternarMenuEditor(el.shapeMenu, $('btn-shape'));
   });
   el.shapeMenu.addEventListener('click', (event) => {
@@ -4965,6 +5245,58 @@ function rotuloDeLaFlecha(indice) {
 const EDICUATEX = 'https://edicuatex.github.io/';
 let ventanaFormulas = null;
 
+// Formas del mapa mental, de la apertura más larga a la más corta: la
+// explosión es ))…(( y la nube )…(. Las demás se escriben como en el flujo.
+const APERTURAS_MAPA = [
+  ['))', [['((', 'bang']]], [')', [['(', 'cloud']]], ['((', [['))', 'circle']]],
+  ['{{', [['}}', 'hex']]], ['(', [[')', 'rounded']]], ['[', [[']', 'rect']]]
+];
+
+// Zonas de texto de una línea: lo que va entre las marcas de una forma
+// (con todas sus variantes, también las dobles como ((…)) o ([…])), entre
+// comillas o entre barras (el texto de una flecha, -->|…|). Cada zona dice
+// dónde empieza y acaba su contenido y si va entre comillas.
+function zonasDeRotulo(linea) {
+  const mapa = diagramKind() === 'mindmap';
+  const aperturas = mapa ? APERTURAS_MAPA : APERTURAS;
+  const zonas = [];
+  let i = 0;
+  while (i < linea.length) {
+    const c = linea[i];
+    if (c === '"' || c === '|') {
+      const fin = linea.indexOf(c, i + 1);
+      if (fin === -1) break;
+      zonas.push({ inicio: i + 1, fin, entrecomillado: c === '"' });
+      i = fin + 1;
+      continue;
+    }
+    // Una forma va pegada a su identificador, así que la punta de una flecha
+    // (-->, ==>) no se toma por la bandera (>…]).
+    const anterior = i > 0 ? linea[i - 1] : '';
+    const apertura = aperturas.find(([a]) => linea.startsWith(a, i));
+    if (!apertura || !/[^\s\-=.~<>|&"]/.test(anterior)) { i += 1; continue; }
+    const [abre, cierres] = apertura;
+    let desde = i + abre.length;
+    let entrecomillado = false;
+    let busca = desde;
+    if (linea[desde] === '"') {
+      const comilla = linea.indexOf('"', desde + 1);
+      if (comilla !== -1) { entrecomillado = true; busca = comilla + 1; }
+    }
+    let mejor = -1;
+    let cierreLargo = 0;
+    cierres.forEach(([cierre]) => {
+      const pos = linea.indexOf(cierre, busca);
+      if (pos !== -1 && (mejor === -1 || pos < mejor)) { mejor = pos; cierreLargo = cierre.length; }
+    });
+    if (mejor === -1) { i += abre.length; continue; }
+    if (entrecomillado) zonas.push({ inicio: desde + 1, fin: busca - 1, entrecomillado: true });
+    else zonas.push({ inicio: desde, fin: mejor, entrecomillado: false });
+    i = mejor + cierreLargo;
+  }
+  return zonas;
+}
+
 // ¿Está el cursor dentro del texto de un rótulo? Devuelve dónde empieza y
 // acaba ese texto; si no lo está, null y la fórmula irá en una caja nueva.
 function cursorEnRotulo() {
@@ -4972,26 +5304,10 @@ function cursorEnRotulo() {
   const desde = texto.lastIndexOf('\n', el.editor.selectionStart - 1) + 1;
   let hasta = texto.indexOf('\n', el.editor.selectionStart);
   if (hasta === -1) hasta = texto.length;
-  const linea = texto.slice(desde, hasta);
   const columna = el.editor.selectionStart - desde;
-  const zonas = /"[^"]*"|\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\|[^|]*\|/g;
-  let m;
-  while ((m = zonas.exec(linea))) {
-    if (columna > m.index && columna < m.index + m[0].length) {
-      let inicio = desde + m.index + 1;
-      let fin = desde + m.index + m[0].length - 1;
-      let entrecomillado = m[0][0] === '"';
-      // A["…"]: el rótulo es lo que va entre las comillas, dentro de los corchetes.
-      const dentro = texto.slice(inicio, fin);
-      if (!entrecomillado && /^"[\s\S]*"$/.test(dentro)) {
-        inicio += 1;
-        fin -= 1;
-        entrecomillado = true;
-      }
-      return { inicio, fin, cursor: el.editor.selectionStart, entrecomillado };
-    }
-  }
-  return null;
+  const zona = zonasDeRotulo(texto.slice(desde, hasta)).find((z) => columna >= z.inicio && columna <= z.fin);
+  if (!zona) return null;
+  return { inicio: desde + zona.inicio, fin: desde + zona.fin, cursor: el.editor.selectionStart, entrecomillado: zona.entrecomillado };
 }
 
 function insertarFormula(latex) {
@@ -5361,6 +5677,19 @@ function objetoDelDiagrama(event) {
     objetivo = document.elementFromPoint(event.clientX, event.clientY) || objetivo;
   }
 
+  // Mapa mental: una caja o una rama, por el número que les da Mermaid, que
+  // sigue el orden del código (node_3; la rama edge_1_3 lleva a la caja 3).
+  if (diagramKind() === 'mindmap') {
+    const cajaMapa = objetivo.closest && objetivo.closest('g.mindmap-node');
+    const numero = cajaMapa && /node_(\d+)$/.exec(cajaMapa.id);
+    if (numero) return { tipo: 'cajaMapa', indice: Number(numero[1]) };
+    const ramas = [...svg.querySelectorAll('path.edge')];
+    const cercana = ramas[flechaCercana(ramas, event.clientX, event.clientY, 12)];
+    const destino = cercana && /edge_\d+_(\d+)$/.exec(cercana.id);
+    if (destino) return { tipo: 'ramaMapa', indice: Number(destino[1]) };
+    return { tipo: 'fondo' };
+  }
+
   // Una caja: Mermaid pone su id tras el del dibujo, con el tipo delante y un
   // número detrás (flowchart-A-0, state-A-1, classId-A-0) o solo (bloques).
   const nodo = objetivo.closest && objetivo.closest('g.node');
@@ -5433,6 +5762,9 @@ function irAlObjeto(objeto) {
       fila = lineas.findIndex((l) => !/^\s*%%/.test(l) && re.test(l));
       if (fila >= 0) columna = re.exec(lineas[fila]).index + 1;
     }
+  } else if (objeto.tipo === 'cajaMapa' || objeto.tipo === 'ramaMapa') {
+    const nodo = nodosDelMapa()[objeto.indice];
+    if (nodo) { fila = nodo.linea; columna = nodo.sangria.length; }
   } else if (objeto.tipo === 'flecha' || objeto.tipo === 'rotulo') {
     let cuenta = 0;
     for (let i = 0; i < lineas.length && fila === -1; i += 1) {
@@ -5687,6 +6019,8 @@ function construirFondoRotulos(caja) {
 // construye su propio contenido.
 const SUBMENUS = {
   fondoRotulos: { titulo: 'colorLabelBg', icono: 'i-paint-bucket', construir: construirFondoRotulos },
+  // La forma de una caja del mapa mental: son siete, caben en el submenú.
+  formaMapa: { titulo: 'ctxShape', icono: 'i-square', construir: (caja) => { formaAlcance = 'esta'; formaAlcanceFijado = true; construirFormasMapa(caja); } },
   tema: { titulo: 'themeMenu', icono: 'i-swatch-book', boton: 'btn-theme', menu: () => el.themeMenu, preparar: buildThemeMenu },
   lineas: { titulo: 'lines', icono: 'i-spline', boton: 'btn-lines', menu: () => el.linesMenu, preparar: () => { updateAppearanceVisibility(); buildLineTargetSection(); } },
   trazo: { titulo: 'strokeMenu', icono: 'i-brush', boton: 'btn-stroke', menu: () => el.strokeMenu, preparar: buildStrokeMenu },
@@ -5835,6 +6169,21 @@ function construirContextual(objeto) {
   const titulo = document.createElement('p');
   titulo.className = 'menu-titulo';
   menu.appendChild(titulo);
+
+  // Mapa mental: el color es el de toda la rama (Mermaid no colorea cajas
+  // sueltas); la caja tiene además su forma, y la rama, el grosor de todas.
+  if (objeto.tipo === 'cajaMapa' || objeto.tipo === 'ramaMapa') {
+    const nodo = nodosDelMapa()[objeto.indice];
+    titulo.textContent = t(objeto.tipo === 'cajaMapa' ? 'ctxBox' : 'ctxBranch') + ' ';
+    const codigo = document.createElement('code');
+    codigo.textContent = nodo ? textoPlanoMapa(nodo) : '';
+    titulo.appendChild(codigo);
+    seccionDeColorRama(menu, seccionDeCajaMapa(objeto.indice));
+    menu.appendChild(document.createElement('hr'));
+    if (objeto.tipo === 'cajaMapa') entradaSubmenu(menu, objeto, 'formaMapa');
+    else entradaSubmenu(menu, objeto, 'lineas');
+    return;
+  }
 
   if (objeto.tipo === 'nodo') {
     titulo.textContent = t('ctxBox') + ' ';

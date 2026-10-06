@@ -42,6 +42,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [34](0034-los-colores-de-la-lista-escriben-a-juego-los-fondos-que-mermaid-sacaria-girando-el-tono.md) | Los colores de la lista escriben a juego los fondos que Mermaid sacaría girando el tono | aceptado |
 | [35](0035-sirena-centra-el-texto-de-las-cajas-de-los-mapas-mentales.md) | Sirena centra el texto de las cajas de los mapas mentales | aceptado |
 | [36](0036-el-grosor-de-las-ramas-del-mapa-mental-se-escribe-en-la-cabecera.md) | El grosor de las ramas del mapa mental se escribe en la cabecera | aceptado |
+| [37](0037-en-el-mapa-mental-se-elige-la-forma-de-cada-caja-y-el-color-de-cada-rama.md) | En el mapa mental se elige la forma de cada caja y el color de cada rama | aceptado |
 
 Para añadir una, se copia [la plantilla](0000-plantilla.md) con el número
 siguiente y se anota aquí. Una decisión que deje de valer no se borra: se marca

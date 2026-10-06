@@ -92,8 +92,11 @@ ofrece su menú se escribe con `linkStyle`, y Mermaid solo atiende esa
 instrucción ahí: en el de estados la acepta sin aplicarla, y en el mapa mental,
 el de clases, el entidad-relación y el de bloques el diagrama deja de dibujarse
 (comprobado con Mermaid 12.1.0 el 06-10-2026). En esos tipos, el botón derecho
-sobre una línea abre el menú de todo el diagrama; en el mapa mental, ahí está el
-grosor de las ramas ([ADR 36](0036-el-grosor-de-las-ramas-del-mapa-mental-se-escribe-en-la-cabecera.md)).
+sobre una línea abre el menú de todo el diagrama. En el mapa mental, sobre una
+caja abre el color de su rama y su forma (un submenú con las siete formas), y
+sobre una rama, su color y el grosor de todas
+([ADR 36](0036-el-grosor-de-las-ramas-del-mapa-mental-se-escribe-en-la-cabecera.md),
+[ADR 37](0037-en-el-mapa-mental-se-elige-la-forma-de-cada-caja-y-el-color-de-cada-rama.md)).
 Hasta ese día se ofrecía en cualquiera, y en un mapa mental escribía
 `linkStyle` y lo rompía.
 
