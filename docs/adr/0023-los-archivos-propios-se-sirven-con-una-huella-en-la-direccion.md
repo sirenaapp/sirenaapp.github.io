@@ -22,8 +22,17 @@ Al cambiar el archivo cambia la huella, y el navegador pide la versión nueva;
 mientras no cambie, la sigue sirviendo de su copia, que es lo que se quiere.
 
 La huella la pone `scripts/sellar-version.sh`, que se ejecuta desde la raíz del
-repositorio antes de confirmar los cambios y reescribe `index.html`. Los
-archivos de `vendor/` no se tocan: llevan su versión en el nombre de la carpeta.
+repositorio antes de confirmar los cambios y reescribe `index.html`.
+
+Mermaid, en `vendor/mermaid`, conserva el nombre de su archivo principal
+(`mermaid.esm.min.mjs`) de una versión a otra; los trozos que carga a demanda
+llevan ya una huella en el nombre. Desde el 06-10-2026 el mismo script pone
+también la huella del archivo principal en la dirección con que `js/sirena.js`
+lo carga. Sin ella, al actualizar Mermaid, un navegador con el archivo
+principal anterior guardado pediría trozos que ya no existen y algunos tipos de
+diagrama no se dibujarían hasta que caducase la copia (GitHub Pages la da por
+buena 10 minutos). Los iconos de `vendor/lucide` no se cargan por dirección: van
+dentro de `index.html`.
 
 ## Alternativas descartadas
 

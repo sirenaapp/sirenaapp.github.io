@@ -1,20 +1,6 @@
 {
-  "_descripcion": "Parches de Sirena a fallos de Mermaid. Cada uno con su incidencia, la función que lo aplica y un ejemplo mínimo que reproduce el fallo con Mermaid solo. scripts/comprobar-parches.mjs dibuja cada ejemplo con una versión de Mermaid y dice si el fallo sigue. Ver docs/parches-mermaid.md. «control» es el mismo caso sin la causa del fallo (sin fórmula, con dagre en vez de ELK, o a escala 1 si el parche lleva «escala»): tiene que salir siempre bien; si no, la medición no sirve para esa versión.",
+  "_descripcion": "Parches de Sirena a fallos de Mermaid. Cada uno con su incidencia, la función que lo aplica y un ejemplo mínimo que reproduce el fallo con Mermaid solo. scripts/comprobar-parches.mjs dibuja cada ejemplo con una versión de Mermaid y dice si el fallo sigue. Ver docs/parches-mermaid.md. «control» es el mismo caso sin la causa del fallo (sin fórmula, o a escala 1 si el parche lleva «escala»): tiene que salir siempre bien; si no, la medición no sirve para esa versión.",
   "parches": [
-    {
-      "clave": "rotulo-fuera-de-linea",
-      "fallo": "Con ELK, un rótulo de flecha queda al lado de su línea en vez de sobre ella",
-      "incidencias": [
-        8292
-      ],
-      "funciones": [
-        "rotulosSobreSuLinea"
-      ],
-      "adr": "0026",
-      "comprobacion": "rotuloFueraDeLinea",
-      "codigo": "flowchart TD\n    A --> B{Decision}\n    B -- Yes --> C[Done]\n    B -- No --> D[Step 1]\n    D --> E{Again?}\n    E -- Yes --> C\n    E -- No --> F[Stop]",
-      "control": "%%{init: {\"layout\":\"dagre\"}}%%\nflowchart TD\n    A --> B{Decision}\n    B -- Yes --> C[Done]\n    B -- No --> D[Step 1]\n    D --> E{Again?}\n    E -- Yes --> C\n    E -- No --> F[Stop]"
-    },
     {
       "clave": "formula-sin-partir",
       "fallo": "Un rótulo con fórmula no se reparte en varias líneas y el texto pierde el espacio junto a la fórmula",

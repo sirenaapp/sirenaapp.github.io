@@ -31,7 +31,7 @@ deshaga después de buena fe, ni siquiera nosotros dentro de un año.
 | [23](0023-los-archivos-propios-se-sirven-con-una-huella-en-la-direccion.md) | Los archivos propios se sirven con una huella en la dirección | aceptado |
 | [24](0024-tipo-de-linea-y-puntas-de-las-flechas-escritos-en-cada-flecha.md) | Tipo de línea y puntas de las flechas, escritos en cada flecha | aceptado |
 | [25](0025-el-calendario-del-diagrama-de-gantt-se-ajusta-desde-la-barra-y-se-escribe-en-el-cuerpo.md) | El calendario del diagrama de Gantt se ajusta desde la barra y se escribe en el cuerpo | aceptado |
-| [26](0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md) | Sirena recoloca los rótulos de flecha que Mermaid deja fuera de su línea | aceptado |
+| [26](0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md) | Sirena recoloca los rótulos de flecha que Mermaid deja fuera de su línea | retirado (Mermaid 12.1.0 corrige el fallo) |
 | [27](0027-limpiar-formato-deja-el-diagrama-sin-aspecto-propio-y-conserva-su-estructura.md) | Limpiar formato deja el diagrama sin aspecto propio y conserva su estructura | aceptado |
 | [28](0028-formato-de-los-bloques-con-style-propio-y-una-clase-comun.md) | Formato de los bloques con style propio y una clase común | aceptado |
 | [29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md) | Dentro de eXeLearning, Sirena devuelve el diagrama al editor, como Edicuatex | aceptado |

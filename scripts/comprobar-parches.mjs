@@ -52,28 +52,6 @@ async function leerVersion(carpeta) {
 // Mediciones, que se ejecutan en la página. Cada una recibe el SVG dibujado y
 // devuelve { sigue, detalle }: si el fallo se reproduce y con qué medida.
 const MEDICIONES = {
-  // El rótulo de flecha más alejado de su línea, en píxeles.
-  rotuloFueraDeLinea: `(svg) => {
-    let peor = 0;
-    for (const rotulo of svg.querySelectorAll('g.edgeLabel')) {
-      const marca = rotulo.querySelector('[data-id]');
-      const pos = /^translate\\(\\s*(-?[\\d.]+(?:e-?\\d+)?)[\\s,]+(-?[\\d.]+(?:e-?\\d+)?)\\s*\\)$/.exec(rotulo.getAttribute('transform') || '');
-      if (!marca || !pos || !rotulo.textContent.trim()) continue;
-      const linea = svg.querySelector('path[data-id="' + CSS.escape(marca.getAttribute('data-id')) + '"][data-points]');
-      if (!linea) continue;
-      const puntos = JSON.parse(atob(linea.getAttribute('data-points')));
-      const aLinea = linea.getCTM().inverse().multiply(rotulo.parentNode.getCTM());
-      const c = new DOMPoint(parseFloat(pos[1]), parseFloat(pos[2])).matrixTransform(aLinea);
-      let mejor = Infinity;
-      for (let i = 0; i < puntos.length - 1; i++) {
-        const a = puntos[i], b = puntos[i + 1], dx = b.x - a.x, dy = b.y - a.y, largo = dx * dx + dy * dy;
-        const t = largo ? Math.max(0, Math.min(1, ((c.x - a.x) * dx + (c.y - a.y) * dy) / largo)) : 0;
-        mejor = Math.min(mejor, Math.hypot(a.x + t * dx - c.x, a.y + t * dy - c.y));
-      }
-      if (mejor < Infinity) peor = Math.max(peor, mejor);
-    }
-    return { sigue: peor > 1, detalle: 'rótulo más alejado: ' + peor.toFixed(1) + ' px de su línea' };
-  }`,
   // El mismo texto sin fórmula (A) y con ella (B): B debería partirse igual.
   formulaSinPartir: `(svg) => {
     const ancho = (id) => { const n = [...svg.querySelectorAll('g.node')].find((g) => g.id.includes('-' + id + '-')); return n ? Math.round(n.getBBox().width) : 0; };

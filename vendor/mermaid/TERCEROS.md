@@ -1,10 +1,10 @@
 # Bibliotecas incluidas en Mermaid
 
-`vendor/mermaid` es la distribución publicada de Mermaid 12.0.0 (licencia MIT,
+`vendor/mermaid` es la distribución publicada de Mermaid 12.1.0 (licencia MIT,
 © Knut Sveidqvist y colaboradores, [LICENSE.txt](LICENSE.txt)). Esa
 distribución lleva dentro las bibliotecas de las que depende Mermaid. Esta es
 la lista, con la licencia que declara cada una en npm (comprobado el
-23-09-2026):
+06-10-2026):
 
 | Biblioteca | Para qué la usa Mermaid | Licencia |
 | --- | --- | --- |
@@ -32,7 +32,7 @@ los archivos (`@license`).
 
 `scripts/actualizar-mermaid.sh` rehace esta lista al actualizar Mermaid.
 
-## Dependencias de Mermaid 12.0.0 según npm (23-09-2026)
+## Dependencias de Mermaid 12.1.0 según npm (06-10-2026)
 
 - @braintree/sanitize-url: MIT
 - @iconify/utils: MIT

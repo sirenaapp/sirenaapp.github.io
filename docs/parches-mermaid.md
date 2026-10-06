@@ -8,7 +8,6 @@ allí Sirena dibuja con el Mermaid de eXe, tal como saldrá en el material
 
 | Fallo | Parche | Incidencias de Mermaid |
 |---|---|---|
-| Con ELK, un rótulo de flecha queda al lado de su línea | `rotulosSobreSuLinea` ([ADR 26](adr/0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md)) | [#8292](https://github.com/mermaid-js/mermaid/issues/8292) |
 | Un rótulo con fórmula no se reparte en varias líneas y pierde el espacio junto a la fórmula | `soltarFilas`, y en `ajustarRotulosHtml` la reducción de la letra de una fórmula que no cabe ([ADR 22](adr/0022-las-formulas-se-escriben-con-latex-y-se-editan-con-edicuatex.md)) | [#8340](https://github.com/mermaid-js/mermaid/issues/8340), [#6690](https://github.com/mermaid-js/mermaid/issues/6690) |
 | En un rótulo con fórmula desaparecen los saltos de línea (`<br>`) | `marcarSaltos` y `restaurarSaltos` (ADR 22) | [#7194](https://github.com/mermaid-js/mermaid/issues/7194), [#5941](https://github.com/mermaid-js/mermaid/issues/5941), [#7873](https://github.com/mermaid-js/mermaid/issues/7873) |
 | El rótulo de flecha con fórmula no tiene fondo opaco y la línea lo atraviesa | en `ajustarRotulosHtml`, el fondo que pone al rótulo (ADR 22) | [#5543](https://github.com/mermaid-js/mermaid/issues/5543) |
@@ -41,6 +40,12 @@ una versión publicada, o corregirse sin cerrarse.
    llamada, y la entrada de `scripts/parches-mermaid.json`.
 3. Probar en Sirena el ejemplo del parche y los de `docs/pruebas.md`.
 4. Actualizar el ADR del parche y esta página.
+
+## Parches retirados
+
+| Fallo | Parche | Retirado |
+|---|---|---|
+| Con ELK, un rótulo de flecha queda al lado de su línea ([#8292](https://github.com/mermaid-js/mermaid/issues/8292)) | `rotulosSobreSuLinea` ([ADR 26](adr/0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md)) | 06-10-2026, con Mermaid 12.1.0, que lo corrige |
 
 ## Ajustes propios de Sirena, que no son parches
 

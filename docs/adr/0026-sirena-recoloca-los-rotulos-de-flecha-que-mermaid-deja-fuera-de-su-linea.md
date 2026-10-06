@@ -1,6 +1,6 @@
 # 26. Sirena recoloca los rótulos de flecha que Mermaid deja fuera de su línea
 
-Fecha: 2026-09-22 · Estado: aceptado
+Fecha: 2026-09-22 · Estado: retirado el 06-10-2026 (Mermaid 12.1.0 corrige el fallo)
 
 ## Contexto
 
@@ -55,3 +55,21 @@ corrección que depende de cómo dibuja Mermaid (el atributo `data-points` y el
 `translate` del rótulo): al actualizar Mermaid hay que comprobar si el fallo
 sigue y, si ya está corregido, quitar la función y marcar este ADR como
 sustituido.
+
+## Retirada (06-10-2026)
+
+Mermaid 12.1.0 corrige el fallo: después de enderezar el final de una flecha
+vuelve a colocar su rótulo sobre la línea
+([PR #8344](https://github.com/mermaid-js/mermaid/pull/8344)). Con el ejemplo
+mínimo y Mermaid solo, el rótulo más alejado queda a 0,1 px de su línea, frente a
+3,1 px con la 12.0.0. Al actualizar Mermaid se quitó `rotulosSobreSuLinea()`, su
+entrada en `scripts/parches-mermaid.json` y su medición en
+`scripts/comprobar-parches.mjs`.
+
+El aviso de versión nueva no pudo darlo por corregido: el ejemplo de control,
+el mismo diagrama con `dagre`, dejaba un rótulo a 1,8 px de los puntos de su
+línea, por encima del margen de 1 px. Con `dagre` el rótulo nunca ha ido
+exactamente sobre la línea dibujada, que es una curva (hasta 4,7 px de
+diferencia ya con la 12.0.0), y en la 12.1.0 ese rótulo pasa de 1,5 a 2,9 px de
+la curva: no se aprecia. Se comprobó a mano midiendo cada rótulo con las dos
+versiones.

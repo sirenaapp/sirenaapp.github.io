@@ -77,3 +77,12 @@ del rótulo crecía por la fórmula y no por el salto; el fondo del `span`, que 
 línea, no se pinta detrás de los bloques) y se corrigió antes de darla por buena.
 Con Mermaid 12.0.0 tal cual, los cuatro controles salen bien y los cuatro fallos
 aparecen.
+
+06-10-2026, primera versión nueva real (Mermaid 12.1.0): la comprobación dio
+cuatro fallos como vigentes y pidió comprobar a mano el del rótulo fuera de su
+línea, porque su control con `dagre` dejaba un rótulo a 1,8 px de su línea. El
+ejemplo con ELK daba 0,1 px. Medido a mano rótulo por rótulo con las dos
+versiones, el fallo estaba corregido y la diferencia del control era un cambio
+pequeño de `dagre`, sin relación con el fallo: el parche se retiró (ADR 26). El
+mecanismo funcionó como estaba previsto: ante un control dudoso no dio un
+resultado, sino que pidió comprobarlo.
