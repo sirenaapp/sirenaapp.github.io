@@ -311,6 +311,10 @@ svg use, .tb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-lin
 .menu-contextual .segmentos { margin-bottom: 8px; flex-wrap: wrap; }
 #line-arrow-type .segmentos { flex-wrap: wrap; }
 .ajuste-flechas { margin: 6px 0 2px; }
+/* El menú de líneas sirve a los diagramas de flujo y a los mapas mentales:
+   cada uno ve solo sus ajustes. */
+#lines-menu[data-tipo="mindmap"] .solo-flujo,
+#lines-menu:not([data-tipo="mindmap"]) .solo-mapa { display: none; }
 .menu-ajustes { max-height: calc(100vh - 120px); overflow-y: auto; }
 .accion-menu-ajustes { grid-column: 1 / -1; margin-top: 4px; }
 #pie-colores { grid-column: 1 / -1; }

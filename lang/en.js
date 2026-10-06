@@ -137,6 +137,7 @@ window.SIRENA_LANG.en = (function (_) { return {
   lines: _('Lines'),
   linesAll: _('All lines'),
   arrowWidth: _('Arrow thickness'),
+  branchWidth: _('Branch thickness'),
   lineType: _('Line type'),
   arrowHead: _('Arrow heads'),
   lineNormal: _('Solid'),

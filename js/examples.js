@@ -1116,7 +1116,8 @@ flowchart TD
         id: 'mindmap',
         label: { es: 'Mapa mental', ca: 'Mapa mental', gl: 'Mapa mental', eu: 'Adimen-mapa', en: 'Mind map' },
         code: {
-          es: `mindmap
+          es: `%%{init: {"themeCSS":".edge{stroke-width:1px}.edge-depth-1{stroke-width:3px}.edge-depth-3{stroke-width:1.5px}"}}%%
+mindmap
   root((Célula))
     Membrana
       Transporte activo
@@ -1127,7 +1128,8 @@ flowchart TD
     Núcleo
       ADN
       Nucléolo`,
-          ca: `mindmap
+          ca: `%%{init: {"themeCSS":".edge{stroke-width:1px}.edge-depth-1{stroke-width:3px}.edge-depth-3{stroke-width:1.5px}"}}%%
+mindmap
   root((Cèl·lula))
     Membrana
       Transport actiu
@@ -1138,7 +1140,8 @@ flowchart TD
     Nucli
       ADN
       Nuclèol`,
-          gl: `mindmap
+          gl: `%%{init: {"themeCSS":".edge{stroke-width:1px}.edge-depth-1{stroke-width:3px}.edge-depth-3{stroke-width:1.5px}"}}%%
+mindmap
   root((Célula))
     Membrana
       Transporte activo
@@ -1149,7 +1152,8 @@ flowchart TD
     Núcleo
       ADN
       Nucléolo`,
-          eu: `mindmap
+          eu: `%%{init: {"themeCSS":".edge{stroke-width:1px}.edge-depth-1{stroke-width:3px}.edge-depth-3{stroke-width:1.5px}"}}%%
+mindmap
   root((Zelula))
     Mintza
       Garraio aktiboa
@@ -1160,7 +1164,8 @@ flowchart TD
     Nukleoa
       DNA
       Nukleoloa`,
-          en: `mindmap
+          en: `%%{init: {"themeCSS":".edge{stroke-width:1px}.edge-depth-1{stroke-width:3px}.edge-depth-3{stroke-width:1.5px}"}}%%
+mindmap
   root((Cell))
     Membrane
       Active transport

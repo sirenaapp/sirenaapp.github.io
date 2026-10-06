@@ -27,13 +27,13 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=e19fa075">
-<script src="lang/es.js?v=372d2ab7"></script>
-<script src="lang/ca.js?v=744374cd"></script>
-<script src="lang/gl.js?v=0914252f"></script>
-<script src="lang/eu.js?v=73a87907"></script>
-<script src="lang/en.js?v=fdedc0ee"></script>
-<script src="js/examples.js?v=373c2e32"></script>
+<link rel="stylesheet" href="css/sirena.css?v=e61c1152">
+<script src="lang/es.js?v=912a51b2"></script>
+<script src="lang/ca.js?v=037ce843"></script>
+<script src="lang/gl.js?v=0a16da21"></script>
+<script src="lang/eu.js?v=a33b114c"></script>
+<script src="lang/en.js?v=09450747"></script>
+<script src="js/examples.js?v=c8043082"></script>
 <script src="js/sintaxis.js?v=78ce0aa8"></script>
 <script src="js/formas.js?v=b24678fb"></script>
 <script src="js/formas-iconos.js?v=3c707c9e"></script>
@@ -261,18 +261,20 @@
         <button type="button" id="btn-lines" class="tb" data-i18n-title="lines"><svg><use href="#i-spline"></use></svg></button>
         <div class="menu menu-izq menu-ajustes" id="lines-menu" hidden>
           <p class="menu-seccion" data-i18n="linesAll"></p>
-          <label class="ajuste" id="ajuste-curve"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="curve"></span><select id="curve-select"></select></label>
-          <label class="ajuste"><svg aria-hidden="true"><use href="#i-arrow-right"></use></svg><span data-i18n="arrowWidth"></span><select id="arrow-width-select"></select></label>
-          <label class="tamano-propio"><span data-i18n="widthCustom"></span><input type="number" id="arrow-width-custom" min="0.5" max="20" step="0.5" inputmode="decimal"><span>px</span></label>
-          <div class="ajuste-flechas">
+          <label class="ajuste solo-flujo" id="ajuste-curve"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="curve"></span><select id="curve-select"></select></label>
+          <label class="ajuste solo-mapa"><svg aria-hidden="true"><use href="#i-spline"></use></svg><span data-i18n="branchWidth"></span><select id="branch-width-select"></select></label>
+          <label class="tamano-propio solo-mapa"><span data-i18n="widthCustom"></span><input type="number" id="branch-width-custom" min="0.5" max="20" step="0.5" inputmode="decimal"><span>px</span></label>
+          <label class="ajuste solo-flujo"><svg aria-hidden="true"><use href="#i-arrow-right"></use></svg><span data-i18n="arrowWidth"></span><select id="arrow-width-select"></select></label>
+          <label class="tamano-propio solo-flujo"><span data-i18n="widthCustom"></span><input type="number" id="arrow-width-custom" min="0.5" max="20" step="0.5" inputmode="decimal"><span>px</span></label>
+          <div class="ajuste-flechas solo-flujo">
             <button type="button" class="pliegue" data-pliegue="line-type-all" aria-expanded="false"><svg class="chev" aria-hidden="true"><use href="#i-chevron"></use></svg><span data-i18n="lineType"></span><span class="pliegue-actual" id="line-type-all-actual"></span></button>
             <div class="lista-flechas" id="line-type-all" hidden></div>
             <button type="button" class="pliegue" data-pliegue="arrow-head-all" aria-expanded="false"><svg class="chev" aria-hidden="true"><use href="#i-chevron"></use></svg><span data-i18n="arrowHead"></span><span class="pliegue-actual" id="arrow-head-all-actual"></span></button>
             <div class="lista-flechas" id="arrow-head-all" hidden></div>
           </div>
-          <label class="ajuste"><svg aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="borderWidth"></span><select id="border-width-select"></select></label>
-          <label class="tamano-propio"><span data-i18n="widthCustom"></span><input type="number" id="border-width-custom" min="0.5" max="20" step="0.5" inputmode="decimal"><span>px</span></label>
-          <div class="color-elemento" id="line-target-box">
+          <label class="ajuste solo-flujo"><svg aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="borderWidth"></span><select id="border-width-select"></select></label>
+          <label class="tamano-propio solo-flujo"><span data-i18n="widthCustom"></span><input type="number" id="border-width-custom" min="0.5" max="20" step="0.5" inputmode="decimal"><span>px</span></label>
+          <div class="color-elemento solo-flujo" id="line-target-box">
             <p class="menu-seccion" data-i18n="linesHere"></p>
             <p class="menu-titulo" id="line-target"></p>
             <div class="segmentos" id="line-partes">
@@ -431,7 +433,7 @@
     <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> ·
     <span data-i18n="poweredBy">Diagramas generados con</span>
     <a href="https://mermaid.js.org/" target="_blank" rel="noopener noreferrer">Mermaid</a> ·
-    <a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.2.1" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.2.1</span></a>
+    <a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.3.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.3.0</span></a>
   </p>
 </footer>
 
@@ -474,7 +476,7 @@
 <div class="modal-overlay" id="creditos-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-creditos">
     <h2 id="titulo-creditos" data-i18n="creditsTip">Créditos, licencias y uso de IA</h2>
-    <p class="modal-help"><a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.2.1" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.2.1</span></a></p>
+    <p class="modal-help"><a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.3.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.3.0</span></a></p>
     <p data-i18n="creditsText"></p>
     <p><a href="https://github.com/sirenaapp/sirenaapp.github.io/blob/main/vendor/mermaid/TERCEROS.md" target="_blank" rel="noopener noreferrer" data-i18n="creditsList">Todas las bibliotecas y sus licencias</a></p>
     <p><span data-i18n="aiBefore"></span><a id="ai-link" href="https://jjdeharo.github.io/miae/?nivel=4" target="_blank" rel="noopener noreferrer" data-i18n="aiLink"></a><span data-i18n="aiAfter"></span></p>
@@ -548,6 +550,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=e7dc0382"></script>
+<script type="module" src="js/sirena.js?v=7dfeb260"></script>
 </body>
 </html>

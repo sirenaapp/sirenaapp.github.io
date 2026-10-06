@@ -99,6 +99,22 @@ const CON_MOTOR = ['flowchart', 'state', 'class', 'er'];
 const SPACINGS = [['30', 'spacingS'], ['50', 'spacingM'], ['80', 'spacingL']];
 // Grosores en píxeles; el vacío es el de serie de Mermaid (2 en flechas, 1 en bordes).
 const ARROW_WIDTHS = [['1', 'widthThin'], ['', 'widthNormal'], ['3', 'widthThick'], ['5', 'widthXThick']];
+// Grosor de las ramas de un mapa mental. Mermaid no tiene un ajuste para él:
+// se escribe en la cabecera como themeCSS, que Mermaid admite ahí, para que el
+// archivo lo conserve en cualquier editor. Se elige el de las ramas que salen
+// del centro; las de los niveles siguientes adelgazan en la misma proporción
+// que las de serie (11, 5 y 3 px). Sin nada escrito, las de serie. Ver ADR 36.
+const BRANCH_WIDTHS = [['3', 'widthThin'], ['6', 'widthNormal'], ['', 'widthThick']];
+const RAMAS_RE = /\.edge\{stroke-width:[\d.]+px\}\.edge-depth-1\{stroke-width:([\d.]+)px\}\.edge-depth-3\{stroke-width:[\d.]+px\}$/;
+let grosorRamas = '';
+// El resto de un themeCSS escrito a mano se conserva delante del de las ramas.
+let cssAjeno = '';
+
+function cssRamas(grosor) {
+  const w = Number(grosor);
+  const medio = (n) => Math.max(1, Math.round(n * 2) / 2);
+  return `.edge{stroke-width:${medio(w * 3 / 11)}px}.edge-depth-1{stroke-width:${w}px}.edge-depth-3{stroke-width:${medio(w * 5 / 11)}px}`;
+}
 // Tipo de línea y puntas de las flechas de flujo. No son ajustes de Mermaid:
 // se escriben en cada flecha (-->, -.->, ==>, ~~~, ---, <-->, --o, --x).
 const LINE_TYPES = [['normal', 'lineNormal'], ['punteada', 'lineDotted'], ['discontinua', 'lineDashed'], ['rayapunto', 'lineDashDot'], ['gruesa', 'lineThick'], ['invisible', 'lineInvisible']];
@@ -210,6 +226,8 @@ const el = {
   strokeMenu: $('stroke-menu'),
   engineSelect: $('engine-select'),
   arrowWidthSelect: $('arrow-width-select'),
+  branchWidthSelect: $('branch-width-select'),
+  branchWidthCustom: $('branch-width-custom'),
   lineTypeAll: $('line-type-all'),
   arrowHeadAll: $('arrow-head-all'),
   lineArrowType: $('line-arrow-type'),
@@ -974,6 +992,7 @@ function buildAppearanceSelects() {
   fillSelect(el.curveSelect, CURVES, localStorage.getItem(STORE.curve), 'basis');
   fillSelect(el.mergeSelect, YESNO, null, 'no');
   fillSelect(el.arrowWidthSelect, ARROW_WIDTHS, null, '');
+  fillSelect(el.branchWidthSelect, BRANCH_WIDTHS, null, '');
   fillSelect(el.borderWidthSelect, BORDER_WIDTHS, null, '');
   fillSelect(el.spacingSelect, SPACINGS, null, '50');
   fillSelect(el.paddingSelect, PADDINGS, null, '20');
@@ -1014,6 +1033,7 @@ function pngFondo() {
 function diagramKind() {
   const code = el.editor.value.replace(INIT_RE, '');
   if (/^\s*(flowchart|graph)\b/m.test(code)) return 'flowchart';
+  if (/^\s*mindmap\b/m.test(code)) return 'mindmap';
   if (/^\s*stateDiagram(-v2)?\b/m.test(code)) return 'state';
   if (/^\s*classDiagram\b/m.test(code)) return 'class';
   if (/^\s*erDiagram\b/m.test(code)) return 'er';
@@ -1037,7 +1057,8 @@ function updateAppearanceVisibility() {
     // Dentro de eXe, los motores ELK solo están si el Mermaid de eXe los trae
     // (desde la versión 12); con la 11 solo hay dagre y no hay nada que elegir.
     engine: conMotor && (!exe || motorExe() !== 'dagre'),
-    lines: esFlujo,
+    // En los mapas mentales, solo el grosor de las ramas (ADR 36).
+    lines: esFlujo || tipo === 'mindmap',
     // En estados no hay formas que elegir, pero sí el ancho de las cajas.
     shape: esFlujo || tipo === 'state',
     spacing: esFlujo && motor === 'dagre',
@@ -1050,6 +1071,7 @@ function updateAppearanceVisibility() {
     calendar: tipo === 'gantt'
   };
   Object.entries(visibles).forEach(([id, v]) => { $('wrap-' + id).hidden = !v; });
+  el.linesMenu.dataset.tipo = tipo;
   // El trazo (clásico, a mano alzada, moderno) no cambia nada en estos tipos
   // (comprobado con Mermaid 12.0.0): el botón sobra.
   $('wrap-stroke').hidden = SIN_TRAZO.includes(editorType());
@@ -1506,6 +1528,28 @@ function ajustarRotulosHtml() {
   currentSvg = svg.outerHTML;
 }
 
+// En un mapa mental con los rótulos como texto SVG, Mermaid coloca el texto de
+// la caja como si estuviera centrado en su punto, pero no lo centra: empieza en
+// el centro de la forma y se sale por la derecha (círculo, cuadrado, caja
+// redondeada y hexágono). En los diagramas de flujo no pasa porque su hoja de
+// estilo sí lo centra. Se centra aquí el texto de esos rótulos, en el propio
+// dibujo, para que llegue también a las descargas. Ver ADR 35.
+// Parche a un fallo de Mermaid: ver docs/parches-mermaid.md.
+function centrarTextoMapaMental() {
+  const svg = el.canvas.querySelector('svg');
+  if (!svg) return;
+  let movido = false;
+  svg.querySelectorAll('g.mindmap-node > g.label').forEach((rotulo) => {
+    if (!/^translate\(\s*0[\s,]/.test(rotulo.getAttribute('transform') || '')) return;
+    rotulo.querySelectorAll('text').forEach((texto) => {
+      if (getComputedStyle(texto).textAnchor === 'middle') return;
+      texto.setAttribute('text-anchor', 'middle');
+      movido = true;
+    });
+  });
+  if (movido) currentSvg = svg.outerHTML;
+}
+
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
@@ -1544,6 +1588,7 @@ async function renderOnce() {
       if (currentSvg.includes('<foreignObject')) {
         ajustarRotulosHtml();
       }
+      centrarTextoMapaMental();
       colorTitulosBloques();
     }
     prepararEnlaces();
@@ -1937,6 +1982,8 @@ function appearanceConfig() {
   }
   if (tipo === 'xychart' && el.datalabelSelect.value === 'yes') config.xyChart = { showDataLabel: true };
   if (tipo === 'sankey' && el.sankeyValuesSelect.value === 'no') config.sankey = { showValues: false };
+  const css = cssAjeno + (tipo === 'mindmap' && grosorRamas ? cssRamas(grosorRamas) : '');
+  if (css) config.themeCSS = css;
   return config;
 }
 
@@ -2600,6 +2647,12 @@ function readAppearance() {
   el.mergeSelect.value = config.elk && config.elk.mergeEdges ? 'yes' : 'no';
   readLineWidths();
   readArrowTypes();
+  const css = typeof config.themeCSS === 'string' ? config.themeCSS : '';
+  const ramas = RAMAS_RE.exec(css);
+  grosorRamas = ramas ? ramas[1] : '';
+  cssAjeno = ramas ? css.slice(0, ramas.index) : css;
+  setGrosorValor(el.branchWidthSelect, grosorRamas);
+  el.branchWidthCustom.value = grosorRamas;
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);
   el.paddingSelect.value = String(flujo.diagramPadding || 20);
   anchoCajas = String((diagramKind() === 'state' ? (config.state || {}).wrappingWidth : flujo.wrappingWidth) || 120);
@@ -4596,6 +4649,22 @@ function setupEditorTools() {
   });
   [el.arrowWidthSelect, el.borderWidthSelect].forEach((select) => {
     select.addEventListener('change', () => writeLineWidths());
+  });
+  el.branchWidthSelect.addEventListener('change', () => {
+    grosorRamas = el.branchWidthSelect.value;
+    el.branchWidthCustom.value = grosorRamas;
+    writeAppearance();
+  });
+  const grosorRamasPropio = () => {
+    const valor = grosorValido(el.branchWidthCustom.value);
+    if (!valor) return;
+    grosorRamas = valor;
+    setGrosorValor(el.branchWidthSelect, valor);
+    writeAppearance();
+  };
+  el.branchWidthCustom.addEventListener('change', grosorRamasPropio);
+  el.branchWidthCustom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); grosorRamasPropio(); }
   });
   // Los pliegues del menú de líneas: uno abierto como mucho.
   el.linesMenu.addEventListener('click', (event) => {

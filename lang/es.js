@@ -135,6 +135,7 @@ window.SIRENA_LANG.es = {
   lines: 'Líneas',
   linesAll: 'Todas las líneas',
   arrowWidth: 'Grosor de las flechas',
+  branchWidth: 'Grosor de las ramas',
   lineType: 'Tipo de línea',
   arrowHead: 'Puntas',
   lineNormal: 'Continua',

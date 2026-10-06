@@ -64,6 +64,18 @@
       "codigo": "flowchart TD\n  A[A deliberately long node label that is wider than the wrapping width]",
       "nota": "solo el white-space: normal que pone al rótulo",
       "control": "flowchart TD\n  A[A deliberately long node label that is wider than the wrapping width]"
+    },
+    {
+      "clave": "texto-mapa-mental",
+      "fallo": "En un mapa mental con los rótulos como texto SVG, el texto de las cajas (círculo, cuadrado, caja redondeada, hexágono) empieza en el centro de la forma y se sale por la derecha",
+      "incidencias": [],
+      "funciones": [
+        "centrarTextoMapaMental"
+      ],
+      "adr": "0035",
+      "comprobacion": "textoMapaMental",
+      "codigo": "%%{init: {\"htmlLabels\": false}}%%\nmindmap\n  root((Cell))\n    a[Square]\n    b(Rounded)\n    c{{Hexagon}}",
+      "control": "%%{init: {\"htmlLabels\": true}}%%\nmindmap\n  root((Cell))\n    a[Square]\n    b(Rounded)\n    c{{Hexagon}}"
     }
   ]
 }

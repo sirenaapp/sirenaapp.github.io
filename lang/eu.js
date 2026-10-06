@@ -135,6 +135,7 @@ window.SIRENA_LANG.eu = {
   lines: 'Lerroak',
   linesAll: 'Lerro guztiak',
   arrowWidth: 'Gezien lodiera',
+  branchWidth: 'Adarren lodiera',
   lineType: 'Lerro mota',
   arrowHead: 'Puntak',
   lineNormal: 'Jarraitua',

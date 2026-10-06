@@ -135,6 +135,7 @@ window.SIRENA_LANG.ca = {
   lines: 'Línies',
   linesAll: 'Totes les línies',
   arrowWidth: 'Gruix de les fletxes',
+  branchWidth: 'Gruix de les branques',
   lineType: 'Tipus de línia',
   arrowHead: 'Puntes',
   lineNormal: 'Contínua',

@@ -135,6 +135,7 @@ window.SIRENA_LANG.gl = {
   lines: 'Liñas',
   linesAll: 'Todas as liñas',
   arrowWidth: 'Grosor das frechas',
+  branchWidth: 'Grosor das ramas',
   lineType: 'Tipo de liña',
   arrowHead: 'Puntas',
   lineNormal: 'Continua',
