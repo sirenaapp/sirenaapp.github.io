@@ -110,6 +110,20 @@ let grosorRamas = '';
 // El resto de un themeCSS escrito a mano se conserva delante del de las ramas.
 let cssAjeno = '';
 
+// Con los rótulos en HTML, Mermaid 11 (el de eXeLearning hasta la 11.12) no
+// aplica el color del texto de una rama (cScaleLabel), y una rama oscura
+// queda con el texto negro. Cuando ese texto tiene que ser blanco se escribe
+// también como regla en themeCSS, que esas versiones sí respetan. Ver ADR 37.
+const TEXTO_RAMA_RE = /\.section-(?:root|\d+) span\{color:#[0-9a-f]{6}\}/g;
+
+function cssTextoRamas() {
+  if (diagramKind() !== 'mindmap') return '';
+  return Object.entries(coloresRamas).map(([seccion, color]) => {
+    if (!color || textoSobre(color) !== '#ffffff') return '';
+    return '.section-' + (Number(seccion) === -1 ? 'root' : seccion) + ' span{color:#ffffff}';
+  }).join('');
+}
+
 function cssRamas(grosor) {
   const w = Number(grosor);
   const medio = (n) => Math.max(1, Math.round(n * 2) / 2);
@@ -1999,7 +2013,7 @@ function appearanceConfig() {
   }
   if (tipo === 'xychart' && el.datalabelSelect.value === 'yes') config.xyChart = { showDataLabel: true };
   if (tipo === 'sankey' && el.sankeyValuesSelect.value === 'no') config.sankey = { showValues: false };
-  const css = cssAjeno + (tipo === 'mindmap' && grosorRamas ? cssRamas(grosorRamas) : '');
+  const css = cssAjeno + cssTextoRamas() + (tipo === 'mindmap' && grosorRamas ? cssRamas(grosorRamas) : '');
   if (css) config.themeCSS = css;
   return config;
 }
@@ -2667,7 +2681,8 @@ function readAppearance() {
   const css = typeof config.themeCSS === 'string' ? config.themeCSS : '';
   const ramas = RAMAS_RE.exec(css);
   grosorRamas = ramas ? ramas[1] : '';
-  cssAjeno = ramas ? css.slice(0, ramas.index) : css;
+  // Las reglas del texto de las ramas se rehacen con sus colores: no son ajenas.
+  cssAjeno = (ramas ? css.slice(0, ramas.index) : css).replace(TEXTO_RAMA_RE, '');
   setGrosorValor(el.branchWidthSelect, grosorRamas);
   el.branchWidthCustom.value = grosorRamas;
   el.spacingSelect.value = String(flujo.nodeSpacing || 50);

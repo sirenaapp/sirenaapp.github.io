@@ -43,6 +43,18 @@ o `gitBranchLabel0`), negro o blanco según cuál contraste más, porque Mermaid
 lo ajusta solo. «Quitar los colores puestos a mano» y «Limpiar formato» los
 quitan.
 
+**Compatibilidad con eXeLearning.** Dentro de eXe, Sirena dibuja con el Mermaid
+de eXe ([ADR 29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md)),
+y con él se exporta el material: la copia que sirve su editor es la 11.12.0
+(aunque su `package.json` pide la 11.17.2) y dibuja los rótulos en HTML. En esa
+versión las formas, el grosor y el color de las ramas funcionan igual, pero el
+color del texto (`cScaleLabel…`) solo se aplica a los rótulos SVG: con HTML el
+texto queda negro. Por eso, cuando el texto de una rama tiene que ser blanco,
+se escribe además en `themeCSS` (`.section-0 span{color:#ffffff}`; el centro,
+`.section-root span`), que esa versión sí respeta. Con un color claro no se
+escribe nada más. Mermaid 11.17.2 y la 12 ya aplican `cScaleLabel…` también en
+HTML.
+
 ## Alternativas descartadas
 
 - **Colorear cajas sueltas con `themeCSS`.** Mermaid no da a cada caja una
@@ -71,4 +83,8 @@ rama; con un color oscuro (`#1f3a93`) el texto queda negro si no se da
 derecho y desde el desplegable de la barra, todas las cajas en una forma y de
 vuelta a la de por defecto; color de una rama desde la paleta, desde un color
 propio oscuro (texto blanco) y desde la barra; color del centro; sin errores de
-JavaScript y los 27 ejemplos en cinco idiomas, sin fallos.
+JavaScript y los 27 ejemplos en cinco idiomas, sin fallos. Con el Mermaid de
+eXe (11.12.0, `public/app/common/mermaid/mermaid.min.js` de su rama principal) y
+su configuración: las siete formas, el grosor (3 y 1,5 px), la negrita, la
+numeración de cajas y ramas que usa el botón derecho, y una rama y un centro
+oscuros escritos por Sirena, con el texto en blanco.
