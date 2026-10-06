@@ -30,7 +30,9 @@ según su nivel. Si el código ya traía un `themeCSS` escrito a mano, se conser
 delante del de las ramas. «Limpiar formato» lo quita, como el resto del aspecto
 ([ADR 27](0027-limpiar-formato-deja-el-diagrama-sin-aspecto-propio-y-conserva-su-estructura.md)).
 
-El ejemplo del mapa mental viene con las ramas finas.
+El ejemplo del mapa mental viene con el grosor de serie: lo que se ofrece es
+poder cambiarlo con facilidad, no otro aspecto por defecto. (La versión 2.3.0
+lo trajo con ramas finas; se retiró en la siguiente.)
 
 ## Alternativas descartadas
 
@@ -55,7 +57,6 @@ pasa `themeCSS` por `sanitizeCss`, que solo exige llaves equilibradas.
 
 ## Validación
 
-06-10-2026, en Chromium y Firefox: el ejemplo abre con «Fino» marcado y ramas de
-3 y 1,5 px; «Normal», «Grueso» y un valor a mano (8 px) escriben y quitan la
+06-10-2026, en Chromium y Firefox: con «Fino», ramas de 3 y 1,5 px; «Normal», «Grueso» y un valor a mano (8 px) escriben y quitan la
 cabecera como se espera; un `themeCSS` escrito a mano se conserva al cambiar el
 grosor; sin errores de JavaScript.
