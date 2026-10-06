@@ -1362,3 +1362,23 @@ body.exe .toolbar { margin-left: 0; }
 .error-exe { flex-basis: 100%; order: 10; font-size: 13px; color: var(--danger); }
 
 .acciones-exe { display: inline-flex; gap: 8px; margin-left: auto; }
+
+/* El «+» que añade una rama a la caja del mapa mental bajo el ratón. */
+.mas-rama {
+  position: fixed;
+  z-index: 40;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface, #fff);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+}
+.mas-rama[hidden] { display: none; }
+.mas-rama svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.mas-rama:hover, .mas-rama:focus-visible { background: var(--accent); color: #fff; }

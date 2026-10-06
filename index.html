@@ -27,12 +27,12 @@
 <title>Sirena · Editor de diagramas Mermaid</title>
 <meta name="description" content="Editor libre de diagramas Mermaid que funciona por completo en el navegador, sin cuenta ni servidor.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/sirena.css?v=3ef2c06c">
-<script src="lang/es.js?v=e76e4616"></script>
-<script src="lang/ca.js?v=fe1ef517"></script>
-<script src="lang/gl.js?v=e0e90fa7"></script>
-<script src="lang/eu.js?v=d82ac804"></script>
-<script src="lang/en.js?v=f2f76eb7"></script>
+<link rel="stylesheet" href="css/sirena.css?v=896b2221">
+<script src="lang/es.js?v=a019e714"></script>
+<script src="lang/ca.js?v=1723518e"></script>
+<script src="lang/gl.js?v=aeef3508"></script>
+<script src="lang/eu.js?v=1f1ce8de"></script>
+<script src="lang/en.js?v=f14a0d7a"></script>
 <script src="js/examples.js?v=373c2e32"></script>
 <script src="js/sintaxis.js?v=78ce0aa8"></script>
 <script src="js/formas.js?v=fe7a3ebe"></script>
@@ -434,7 +434,7 @@
     <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> ·
     <span data-i18n="poweredBy">Diagramas generados con</span>
     <a href="https://mermaid.js.org/" target="_blank" rel="noopener noreferrer">Mermaid</a> ·
-    <a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.3.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.3.0</span></a>
+    <a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.4.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.4.0</span></a>
   </p>
 </footer>
 
@@ -452,6 +452,7 @@
   <button type="button" data-formato="formula" data-i18n-title="formula"><svg><use href="#i-formula"></use></svg></button>
 </div>
 <textarea id="editor-sitio" class="editor-sitio" spellcheck="false" hidden></textarea>
+<button type="button" id="mas-rama" class="mas-rama" data-i18n-title="mindAddBranch" hidden><svg aria-hidden="true"><use href="#i-plus"></use></svg></button>
 <div class="menu menu-contextual" id="context-menu" hidden></div>
 <div class="menu menu-contextual menu-cascada" id="context-submenu" hidden></div>
 
@@ -477,7 +478,7 @@
 <div class="modal-overlay" id="creditos-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-creditos">
     <h2 id="titulo-creditos" data-i18n="creditsTip">Créditos, licencias y uso de IA</h2>
-    <p class="modal-help"><a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.3.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.3.0</span></a></p>
+    <p class="modal-help"><a class="version-enlace" href="https://github.com/sirenaapp/sirenaapp.github.io/releases/tag/v2.4.0" target="_blank" rel="noopener noreferrer"><span data-i18n="version">Versión</span> <span class="version-num">2.4.0</span></a></p>
     <p data-i18n="creditsText"></p>
     <p><a href="https://github.com/sirenaapp/sirenaapp.github.io/blob/main/vendor/mermaid/TERCEROS.md" target="_blank" rel="noopener noreferrer" data-i18n="creditsList">Todas las bibliotecas y sus licencias</a></p>
     <p><span data-i18n="aiBefore"></span><a id="ai-link" href="https://jjdeharo.github.io/miae/?nivel=4" target="_blank" rel="noopener noreferrer" data-i18n="aiLink"></a><span data-i18n="aiAfter"></span></p>
@@ -551,6 +552,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script type="module" src="js/sirena.js?v=7e83e56e"></script>
+<script type="module" src="js/sirena.js?v=9024340d"></script>
 </body>
 </html>

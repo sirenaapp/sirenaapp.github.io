@@ -43,6 +43,21 @@ o `gitBranchLabel0`), negro o blanco según cuál contraste más, porque Mermaid
 lo ajusta solo. «Quitar los colores puestos a mano» y «Limpiar formato» los
 quitan.
 
+**Texto y ramas nuevas desde el dibujo.** El doble clic sobre una caja (o
+«Escribir el texto» en su menú) abre el campo encima de ella; el texto se
+escribe con la forma de la caja, entre comillas y acentos graves si lleva
+negrita o cursiva, y si una caja por defecto recibe paréntesis, corchetes o
+llaves pasa a cuadrado con un aviso. Al pasar el ratón por una caja aparece a su
+derecha un «+» que añade una rama que sale de ella, detrás de las que ya tiene y
+con su sangría, escrita «Nueva idea» y lista para cambiarla; en pantalla táctil
+la misma acción está en el menú de la caja («Añadir una rama»). Antes, el doble
+clic tomaba la caja por una flecha del diagrama de flujo: el campo salía en otro
+sitio y lo escrito no se guardaba.
+
+**Menú del lienzo.** En el mapa mental ofrece «Todas las cajas», con las siete
+formas para cambiarlas todas a la vez, y no el ancho de las cajas, que el mapa
+mental no atiende.
+
 **Compatibilidad con eXeLearning.** Dentro de eXe, Sirena dibuja con el Mermaid
 de eXe ([ADR 29](0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md)),
 y con él se exporta el material: la copia que sirve su editor es la 11.12.0
@@ -61,7 +76,8 @@ HTML.
   clase propia estable, y el resultado no se parecería a lo que hace Mermaid
   con el color de las ramas.
 - **Las formas en la ventana grande del diagrama de flujo.** Son siete: caben
-  en un desplegable, que es más rápido.
+  en un desplegable, que es más rápido (lo pidió el autor al verlo en la
+  ventana).
 
 ## Consecuencias
 
@@ -87,4 +103,7 @@ JavaScript y los 27 ejemplos en cinco idiomas, sin fallos. Con el Mermaid de
 eXe (11.12.0, `public/app/common/mermaid/mermaid.min.js` de su rama principal) y
 su configuración: las siete formas, el grosor (3 y 1,5 px), la negrita, la
 numeración de cajas y ramas que usa el botón derecho, y una rama y un centro
-oscuros escritos por Sirena, con el texto en blanco.
+oscuros escritos por Sirena, con el texto en blanco. Y Sirena abierta dentro de un TinyMCE de eXe
+con ese Mermaid, como describe `docs/pruebas.md`, en Chromium y Firefox: color de
+rama, forma desde el submenú, doble clic con negrita, «+», grosor fino e
+inserción del diagrama en el editor, sin errores.
