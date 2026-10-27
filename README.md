@@ -152,6 +152,22 @@ con el Mermaid de eXe, sin los retoques propios de Sirena, para que lo que se ve
 al editar sea lo que sale en el material. Fuera de eXe, nada de esto se activa. Los detalles están en el
 [ADR 29](docs/adr/0029-dentro-de-exelearning-sirena-devuelve-el-diagrama-al-editor-como-edicuatex.md).
 
+## Desde otro programa
+
+Cualquier programa puede usar Sirena para editar sus diagramas, como
+EdiMarkdown, sin copiarla. La abre con `pm=1`, su origen y su idioma en la
+dirección, y el diagrama en el enlace, igual que en los enlaces compartidos:
+
+```text
+https://sirenaapp.github.io/index.html?pm=1&origin=https%3A%2F%2Fejemplo.org&lang=es#z=…
+```
+
+Sirena enseña abajo «Cancelar» e «Insertar», no guarda nada en su biblioteca y,
+al pulsar «Insertar», devuelve `{ type: 'sirena:result', code }` por
+`postMessage` solo a ese origen (`{ type: 'sirena:cancel' }` al cancelar).
+Los detalles están en el
+[ADR 38](docs/adr/0038-abierta-desde-otro-programa-sirena-le-devuelve-el-diagrama.md).
+
 Por eso los textos de `lang/en.js` van dentro de `_('…')`: eXe recoge esas
 llamadas para su catálogo de traducciones. Todo texto nuevo de la interfaz se
 escribe así.

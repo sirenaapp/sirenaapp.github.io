@@ -64,6 +64,19 @@ Sirena copiada en `app/common/sirena`. En una caja de texto hay dos editores
 (texto y retroalimentación): antes de abrir Sirena a mano hay que enfocar el
 visible, porque el diagrama va al editor activo.
 
+## Abierta desde otro programa
+
+El modo del [ADR 38](adr/0038-abierta-desde-otro-programa-sirena-le-devuelve-el-diagrama.md)
+se prueba con el programa que la abre, desviando las peticiones a
+`sirenaapp.github.io` hacia la copia local (con `context.route` de Playwright),
+para que el origen sea el real. Conviene comprobar, en Chromium, Firefox y
+WebKit: que se abre con el diagrama y el idioma pedidos, que la barra sale sin
+las medidas de eXe y sin la biblioteca, que «Insertar» devuelve el código y
+cierra la ventana, que «Cancelar» no devuelve nada, y que en `localStorage` no
+queda ningún diagrama ni cambia la lengua guardada (mirándolo desde una
+dirección vacía del mismo origen: la página normal guarda su diagrama al
+arrancar).
+
 ## Parches a fallos de Mermaid
 
 Los fallos de Mermaid que Sirena corrige por su cuenta están en

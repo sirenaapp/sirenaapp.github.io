@@ -360,6 +360,24 @@ function anfitrionExe() {
   return null;
 }
 const exe = anfitrionExe();
+
+// Abierta desde otro programa para editar uno de sus diagramas (EdiMarkdown,
+// por ejemplo), como se abre EdiCuaTeX: la dirección lleva `pm=1` y el origen
+// de quien la abre, y el diagrama llega en el enlace (#z= o #d=). Al pulsar
+// Insertar, Sirena le devuelve el código por postMessage, solo a ese origen, y
+// no guarda nada en su biblioteca: el diagrama vive en el documento de quien
+// la abrió. Ver ADR 38.
+function programaQueAbre() {
+  if (exe) return null;
+  const params = new URLSearchParams(location.search);
+  const origen = params.get('origin') || '';
+  if (params.get('pm') !== '1' || !origen) return null;
+  let destino = null;
+  if (window.opener && !window.opener.closed) destino = window.opener;
+  else if (window.parent && window.parent !== window) destino = window.parent;
+  return destino ? { origen, destino, lang: params.get('lang') || '' } : null;
+}
+const otroPrograma = programaQueAbre();
 // Dentro de eXe, Sirena dibuja con el Mermaid de eXe, el mismo que dibujará
 // el diagrama en el material: así lo que se ve al editar es lo que sale, sea
 // cual sea la versión de Mermaid que lleve eXe. Si no llegara a cargarse, se
@@ -533,8 +551,9 @@ function nombreSugerido(codigo) {
 // Si el diagrama abierto está vacío se reaprovecha, para no dejar fichas
 // vacías en la lista cada vez que se carga un ejemplo o un archivo.
 function crearDoc(codigo, nombre) {
-  // En eXe el diagrama vive en el material, no en la biblioteca del navegador.
-  if (exe) return null;
+  // En eXe el diagrama vive en el material, no en la biblioteca del navegador;
+  // abierta desde otro programa, en el documento de ese programa.
+  if (exe || otroPrograma) return null;
   const docs = leerDocs();
   const actual = docs.find((d) => d.id === docActivo);
   if (actual && !actual.codigo.trim() && codigo.trim()) {
@@ -588,7 +607,7 @@ function soltarDocActivo() {
 
 // Cada cambio se guarda solo en el diagrama abierto, sin botón de guardar.
 function guardarDocActivo() {
-  if (exe) return;
+  if (exe || otroPrograma) return;
   clearTimeout(guardadoTimer);
   guardadoTimer = setTimeout(() => {
     const docs = leerDocs();
@@ -840,6 +859,9 @@ function detectLang() {
     const propio = base === 'va' ? 'ca' : base;
     return window.SIRENA_LANG[propio] ? propio : 'en';
   }
+  // Quien abre Sirena dice en qué idioma la tiene la persona.
+  const pedido = otroPrograma && otroPrograma.lang.toLowerCase().split(/[-_]/)[0];
+  if (pedido && window.SIRENA_LANG[pedido]) return pedido;
   const saved = localStorage.getItem(STORE.lang);
   if (saved && window.SIRENA_LANG[saved]) return saved;
   for (const nav of navigator.languages || [navigator.language || 'es']) {
@@ -875,7 +897,8 @@ function traducirConExe(key) {
 function applyLang(code) {
   lang = window.SIRENA_LANG[code] ? code : 'es';
   strings = window.SIRENA_LANG[lang];
-  if (!exe) localStorage.setItem(STORE.lang, lang);
+  // La lengua que pide otro programa vale para esta vez, no cambia la guardada.
+  if (!exe && !otroPrograma) localStorage.setItem(STORE.lang, lang);
   document.documentElement.lang = (exe && idiomaExe()) || lang;
 
   document.querySelectorAll('[data-i18n]').forEach((node) => {
@@ -1573,7 +1596,7 @@ async function renderOnce() {
   // las fórmulas o el ajuste del modo oscuro, que no debe pasar a otros temas.
   if (hayFormulas(code) !== mermaidConFormulas || (sigueAlModo() && isDark()) !== mermaidOscuroPropio) initMermaid();
   codigoPrevio = el.editor.value;
-  if (!exe) localStorage.setItem(STORE.code, el.editor.value);
+  if (!exe && !otroPrograma) localStorage.setItem(STORE.code, el.editor.value);
   guardarDocActivo();
   updateStatus();
   renderGutter();
@@ -7244,6 +7267,32 @@ function prepararExe() {
   });
 }
 
+// Devuelve el diagrama al programa que abrió Sirena. Si la abrió en una
+// ventana, la ventana se cierra; si la lleva dentro, la cierra él.
+function insertarEnPrograma() {
+  const codigo = el.editor.value.trim();
+  if (!codigo) {
+    toast(t('exeEmpty'));
+    el.editor.focus();
+    return;
+  }
+  otroPrograma.destino.postMessage({ type: 'sirena:result', code: codigo }, otroPrograma.origen);
+  if (otroPrograma.destino === window.opener) window.close();
+}
+
+function cancelarEnPrograma() {
+  otroPrograma.destino.postMessage({ type: 'sirena:cancel' }, otroPrograma.origen);
+  if (otroPrograma.destino === window.opener) window.close();
+}
+
+// La misma barra que dentro de eXe, sin las medidas, que son cosa de eXe.
+function prepararOtroPrograma() {
+  document.body.classList.add('otro-programa');
+  el.barraExe.hidden = false;
+  $('exe-insertar').addEventListener('click', insertarEnPrograma);
+  $('exe-cancelar').addEventListener('click', cancelarEnPrograma);
+}
+
 /* --- Divisor de paneles --- */
 
 // El separador dice a los lectores de pantalla qué parte del ancho ocupa el
@@ -7756,6 +7805,11 @@ async function start() {
     await cargarMermaidExe();
     await comprobarEjemplosExe();
     await comprobarFormasExe();
+  } else if (otroPrograma) {
+    prepararOtroPrograma();
+    docActivo = null;
+    // Sin diagrama en el enlace, quien la abre pide uno nuevo.
+    if (!fromLink) el.editor.value = DEFAULT_CODE[lang] || DEFAULT_CODE.es;
   } else if (fromLink) {
     // Un diagrama que llega por enlace no entra en la biblioteca hasta que se
     // toca: así abrirlo no ensucia lo que la persona tenga guardado.

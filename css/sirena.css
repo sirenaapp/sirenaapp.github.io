@@ -1291,18 +1291,31 @@ body.viewer .pane-preview { display: flex !important; flex: 1 1 auto; }
    «Insertar»), la biblioteca del navegador, compartir por enlace, imprimir y el
    idioma, que es el de eXe. La marca ya la pone el título de la ventana de
    eXe. Se oculta la caja entera de cada botón con menú, y la raya que quedaba
-   al principio, para que no dejen huecos en la barra. */
+   al principio, para que no dejen huecos en la barra. Lo mismo vale cuando la
+   abre otro programa (EdiMarkdown), salvo la marca: en una ventana suelta no
+   hay otro título que diga qué es. */
 body.exe #btn-new,
+body.otro-programa #btn-new,
 body.exe #btn-open,
+body.otro-programa #btn-open,
 body.exe .menu-wrap:has(> #btn-download),
+body.otro-programa .menu-wrap:has(> #btn-download),
 body.exe .menu-wrap:has(> #btn-share),
+body.otro-programa .menu-wrap:has(> #btn-share),
 body.exe .menu-wrap:has(> #btn-lang),
+body.otro-programa .menu-wrap:has(> #btn-lang),
 body.exe .toolbar > .tb-sep,
+body.otro-programa .toolbar > .tb-sep,
 body.exe #btn-copy-image,
+body.otro-programa #btn-copy-image,
 body.exe #btn-library,
+body.otro-programa #btn-library,
 body.exe #btn-print,
+body.otro-programa #btn-print,
 body.exe #doc-name,
-body.exe .footer { display: none !important; }
+body.otro-programa #doc-name,
+body.exe .footer,
+body.otro-programa .footer { display: none !important; }
 
 /* La marca no se ve (el título está en la ventana de eXe), pero el título de
    la página sigue ahí para los lectores de pantalla. */
@@ -1362,6 +1375,10 @@ body.exe .toolbar { margin-left: 0; }
 .error-exe { flex-basis: 100%; order: 10; font-size: 13px; color: var(--danger); }
 
 .acciones-exe { display: inline-flex; gap: 8px; margin-left: auto; }
+/* Abierta desde otro programa: la misma barra, sin las medidas de eXe. */
+.otro-programa .campo-exe,
+.otro-programa .pista-exe,
+.otro-programa .ayuda-exe { display: none; }
 
 /* El «+» que añade una rama a la caja del mapa mental bajo el ratón. */
 .mas-rama {
