@@ -1,6 +1,6 @@
 # 35. Sirena centra el texto de las cajas de los mapas mentales
 
-Fecha: 2026-10-06 · Estado: aceptado
+Fecha: 2026-10-06 · Estado: retirado el 27-10-2026 (Mermaid 12.2.0 corrige el fallo)
 
 ## Contexto
 
@@ -64,3 +64,16 @@ clases alinea a la izquierda sus atributos a propósito.
 cajas del ejemplo queda a 0 px del centro de su forma, también en el PNG
 descargado. `scripts/comprobar-parches.mjs` da el control bien (rótulos en HTML)
 y el ejemplo con el fallo, a 32 px del centro.
+
+## Retirada (27-10-2026)
+
+Mermaid 12.2.0 corrige el fallo: centra el texto de las cajas del mapa mental
+cuando los rótulos son texto SVG
+([PR #8390](https://github.com/mermaid-js/mermaid/pull/8390), que cierra
+[#8387](https://github.com/mermaid-js/mermaid/issues/8387)). El aviso de versión
+nueva lo dio como corregido: con el ejemplo mínimo y Mermaid solo, el texto
+queda a 0,0 px del centro de su caja. Al actualizar Mermaid se quitó
+`centrarTextoMapaMental()`, su entrada en `scripts/parches-mermaid.json` y su
+medición en `scripts/comprobar-parches.mjs`. En Sirena, sin el parche, el texto
+del ejemplo del mapa mental queda a menos de 0,3 px del centro de su caja en los
+cinco idiomas, en Chromium y en Firefox.

@@ -15,9 +15,10 @@ causa no era un fallo de Mermaid: bastaba escribir `layout: dagre` para que
 volvieran a funcionar.
 
 Medido con Mermaid sin código de Sirena, mismo diagrama en cada versión (la
-12.1.0, el 06-10-2026, da trazados idénticos a la 12.0.0):
+12.1.0, el 06-10-2026, da trazados idénticos a la 12.0.0, y la 12.2.0, el
+27-10-2026, idénticos a la 12.1.0):
 
-| Configuración | 11.17.2 | 12.0.0 y 12.1.0 |
+| Configuración | 11.17.2 | 12.0.0, 12.1.0 y 12.2.0 |
 |---|---|---|
 | por defecto | curvas | ángulo recto |
 | `curve: linear`, sin más | rectas | sin efecto |

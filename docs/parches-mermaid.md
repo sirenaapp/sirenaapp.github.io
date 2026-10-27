@@ -12,7 +12,6 @@ allí Sirena dibuja con el Mermaid de eXe, tal como saldrá en el material
 | En un rótulo con fórmula desaparecen los saltos de línea (`<br>`) | `marcarSaltos` y `restaurarSaltos` (ADR 22) | [#7194](https://github.com/mermaid-js/mermaid/issues/7194), [#5941](https://github.com/mermaid-js/mermaid/issues/5941), [#7873](https://github.com/mermaid-js/mermaid/issues/7873) |
 | El rótulo de flecha con fórmula no tiene fondo opaco y la línea lo atraviesa | en `ajustarRotulosHtml`, el fondo que pone al rótulo (ADR 22) | [#5543](https://github.com/mermaid-js/mermaid/issues/5543) |
 | En Chrome y Edge, con algunas escalas de pantalla o de zoom, el texto de una caja que no cabe en una línea queda en una sola y cortado | en `ajustarRotulosHtml`, el `white-space: normal` que pone al rótulo (ADR 22) | [#7794](https://github.com/mermaid-js/mermaid/issues/7794) |
-| En un mapa mental con los rótulos como texto SVG, el texto de las cajas (círculo, cuadrado, caja redondeada, hexágono) empieza en el centro y se sale por la derecha | `centrarTextoMapaMental` ([ADR 35](adr/0035-sirena-centra-el-texto-de-las-cajas-de-los-mapas-mentales.md)) | [#8387](https://github.com/mermaid-js/mermaid/issues/8387) |
 
 La lista que usan las comprobaciones está en `scripts/parches-mermaid.json`:
 por cada parche, un ejemplo mínimo que reproduce el fallo y un ejemplo de
@@ -47,6 +46,7 @@ una versión publicada, o corregirse sin cerrarse.
 | Fallo | Parche | Retirado |
 |---|---|---|
 | Con ELK, un rótulo de flecha queda al lado de su línea ([#8292](https://github.com/mermaid-js/mermaid/issues/8292)) | `rotulosSobreSuLinea` ([ADR 26](adr/0026-sirena-recoloca-los-rotulos-de-flecha-que-mermaid-deja-fuera-de-su-linea.md)) | 06-10-2026, con Mermaid 12.1.0, que lo corrige |
+| En un mapa mental con los rótulos como texto SVG, el texto de las cajas (círculo, cuadrado, caja redondeada, hexágono) empieza en el centro y se sale por la derecha ([#8387](https://github.com/mermaid-js/mermaid/issues/8387)) | `centrarTextoMapaMental` ([ADR 35](adr/0035-sirena-centra-el-texto-de-las-cajas-de-los-mapas-mentales.md)) | 27-10-2026, con Mermaid 12.2.0, que lo corrige |
 
 ## Ajustes propios de Sirena, que no son parches
 

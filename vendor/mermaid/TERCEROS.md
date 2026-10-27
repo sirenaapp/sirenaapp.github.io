@@ -32,7 +32,7 @@ los archivos (`@license`).
 
 `scripts/actualizar-mermaid.sh` rehace esta lista al actualizar Mermaid.
 
-## Dependencias de Mermaid 12.1.0 según npm (06-10-2026)
+## Dependencias de Mermaid 12.2.0 según npm (27-10-2026)
 
 - @braintree/sanitize-url: MIT
 - @iconify/utils: MIT

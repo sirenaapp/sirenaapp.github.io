@@ -110,17 +110,6 @@ const MEDICIONES = {
   }`,
   // Mapa mental: el texto de cada caja tiene que quedar centrado en su forma.
   // Vale para los rótulos en HTML (control) y como texto SVG (ejemplo).
-  textoMapaMental: `(svg) => {
-    let peor = 0;
-    for (const nodo of svg.querySelectorAll('g.mindmap-node')) {
-      const forma = nodo.querySelector(':scope > circle, :scope > rect, :scope > path, :scope > polygon');
-      const texto = nodo.querySelector('g.label text, g.label foreignObject p, g.label foreignObject span');
-      if (!forma || !texto || !texto.textContent.trim()) continue;
-      const a = forma.getBoundingClientRect(), b = texto.getBoundingClientRect();
-      peor = Math.max(peor, Math.abs((b.left + b.right) / 2 - (a.left + a.right) / 2));
-    }
-    return { sigue: peor > 2, detalle: 'texto más descentrado: ' + peor.toFixed(1) + ' px del centro de su caja' };
-  }`,
 };
 
 const TIPOS = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript' };

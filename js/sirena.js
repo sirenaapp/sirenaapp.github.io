@@ -9,7 +9,7 @@ let mermaid = null;
 
 async function cargarMermaidPropio() {
   try {
-    mermaid = (await import('../vendor/mermaid/mermaid.esm.min.mjs?v=37be56aa')).default;
+    mermaid = (await import('../vendor/mermaid/mermaid.esm.min.mjs?v=15e3e102')).default;
   } catch (_) {
     mermaid = null;
   }
@@ -1566,28 +1566,6 @@ function ajustarRotulosHtml() {
   currentSvg = svg.outerHTML;
 }
 
-// En un mapa mental con los rótulos como texto SVG, Mermaid coloca el texto de
-// la caja como si estuviera centrado en su punto, pero no lo centra: empieza en
-// el centro de la forma y se sale por la derecha (círculo, cuadrado, caja
-// redondeada y hexágono). En los diagramas de flujo no pasa porque su hoja de
-// estilo sí lo centra. Se centra aquí el texto de esos rótulos, en el propio
-// dibujo, para que llegue también a las descargas. Ver ADR 35.
-// Parche a un fallo de Mermaid (#8387): ver docs/parches-mermaid.md.
-function centrarTextoMapaMental() {
-  const svg = el.canvas.querySelector('svg');
-  if (!svg) return;
-  let movido = false;
-  svg.querySelectorAll('g.mindmap-node > g.label').forEach((rotulo) => {
-    if (!/^translate\(\s*0[\s,]/.test(rotulo.getAttribute('transform') || '')) return;
-    rotulo.querySelectorAll('text').forEach((texto) => {
-      if (getComputedStyle(texto).textAnchor === 'middle') return;
-      texto.setAttribute('text-anchor', 'middle');
-      movido = true;
-    });
-  });
-  if (movido) currentSvg = svg.outerHTML;
-}
-
 async function renderOnce() {
   anchoDeMedida();
   const code = el.editor.value.trim();
@@ -1626,7 +1604,6 @@ async function renderOnce() {
       if (currentSvg.includes('<foreignObject')) {
         ajustarRotulosHtml();
       }
-      centrarTextoMapaMental();
       colorTitulosBloques();
     }
     prepararEnlaces();

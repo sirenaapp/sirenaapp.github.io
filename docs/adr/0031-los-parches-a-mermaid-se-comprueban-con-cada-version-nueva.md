@@ -86,3 +86,7 @@ versiones, el fallo estaba corregido y la diferencia del control era un cambio
 pequeño de `dagre`, sin relación con el fallo: el parche se retiró (ADR 26). El
 mecanismo funcionó como estaba previsto: ante un control dudoso no dio un
 resultado, sino que pidió comprobarlo.
+
+27-10-2026, Mermaid 12.2.0: la comprobación dio como corregido el fallo del
+texto del mapa mental, con su control bien, y como vigentes los otros cuatro.
+Se confirmó en Sirena y el parche se retiró (ADR 35).
