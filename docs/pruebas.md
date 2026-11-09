@@ -30,6 +30,10 @@ Cada lunes, la acción `.github/workflows/check-mermaid-version.yml` compara
 distintas, abre una incidencia con los pasos de actualización. También se puede
 lanzar a mano desde la pestaña Actions del repositorio.
 
+Al actualizar, conviene mirar en sus notas si la versión nueva trae el diagrama
+BPMN (`bpmn-beta`): entonces se añade como tipo nuevo, con sus formas
+([ADR 39](adr/0039-las-formas-bpmn-esperan-al-diagrama-bpmn-de-mermaid.md)).
+
 ## Ajustes que dependen de la versión de Mermaid
 
 Mermaid 12 cambió el motor de distribución por defecto de `dagre` a `elk`, que
