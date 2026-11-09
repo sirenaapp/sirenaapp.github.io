@@ -1,10 +1,10 @@
 # Bibliotecas incluidas en Mermaid
 
-`vendor/mermaid` es la distribución publicada de Mermaid 12.1.0 (licencia MIT,
+`vendor/mermaid` es la distribución publicada de Mermaid 12.3.0 (licencia MIT,
 © Knut Sveidqvist y colaboradores, [LICENSE.txt](LICENSE.txt)). Esa
 distribución lleva dentro las bibliotecas de las que depende Mermaid. Esta es
 la lista, con la licencia que declara cada una en npm (comprobado el
-06-10-2026):
+09-11-2026):
 
 | Biblioteca | Para qué la usa Mermaid | Licencia |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ la lista, con la licencia que declara cada una en npm (comprobado el
 | chevrotain, @mermaid-js/parser | Lectura del código | Apache-2.0 / MIT |
 | @upsetjs/venn.js | Diagrama de Venn | MIT |
 | @iconify/utils | Iconos | MIT |
-| es-toolkit, lodash-es, ts-dedent, uuid | Utilidades | MIT |
+| es-toolkit, lodash-es, ts-dedent | Utilidades | MIT |
 
 ELK se usa bajo su licencia GPL-3.0-or-later, que es compatible con la AGPL v3
 de Sirena. Algunas bibliotecas conservan además su aviso de licencia dentro de
@@ -32,7 +32,7 @@ los archivos (`@license`).
 
 `scripts/actualizar-mermaid.sh` rehace esta lista al actualizar Mermaid.
 
-## Dependencias de Mermaid 12.2.0 según npm (27-10-2026)
+## Dependencias de Mermaid 12.3.0 según npm (09-11-2026)
 
 - @braintree/sanitize-url: MIT
 - @iconify/utils: MIT
@@ -54,5 +54,4 @@ los archivos (`@license`).
 - roughjs: MIT
 - stylis: MIT
 - ts-dedent: MIT
-- uuid: MIT
 - @mermaid-js/parser: MIT

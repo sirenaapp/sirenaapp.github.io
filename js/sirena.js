@@ -9,7 +9,7 @@ let mermaid = null;
 
 async function cargarMermaidPropio() {
   try {
-    mermaid = (await import('../vendor/mermaid/mermaid.esm.min.mjs?v=15e3e102')).default;
+    mermaid = (await import('../vendor/mermaid/mermaid.esm.min.mjs?v=1cb48a59')).default;
   } catch (_) {
     mermaid = null;
   }

@@ -90,3 +90,7 @@ resultado, sino que pidió comprobarlo.
 27-10-2026, Mermaid 12.2.0: la comprobación dio como corregido el fallo del
 texto del mapa mental, con su control bien, y como vigentes los otros cuatro.
 Se confirmó en Sirena y el parche se retiró (ADR 35).
+
+09-11-2026, Mermaid 12.3.0: la comprobación dio los cuatro fallos como
+vigentes, con sus controles bien, y la repetida a mano con la copia de
+`vendor/mermaid` dio lo mismo. No se retiró ningún parche.
